@@ -17,11 +17,11 @@ else if (CourtList is null) {
     </div>
 }
 else {
-    <div class="h-full grid grid-cols-[0.1fr_1fr] grid-rows-[auto_1fr] py-2">
+    <div class="h-full grid grid-cols-[0.2fr_1fr] grid-rows-[auto_1fr] py-2">
         <div class="row-span-2 flex flex-col pr-2 mx-2 border-r border-r-3 border-r-slate-500 overflow-y-auto">
             @foreach (var defendant in CourtList.Defendants) {
                 <div class="text-sm lg:text-lg p-1 max-h-[6rem] overflow-hidden border border-slate-500 bg-slate-200 cursor-pointer @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
-                    @defendant.FirstName @defendant.LastName
+                    @defendant.LastName, @defendant.FirstName 
                 </div>
             }
         </div>

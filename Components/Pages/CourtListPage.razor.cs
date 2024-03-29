@@ -1,6 +1,5 @@
 ﻿using CourtSystem.Data;
 using CourtSystem.Models.UI;
-using Microsoft.AspNetCore.Components;
 
 namespace CourtSystem.Components.Pages;
 public partial class CourtListPage {
@@ -18,6 +17,8 @@ public partial class CourtListPage {
         }
         CourtList = courtList;
         CourtList.GenerateInformations();
+        CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
+        ActiveDefendant = CourtList.Defendants.First();
     }
 
     private void ActivateDefendant(Defendant defendant) {
