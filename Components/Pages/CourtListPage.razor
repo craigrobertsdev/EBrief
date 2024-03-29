@@ -1,0 +1,72 @@
+@page "/court-list"
+
+@using CourtSystem.Components
+@using CourtSystem.Components.Pages
+@using CourtSystem.Models.UI
+@using Microsoft.JSInterop
+@using Radzen.Blazor
+@inject IJSRuntime JSRuntime
+
+@if (_error is not null) {
+    <p>@_error</p>
+}
+
+else if (CourtList is null) {
+    <div class="w-full h-full flex justify-center items-center">
+        <p>Loading...</p>
+    </div>
+}
+else {
+    <div class="h-full grid grid-cols-[0.1fr_1fr] grid-rows-[auto_1fr] py-2">
+        <div class="row-span-2 flex flex-col pr-2 mx-2 border-r border-r-3 border-r-slate-500 overflow-y-auto">
+            @foreach (var defendant in CourtList.Defendants) {
+                <div class="text-sm lg:text-lg p-1 max-h-[6rem] overflow-hidden border border-slate-500 bg-slate-200 cursor-pointer @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
+                    @defendant.FirstName @defendant.LastName
+                </div>
+            }
+        </div>
+        @if (ActiveDefendant is null) {
+            <div class="pb-2">
+            </div>
+        }
+        else {
+            <div class="pb-2 pr-4 w-full flex justify-between">
+                <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
+                <RadzenButton Text="Save" Click="SaveCourtList" />
+            </div>
+        }
+        <div class="h-full">
+            <CascadingValue Value="this">
+                <CascadingValue Value="_dataAccess">
+                    <TabControl>
+                        <TabPage Title="CFEL">
+                            <CfelPage />
+                        </TabPage>
+                        <TabPage Title="Information">
+                            <InformationPage />
+                        </TabPage>
+                        <TabPage Title="Facts of Charge">
+                            <FactsOfChargePage />
+                        </TabPage>
+                        <TabPage Title="Correspondence">
+                            <CorrespondencePage />
+                        </TabPage>
+                        <TabPage Title="Evidence">
+                            <EvidencePage />
+                        </TabPage>
+                        <TabPage Title="Schedule">
+                            <SchedulePage />
+                        </TabPage>
+                        <TabPage Title="Follow-Ups">
+                            <FollowUpsPage />
+                        </TabPage>
+                        <TabPage Title="Notes">
+                            <NotesPage />
+                        </TabPage>
+                    </TabControl>
+                </CascadingValue>
+            </CascadingValue>
+        </div>
+
+    </div>
+}

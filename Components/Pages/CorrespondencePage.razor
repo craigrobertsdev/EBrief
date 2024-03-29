@@ -1,0 +1,68 @@
+@using CourtSystem.Helpers
+@using CourtSystem.Models
+@using System.IO
+@using System.Net
+@using System.Net.Http
+@using CourtSystem.Models.UI
+
+<div class="flex flex-grow">
+    @if (Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.Count == 0) {
+        <p>No correspondence to display</p>
+    }
+    else {
+        <div class="row-span-2 flex flex-col pr-2 mx-2 border-r border-r-3 border-r-slate-500 overflow-y-auto">
+            @foreach (var document in Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments!) {
+                <div class="text-sm lg:text-lg p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" @onclick=@(() => SelectDocument(document))>
+                    @document.Title
+                </div>
+            }
+        </div>
+        <div>
+            <iframe src=@_pdfContent style="height: 1000px; width: 700px" />
+        </div>
+    }
+
+</div>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+    public CaseFileDocument? SelectedDocument { get; set; }
+    private string _pdfContent = "";
+    private string serverUrl = "https://localhost:7150/correspondence";
+    private HttpClient _client = default!;
+
+    protected override async Task OnInitializedAsync() {
+        _client = new();
+        var file = Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.First();
+        if (file != null) {
+            await SelectDocument(file);
+        }
+    }
+
+    private async Task SelectDocument(CaseFileDocument document) {
+        SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
+        Console.WriteLine("Loading " + document.FileName);
+        await LoadDocument(document.FileName);
+    }
+
+    private async Task LoadDocument(string fileName) {
+        var response = await _client.GetAsync($"{serverUrl}/{fileName}");
+
+        if (response.IsSuccessStatusCode) {
+            var pdfStream = await response.Content.ReadAsStreamAsync();
+            var memoryStream = new MemoryStream();
+            await pdfStream.CopyToAsync(memoryStream);
+            var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+            var mimeType = FileHelpers.GetMimeType(fileExtension);
+            _pdfContent = $"data:{mimeType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+        }
+    }
+
+    private string IsSelected(CaseFileDocument document) {
+        if (SelectedDocument?.FileName == document.FileName) {
+            return "bg-sky-700 text-white";
+        }
+
+        return "bg-slate-200 text-black";
+    }
+}

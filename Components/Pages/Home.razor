@@ -1,0 +1,39 @@
+@page "/"
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+<div class="w-full h-full flex justify-center items-center">
+    <RadzenButton Text="Load New Court List" Style="margin-left: auto; margin-right: 1rem;" Click="OpenNewCourtListDialog" />
+    <RadzenButton Text="Open Previous Court List" Style="margin-right: auto; margin-left: 1rem;" Click="OpenPreviousCourtListDialog" />
+    <RadzenButton Text="Go to Court List" Style="margin-right: auto; margin-left: 1rem;" Click="@(() => NavManager.NavigateTo("court-list"))" />
+</div>
+
+@if (_error is not null) {
+    <div class="w-full h-full flex justify-center items-center">
+        <p class="text-red-500">@_error</p>
+    </div>
+}
+
+<dialog @ref="LoadNewCourtListDialog" class="p-5">
+    <h3 class="text-lg">Copy the column of case file numbers from your court list into the box below</h3>
+    <div class="w-full pb-4">
+        <textarea @bind="@CaseFileNumbers" rows="15" class="w-full p-2 border border-slate-500 rounded-md resize-none"/>
+    </div>
+    <div class="flex w-full justify-end gap-3">
+        <RadzenButton Text="Confirm" Click="FetchCourtList" />
+        <RadzenButton Text="Cancel" Click="CloseLoadNewCourtListDialog" />
+    </div>
+</dialog>
+
+<dialog @ref="LoadPreviousCourtListDialog" class="p-5">
+    <h5>Enter the case file numbers from your court list below</h5>
+    <div class="w-full pb-4">
+        <textarea @bind="@CaseFileNumbers" rows="15" class="w-full p-2 border border-slate-500 rounded-md resize-none"/>
+    </div>
+    <div class="flex w-full justify-end gap-3">
+        <RadzenButton Text="Confirm" Click="FetchCourtList" />
+        <RadzenButton Text="Cancel" Click="CloseLoadPreviousCourtListDialog" />
+    </div>
+</dialog>

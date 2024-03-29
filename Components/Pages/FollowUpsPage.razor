@@ -1,0 +1,39 @@
+@using CourtSystem.Models;
+@using CourtSystem.Models.UI
+
+<div class="pb-4">
+    @* Create task section *@
+    <div>
+        @* Should be a flex box with the text section and case files side-by-side *@
+        <h3 class="text-lg">Create follow up task</h3>
+        <div class="flex gap-6">
+            <textarea placeholder="Enter task remarks here..." @bind=RemarksText
+                      class="w-1/2 p-2 border border-black" />
+            <div>
+                <RadzenCheckBoxList Data="CaseFiles" @bind-Value=@SelectedCaseFiles TextProperty="CaseFileNumber"
+                ValueProperty="CaseFileNumber" Orientation="Orientation.Vertical"/>
+
+                <RadzenButton Text="Create follow up task"/>
+            </div>
+        </div>
+    </div>
+    @* CFEL section *@
+    <div>
+        <h3 for="cfel-entry">Enter text to add to all selected case files' CFELs</h3>
+        <textarea name="cfel-entry" id="cfel-entry" @bind="@CfelText" class="w-1/2 p-2 border border-black" />
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+    public string? RemarksText { get; set; }
+    public string? CfelText { get; set; }
+    public IEnumerable<string> SelectedCaseFiles { get; set; } = [];
+    public List<CaseFile> CaseFiles { get; set; } = [];
+
+    protected override void OnInitialized() {
+        if (Parent?.ActiveDefendant?.CaseFiles is var caseFiles && caseFiles is not null) {
+            CaseFiles = caseFiles;
+        }
+    }
+}

@@ -1,0 +1,32 @@
+@using CourtSystem.Models;
+@using CourtSystem.Models.UI
+
+<div>
+    @if (Parent?.ActiveDefendant?.ActiveCaseFile?.CfelEntries is null) {
+        <p>No CFEL entries to display</p>
+    }
+    else {
+        @foreach (var entry in Parent.ActiveDefendant.ActiveCaseFile.CfelEntries!) {
+            <div class="border-b border-b-black pb-4 mb-4">
+                <p class="py-1 text-sm text-gray-700">Entered on @entry.EntryDate by @entry.EnteredBy</p>
+                <p>
+                    @entry.EntryText
+                </p>
+
+            </div>
+
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+    public List<CaseFileEnquiryLog> CfelEntries = [];
+
+    protected override void OnInitialized() {
+        if (Parent?.ActiveDefendant?.ActiveCaseFile?.CfelEntries is var entries && entries is not null) {
+            CfelEntries = entries;
+        }
+    }
+
+}

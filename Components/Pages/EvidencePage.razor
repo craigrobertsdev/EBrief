@@ -1,0 +1,34 @@
+@using CourtSystem.Models;
+@using CourtSystem.Models.UI
+
+<div class="flex">
+    @if (Evidence.Count == 0) {
+        <p>No evidence on file</p>
+    }
+    else {
+        <div class="border-r border-r-black">
+            @foreach (var document in Evidence) {
+                <div @onclick=@(() => SelectDocument(document.Title))>@document.Title</div>
+            }
+        </div>
+        <div>
+            <embed src="@SelectedDocument?.FileName" />
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+    public OccurrenceDocument? SelectedDocument { get; set; }
+    public List<OccurrenceDocument> Evidence = [];
+
+    protected override void OnInitialized() {
+        if (Parent?.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments is var documents && documents is not null) {
+            Evidence = documents;
+        }
+    }
+
+    private void SelectDocument(string title) {
+        SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.OccurrenceDocuments.FirstOrDefault(d => d.Title == title);
+    }
+}
