@@ -15,6 +15,7 @@ public class CourtListModel {
             caseFile.GenerateInformationFromCharges();
             if (!defendants.Any(d => d.Id == caseFile.Defendant.Id)) {
                 defendants.Add(caseFile.Defendant);
+                caseFile.Defendant.CaseFiles.Add(caseFile);
             }
             else {
                 defendants.First(d => d.Id == caseFile.Defendant.Id).CaseFiles.Add(caseFile);
