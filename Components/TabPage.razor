@@ -1,5 +1,7 @@
-﻿@if (Parent.ActiveTab == this) {
-    @ChildContent
+@if (Parent.ActiveTab == this) {
+    <div class="px-4">
+        @ChildContent
+    </div>
 }
 
 @code {

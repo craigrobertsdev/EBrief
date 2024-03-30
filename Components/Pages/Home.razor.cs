@@ -19,11 +19,8 @@ public partial class Home {
         }
     }
 
-    private async Task OpenPreviousCourtListDialog() {
-        if (LoadNewCourtListDialog is not null) {
-            _error = null;
-            await JSRuntime.InvokeVoidAsync("openDialog", LoadPreviousCourtListDialog);
-        }
+    private void LoadPreviousCourtList() {
+        NavManager.NavigateTo("/court-list?newList=false");
     }
 
     private async Task FetchCourtList() {
@@ -52,7 +49,7 @@ public partial class Home {
         courtDbAccess.ClearDatabase();
         courtDbAccess.SaveCourtList(courtList);
 
-        NavManager.NavigateTo($"/court-list");
+        NavManager.NavigateTo($"/court-list/?newList=true");
     }
 
     private async Task CloseLoadNewCourtListDialog() {

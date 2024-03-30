@@ -8,7 +8,7 @@ public class CourtListModel {
     public DateTime Date { get; set; }
     public List<CaseFileModel> CaseFiles { get; set; } = [];
 
-    public CourtList ToCourtList() {
+    public CourtList ToUIModel() {
         var defendants = new List<Defendant>();
         foreach (var caseFileModel in CaseFiles) {
             var caseFile = caseFileModel.ToUIModel();

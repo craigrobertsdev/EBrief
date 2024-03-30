@@ -11,4 +11,13 @@ public class CourtList {
             }
         }
     }
+    
+    public List<CaseFile> GetCaseFiles() {
+        var caseFiles = new List<CaseFile>();
+        foreach (var defendant in Defendants) {
+            caseFiles.AddRange(defendant.CaseFiles);
+        }
+
+        return caseFiles;
+    }
 }

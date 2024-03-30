@@ -1,0 +1,10 @@
+Still need to fix the logic that causes a failure to update the document that is being viewed when changing between defendants.
+
+Implement Schedule page
+Create and implement Brief Cover page
+
+Add ability to save notes for each case file.
+
+Tidy UI.
+-	Remove padding from individual pages to let TabPage component handle it
+-	Charge numbers do not increase

@@ -1,30 +1,80 @@
 ﻿using CourtSystem.Data;
 using CourtSystem.Helpers;
 using CourtSystem.Models.UI;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace CourtSystem.Components.Pages;
 public partial class CourtListPage {
+    [SupplyParameterFromQuery(Name = "newList")]
+    public bool NewList { get; set; }
+    private ElementReference? UnsavedChangesDialog { get; set; }
     private CourtList CourtList { get; set; } = default!;
     public Defendant? ActiveDefendant { get; set; }
     private string? _error;
     private readonly CourtListDataAccess _dataAccess = new();
+    private bool _loading;
 
     protected override async Task OnInitializedAsync() {
-        Console.WriteLine("Getting court list");
-        var courtList = _dataAccess.GetCourtList()?.ToCourtList();
-
-        if (courtList is null) {
-            _error = "Failed to load the court list.";
-            return;
+        _loading = true;
+        if (NewList) {
+            try {
+                await LoadNewCourtList();
+            }
+            catch (Exception e) {
+                _error = e.Message;
+                return;
+            }
         }
-        CourtList = courtList;
+        else {
+            try {
+                LoadPreviousCourtList();
+            }
+            catch (Exception e) {
+                _error = e.Message;
+                return;
+            }
+        }
+
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
         ActivateDefendant(CourtList.Defendants.First());
+        _loading = false;
+    }
+
+    private async Task LoadNewCourtList() {
+        var courtList = _dataAccess.GetCourtList()?.ToUIModel();
+
+        if (courtList is null) {
+            throw new Exception("Failed to load court list.");
+        }
+
+        CourtList = courtList;
 
         await DownloadDocuments(courtList);
     }
 
+    private void LoadPreviousCourtList() {
+        var courtList = _dataAccess.GetCourtList()?.ToUIModel();
+
+        if (courtList is null) {
+            throw new Exception("No previous court list in database");
+        }
+
+        CourtList = courtList;
+    }
+
+    private async Task HandleReturnHome() {
+        if (UnsavedChanges()) {
+            await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
+        }
+
+        NavManager.NavigateTo("/");
+    }
+
+    private async Task CloseUnsavedChangesDialog() {
+        await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
+    }   
     private void ActivateDefendant(Defendant defendant) {
         ActiveDefendant = defendant;
         if (ActiveDefendant.ActiveCaseFile is null) {
@@ -41,7 +91,20 @@ public partial class CourtListPage {
     }
 
     private void SaveCourtList() {
+        _dataAccess.UpdateCourtList(CourtList);
+    }
 
+    private bool UnsavedChanges() {
+        var courtList = _dataAccess.GetCourtList()!;
+
+        foreach (var caseFile in CourtList.GetCaseFiles()) {
+            var caseFileModel = courtList.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber);
+            if (caseFileModel.Notes != caseFile.Notes) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static async Task DownloadDocuments(CourtList courtList) {
