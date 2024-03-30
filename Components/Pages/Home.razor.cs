@@ -40,9 +40,10 @@ public partial class Home {
         }
 
         var courtList = new CourtListModel {
-            Date = DateTime.Now,
             CaseFiles = caseFiles
         };
+
+        courtList.CombineDefendantCaseFiles();
 
         var courtDbAccess = new CourtListDataAccess();
 
@@ -57,15 +58,10 @@ public partial class Home {
             await JSRuntime.InvokeVoidAsync("closeDialog", LoadNewCourtListDialog);
         }
     }
-    private async Task CloseLoadPreviousCourtListDialog() {
-        if (LoadNewCourtListDialog is not null) {
-            await JSRuntime.InvokeVoidAsync("closeDialog", LoadPreviousCourtListDialog);
-        }
-    }
 
     // This was implemented for the case of needing to specify which case file numbers related to the current court list
     // so they could be fetched from the database. Current implementation is that there will be the ability to only have one list at a time.
-    private string BuildCaseFileQueryString(IEnumerable<string> caseFileNumbers) {
-        return string.Join("&", caseFileNumbers.Select(e => $"caseFileNumbers={e}"));
-    }
+    //private string BuildCaseFileQueryString(IEnumerable<string> caseFileNumbers) {
+    //    return string.Join("&", caseFileNumbers.Select(e => $"caseFileNumbers={e}"));
+    //}
 }

@@ -4,6 +4,7 @@
 @using System.Net
 @using System.Net.Http
 @using CourtSystem.Models.UI
+@implements IDisposable
 
 <div class="flex flex-grow">
     @if (Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.Count == 0) {
@@ -17,8 +18,8 @@
                 </div>
             }
         </div>
-        <div>
-            <iframe src=@_pdfContent style="height: 1000px; width: 700px" />
+        <div class="flex-1">
+            <iframe src=@_pdfContent style="height: 100%; width: 100%;"/>
         </div>
     }
 
@@ -30,6 +31,11 @@
     private string _pdfContent = "";
 
     protected override async Task OnInitializedAsync() {
+        await HandleDefendantChange();
+        Parent.OnDefendantChange += HandleDefendantChange;
+    }
+
+    private async Task HandleDefendantChange() {
         var file = Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.First();
         if (file != null) {
             await SelectDocument(file);
@@ -57,5 +63,11 @@
         }
 
         return "bg-slate-200 text-black";
+    }
+
+    public void Dispose() {
+        Parent.OnDefendantChange -= HandleDefendantChange;
+        SelectedDocument = null;
+        GC.Collect();
     }
 }

@@ -11,6 +11,7 @@ public partial class CourtListPage {
     private ElementReference? UnsavedChangesDialog { get; set; }
     private CourtList CourtList { get; set; } = default!;
     public Defendant? ActiveDefendant { get; set; }
+    public event Func<Task>? OnDefendantChange;
     private string? _error;
     private readonly CourtListDataAccess _dataAccess = new();
     private bool _loading;
@@ -80,6 +81,8 @@ public partial class CourtListPage {
         if (ActiveDefendant.ActiveCaseFile is null) {
             ActiveDefendant.ActiveCaseFile = ActiveDefendant.CaseFiles.First();
         }
+
+        OnDefendantChange?.Invoke();
     }
 
     private string IsSelected(Defendant defendant) {

@@ -5,7 +5,6 @@ namespace CourtSystem.Models.Data;
 public class CourtListModel {
     [Key]
     public int Id { get; set; }
-    public DateTime Date { get; set; }
     public List<CaseFileModel> CaseFiles { get; set; } = [];
 
     public CourtList ToUIModel() {
@@ -23,8 +22,16 @@ public class CourtListModel {
         }
 
         return new CourtList {
-            Date = Date,
             Defendants = defendants
         };
+    }
+
+    // To handle the situation where a defendant has multiple case files
+    // Every object from the server has a different reference, so we need to combine them
+    public void CombineDefendantCaseFiles() {
+        var defendants = CaseFiles.Select(cf => cf.Defendant).DistinctBy(d => d.Id).ToList();
+        foreach (var caseFile in CaseFiles) {
+            caseFile.Defendant = defendants.First(d => d.Id == caseFile.Defendant.Id);
+        }
     }
 }
