@@ -1,6 +1,7 @@
 @using CourtSystem.Helpers
 @using CourtSystem.Models;
 @using CourtSystem.Models.UI
+@implements IDisposable
 
 <div class="flex flex-grow">
     @if (Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments.Count == 0) {
@@ -14,8 +15,8 @@
                 </div>
             }
         </div>
-        <div>
-            <iframe src=@_pdfContent style="height: 1000px; width: 700px" />
+        <div class="flex-1">
+            <iframe src=@_pdfContent style="height: 100%; width: 100%;"/>
         </div>
     }
 
@@ -27,6 +28,10 @@
     private string _pdfContent = "";
 
     protected override async Task OnInitializedAsync() {
+        await HandleDefendantChange();
+    }
+
+    private async Task HandleDefendantChange() {
         var file = Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments.First();
         if (file != null) {
             await SelectDocument(file);
@@ -54,5 +59,11 @@
         }
 
         return "bg-slate-200 text-black";
+    }
+
+    public void Dispose() {
+        Parent.OnDefendantChange -= HandleDefendantChange;
+        SelectedDocument = null;
+        GC.Collect();
     }
 }
