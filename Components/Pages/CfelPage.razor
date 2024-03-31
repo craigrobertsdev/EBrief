@@ -1,7 +1,7 @@
 @using CourtSystem.Models;
 @using CourtSystem.Models.UI
 
-<div>
+<div class="flex-grow">
     @if (Parent?.ActiveDefendant?.ActiveCaseFile?.CfelEntries is null) {
         <p>No CFEL entries to display</p>
     }

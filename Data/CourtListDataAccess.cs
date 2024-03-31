@@ -42,6 +42,8 @@ public class CourtListDataAccess {
             .ThenInclude(cf => cf.OccurrenceDocuments)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.Defendant)
+            .Include(cl => cl.CaseFiles)
+            .ThenInclude(cf => cf.PreviousHearings)
             .FirstOrDefault();
     }
 }
