@@ -1,10 +1,10 @@
-﻿using CourtSystem.Data;
-using CourtSystem.Helpers;
-using CourtSystem.Models.UI;
+﻿using EBrief.Data;
+using EBrief.Helpers;
+using EBrief.Models.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace CourtSystem.Components.Pages;
+namespace EBrief.Components.Pages;
 public partial class CourtListPage {
     [SupplyParameterFromQuery(Name = "newList")]
     public bool NewList { get; set; }

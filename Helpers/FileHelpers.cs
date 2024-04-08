@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Helpers;
+﻿namespace EBrief.Helpers;
 public static class FileHelpers {
     public static string GetMimeType(string fileExtension) {
         return fileExtension switch {

@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 
 public class OccurrenceDocument {
     public int Id { get; set; }

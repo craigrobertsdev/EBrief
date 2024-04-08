@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 
 public class BailAgreement {
     public DateTime DateEnteredInto { get; set; }

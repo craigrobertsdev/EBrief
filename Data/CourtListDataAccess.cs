@@ -1,8 +1,8 @@
-﻿using CourtSystem.Models.Data;
-using CourtSystem.Models.UI;
+﻿using EBrief.Models.Data;
+using EBrief.Models.UI;
 using Microsoft.EntityFrameworkCore;
 
-namespace CourtSystem.Data;
+namespace EBrief.Data;
 public class CourtListDataAccess {
     private readonly ApplicationDbContext _context;
 

@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 public class CaseFile {
     public string CaseFileNumber { get; set; } = string.Empty;
     public Defendant Defendant { get; set; } = default!;

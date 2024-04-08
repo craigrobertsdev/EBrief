@@ -1,7 +1,7 @@
-﻿using CourtSystem.Models.Data;
+﻿using EBrief.Models.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace CourtSystem.Data;
+namespace EBrief.Data;
 public class ApplicationDbContext : DbContext {
     public DbSet<CourtListModel> CourtLists { get; set; }
     public DbSet<CaseFileModel> CaseFiles { get; set; }
@@ -10,7 +10,7 @@ public class ApplicationDbContext : DbContext {
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options) {
-        string dbPath = Path.Combine(FileSystem.AppDataDirectory, "CourtSystem.db");
+        string dbPath = Path.Combine(FileSystem.AppDataDirectory, "EBrief.db");
         options.UseSqlite($"Filename={dbPath}");
     }
 }

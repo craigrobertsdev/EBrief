@@ -1,4 +1,4 @@
-﻿namespace CourtSystem;
+﻿namespace EBrief;
 
 public partial class App : Application {
     public App() {

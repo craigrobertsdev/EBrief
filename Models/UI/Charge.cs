@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 public class Charge {
     public int Sequence { get; set; }
     public string Name { get; set; } = string.Empty;

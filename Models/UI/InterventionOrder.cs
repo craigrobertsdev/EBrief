@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 
 public class InterventionOrder {
     public string OrderNumber { get; set; } = string.Empty;

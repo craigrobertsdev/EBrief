@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 public class HearingEntry {
     public int Id { get; set; }
     public DateTime HearingDate { get; set; }

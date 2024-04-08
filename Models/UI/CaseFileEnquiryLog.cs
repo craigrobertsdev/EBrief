@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CourtSystem.Models.UI;
+namespace EBrief.Models.UI;
 public class CaseFileEnquiryLog {
     [Key]
     public int Id { get; set; }

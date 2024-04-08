@@ -1,11 +1,11 @@
-﻿using CourtSystem.Data;
-using CourtSystem.Helpers;
-using CourtSystem.Models.Data;
+﻿using EBrief.Data;
+using EBrief.Helpers;
+using EBrief.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Net.Http.Json;
 
-namespace CourtSystem.Components.Pages;
+namespace EBrief.Components.Pages;
 
 public partial class Home {
     public ElementReference? LoadNewCourtListDialog { get; set; }

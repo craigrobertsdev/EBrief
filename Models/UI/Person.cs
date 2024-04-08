@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 
 public record Person {
     public string FirstName { get; set; } = string.Empty;

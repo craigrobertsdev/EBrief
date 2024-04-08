@@ -1,7 +1,7 @@
-﻿using CourtSystem.Models.UI;
+﻿using EBrief.Models.UI;
 using System.ComponentModel.DataAnnotations;
 
-namespace CourtSystem.Models.Data;
+namespace EBrief.Models.Data;
 public class DefendantModel {
     [Key]
     public int Id { get; set; }

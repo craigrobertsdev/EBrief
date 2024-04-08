@@ -1,4 +1,4 @@
-﻿namespace CourtSystem.Models.UI;
+﻿namespace EBrief.Models.UI;
 public class Defendant {
     public int Id { get; set; }
     public int ListNumber { get; set; }
@@ -6,7 +6,7 @@ public class Defendant {
     public string LastName { get; set; } = string.Empty;
     public List<CaseFile> CaseFiles { get; set; } = [];
     public CaseFile? ActiveCaseFile { get; set; }
-    public OffenderHistory? OffenderHistory { get; set; }
+    public string? OffenderHistory { get; set; }
     public List<BailAgreement> BailAgreements { get; set; } = [];
     public List<InterventionOrder> InterventionOrders { get; set; } = [];
 }
