@@ -16,10 +16,9 @@
             }
         </div>
         <div class="flex-1">
-            <iframe src=@_pdfContent style="height: 100%; width: 100%;"/>
+            <iframe src=@_pdfContent style="height: 100%; width: 100%;" />
         </div>
     }
-
 </div>
 
 @code {
@@ -29,10 +28,12 @@
 
     protected override async Task OnInitializedAsync() {
         await HandleDefendantChange();
+        Parent.OnDefendantChange += HandleDefendantChange;
     }
 
     private async Task HandleDefendantChange() {
-        var file = Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments.First();
+        var file = Parent.ActiveDefendant?.ActiveCaseFile?.SelectedOccurrenceDocument ?? 
+            Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments.First();
         if (file != null) {
             await SelectDocument(file);
         }
@@ -40,7 +41,7 @@
 
     private async Task SelectDocument(OccurrenceDocument document) {
         SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.OccurrenceDocuments.FirstOrDefault(d => d.Title == document.Title);
-        Console.WriteLine("Loading " + document.FileName);
+        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedOccurrenceDocument = SelectedDocument;
         await LoadDocument(document.FileName);
     }
 

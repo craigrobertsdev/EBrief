@@ -22,7 +22,6 @@
             <iframe src=@_pdfContent style="height: 100%; width: 100%;"/>
         </div>
     }
-
 </div>
 
 @code {
@@ -36,7 +35,8 @@
     }
 
     private async Task HandleDefendantChange() {
-        var file = Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.First();
+        var file = Parent.ActiveDefendant?.ActiveCaseFile?.SelectedCaseFileDocument ??
+            Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.First();
         if (file != null) {
             await SelectDocument(file);
         }
@@ -44,7 +44,7 @@
 
     private async Task SelectDocument(CaseFileDocument document) {
         SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
-        Console.WriteLine("Loading " + document.FileName);
+        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = SelectedDocument;
         await LoadDocument(document.FileName);
     }
 
