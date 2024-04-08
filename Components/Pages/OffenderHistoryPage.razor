@@ -1,0 +1,13 @@
+<div class="flex-grow">
+    @if (Parent?.ActiveDefendant?.OffenderHistory is null) {
+        <p>The accused has no priors</p>
+    }
+    else {
+        @Parent.ActiveDefendant.OffenderHistory
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    public CourtListPage Parent { get; set; } = default!;
+}

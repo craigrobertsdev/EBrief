@@ -10,6 +10,9 @@
 
 @if (_error is not null) {
     <p>@_error</p>
+    @if (_returnHomeButtonVisible) {
+        <RadzenButton Text="Back to start" Click="HandleReturnHome" />
+    }
 }
 
 else if (_loading) {
@@ -34,12 +37,14 @@ else {
         }
         else {
             <div class="pb-2 pr-4 w-full flex justify-between">
-                <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
-                <RadzenButton Text="Save" Click="SaveCourtList" />
-                <RadzenButton Text="Back to start" Click="HandleReturnHome" />
+                <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" Change="@CaseFileChanged" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
+                <div>
+                    <RadzenButton Text="Save" Click="SaveCourtList" />
+                    <RadzenButton Text="Back to start" Click="HandleReturnHome" />
+                </div>
             </div>
         }
-        <div class="h-full flex flex-col border-l border-l-3 border-l-slate-500">
+        <div class="h-full border-l border-l-3 border-l-slate-500">
             <CascadingValue Value="this">
                 <CascadingValue Value="_dataAccess">
                     <TabControl>
@@ -52,11 +57,17 @@ else {
                         <TabPage Title="Facts of Charge">
                             <FactsOfChargePage />
                         </TabPage>
+                        <TabPage Title="Offender History">
+                            <OffenderHistoryPage />
+                        </TabPage>
                         <TabPage Title="Correspondence">
                             <CorrespondencePage />
                         </TabPage>
                         <TabPage Title="Evidence">
                             <EvidencePage />
+                        </TabPage>
+                        <TabPage Title="Orders">
+                            <OrdersPage />
                         </TabPage>
                         <TabPage Title="Schedule">
                             <SchedulePage />
