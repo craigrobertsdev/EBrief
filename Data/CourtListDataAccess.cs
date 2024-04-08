@@ -42,8 +42,19 @@ public class CourtListDataAccess {
             .ThenInclude(cf => cf.OccurrenceDocuments)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.Defendant)
+            .ThenInclude(d => d.BailAgreements)
+            .ThenInclude(ba => ba.Conditions)
+            .Include(cl => cl.CaseFiles)
+            .ThenInclude(cf => cf.Defendant)
+            .ThenInclude(d => d.InterventionOrders)
+            .ThenInclude(io => io.ProtectedPerson)
+            .Include(cl => cl.CaseFiles)
+            .ThenInclude(cf => cf.Defendant)
+            .ThenInclude(d => d.InterventionOrders)
+            .ThenInclude(io => io.Conditions)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.PreviousHearings)
+            .AsSplitQuery()
             .FirstOrDefault();
     }
 }
