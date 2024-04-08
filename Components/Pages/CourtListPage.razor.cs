@@ -14,6 +14,7 @@ public partial class CourtListPage {
     public event Func<Task>? OnDefendantChange;
     private string? _error;
     private readonly CourtListDataAccess _dataAccess = new();
+    private bool _returnHomeButtonVisible;
     private bool _loading;
 
     protected override async Task OnInitializedAsync() {
@@ -59,6 +60,7 @@ public partial class CourtListPage {
         var courtList = _dataAccess.GetCourtList()?.ToUIModel();
 
         if (courtList is null) {
+            _returnHomeButtonVisible = true;
             throw new Exception("No previous court list in database");
         }
 
@@ -85,6 +87,10 @@ public partial class CourtListPage {
         OnDefendantChange?.Invoke();
     }
 
+    private void CaseFileChanged() {
+        ActivateDefendant(ActiveDefendant!);
+    }
+
     private string IsSelected(Defendant defendant) {
         if (ActiveDefendant?.Id == defendant.Id) {
             return "!bg-sky-700";
@@ -98,6 +104,10 @@ public partial class CourtListPage {
     }
 
     private bool UnsavedChanges() {
+        if (_returnHomeButtonVisible) {
+            return false;
+        }
+
         var courtList = _dataAccess.GetCourtList()!;
 
         foreach (var caseFile in CourtList.GetCaseFiles()) {
