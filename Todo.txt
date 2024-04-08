@@ -1,3 +1,10 @@
-Implement Schedule page
-Create and implement Brief Cover page
+Checking if there are changes when exiting doesn't work.
 
+Changing the case file doesn't cause the document to reload in the occurrence documents.
+
+Add offender history.
+
+Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
+on screens that are the size of the work laptops
+
+Add colour coding for whether notes have been added to the case file
