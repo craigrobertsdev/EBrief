@@ -4,6 +4,8 @@ Changing the case file doesn't cause the document to reload in the occurrence do
 
 Add offender history.
 
+Handle scrolling in facts of charge
+
 Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
 on screens that are the size of the work laptops
 
