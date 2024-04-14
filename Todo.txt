@@ -1,23 +1,25 @@
-Checking if there are changes when exiting doesn't work.
+FUNCTIONALITY:
+	- Checking if there are changes when exiting doesn't work.
+	- Changing the case file doesn't cause the document to reload in the occurrence documents.
+	- Test that the court lists load correctly when moving between lists
+	- Properly implement functionality to export court lists to a file
+	- Implement functionality to import court lists from a file
 
-Changing the case file doesn't cause the document to reload in the occurrence documents.
+STYLING:
+	- Add styling to select fields on NewCourtListDialog
+	- Add styling to the list of court lists in PreviousCourtListsDialog
+	- Handle scrolling in facts of charge
+	- Add colour coding for whether notes have been added to the case file
+	- Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
+	on screens that are the size of the work laptops
 
-Add offender history.
+DECISION LOG:
+	Options for storing court lists:
+	1. Single court list stored in a local database
+	2. Multiple court lists stored in a local database, locatable by date and court room - there will need to be a way to
+	   select which court list to use
+	3. Multiple court lists both stored in a local database and able to be exported to a file to enable sharing
 
-Handle scrolling in facts of charge
+	Chose option 3.
 
-Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
-on screens that are the size of the work laptops
 
-Add colour coding for whether notes have been added to the case file
-
-Options for storing court lists:
-1. Single court list stored in a local database
-2. Multiple court lists stored in a local database, locatable by date and court room - there will need to be a way to
-   select which court list to use
-3. Court lists both stored in a local database and able to be exported to a file to enable sharing
-
-Chose option 3.
-
-Currently working on having multiple defendants in the database with the same ID. It it probably unnecessary for this to be a relevant consideration
-and the ID can be a GUID to avoid collisions. They will not need to know about one another from list to list.
