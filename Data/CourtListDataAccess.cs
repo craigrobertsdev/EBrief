@@ -1,4 +1,5 @@
-﻿using EBrief.Models.Data;
+﻿using EBrief.Models;
+using EBrief.Models.Data;
 using EBrief.Models.UI;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,8 +12,13 @@ public class CourtListDataAccess {
     }
 
     public void SaveCourtList(CourtListModel courtList) {
-        _context.CourtLists.Add(courtList);
-        _context.SaveChanges();
+        try {
+            _context.CourtLists.Add(courtList);
+            _context.SaveChanges();
+        }
+        catch (Exception e) {
+            Console.WriteLine(e.Message);
+        }
     }
 
     public void UpdateCourtList(CourtList courtList) {
@@ -25,13 +31,11 @@ public class CourtListDataAccess {
         _context.SaveChanges();
     }
 
-    public void ClearDatabase() {
-        _context.Database.EnsureDeleted();
-        _context.Database.EnsureCreated();
-    }
-
-    public CourtListModel? GetCourtList() {
+    public CourtListModel? GetCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom) {
         return _context.CourtLists
+            .Where(cl => cl.CourtCode == courtCode)
+            .Where(cl => cl.CourtDate == courtDate)
+            .Where(cl => cl.CourtRoom == courtRoom)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.CaseFileDocuments)
             .Include(cl => cl.CaseFiles)

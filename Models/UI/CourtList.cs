@@ -1,7 +1,12 @@
-﻿namespace EBrief.Models.UI;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace EBrief.Models.UI;
 public class CourtList {
     public int Id { get; set; }
-    public DateTime Date { get; set; }
+    public DateTime CourtDate { get; set; }
+    public CourtCode CourtCode { get; set; }
+    public int CourtRoom { get; set; }  
     public List<Defendant> Defendants { get; set; } = [];
 
     public void GenerateInformations() {
@@ -11,7 +16,7 @@ public class CourtList {
             }
         }
     }
-    
+
     public List<CaseFile> GetCaseFiles() {
         var caseFiles = new List<CaseFile>();
         foreach (var defendant in Defendants) {
@@ -19,5 +24,12 @@ public class CourtList {
         }
 
         return caseFiles;
+    }
+
+    public string SerialiseToJson() {
+        return JsonSerializer.Serialize(this, new JsonSerializerOptions { 
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        });
     }
 }

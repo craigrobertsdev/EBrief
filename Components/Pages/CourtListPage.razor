@@ -10,9 +10,7 @@
 
 @if (_error is not null) {
     <p>@_error</p>
-    @if (_returnHomeButtonVisible) {
-        <RadzenButton Text="Back to start" Click="HandleReturnHome" />
-    }
+    <RadzenButton Text="Back to start" Click="HandleReturnHome" />
 }
 
 else if (_loading) {
@@ -40,6 +38,7 @@ else {
                 <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" Change="@CaseFileChanged" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
                 <div>
                     <RadzenButton Text="Save" Click="SaveCourtList" />
+                    <RadzenButton Text="Export Court List" Click="ExportCourtList" />
                     <RadzenButton Text="Back to start" Click="HandleReturnHome" />
                 </div>
             </div>

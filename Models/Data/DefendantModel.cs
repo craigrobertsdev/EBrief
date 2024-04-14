@@ -1,9 +1,11 @@
 ﻿using EBrief.Models.UI;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EBrief.Models.Data;
 public class DefendantModel {
-    [Key]
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid DbKey { get; set; }
     public int Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

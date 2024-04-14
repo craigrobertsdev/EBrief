@@ -572,6 +572,10 @@ video {
   display: grid;
 }
 
+.hidden {
+  display: none;
+}
+
 .h-full {
   height: 100%;
 }
@@ -646,6 +650,10 @@ video {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.justify-around {
+  justify-content: space-around;
 }
 
 .gap-3 {
@@ -736,6 +744,11 @@ video {
 .bg-slate-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+}
+
+.bg-slate-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(100 116 139 / var(--tw-bg-opacity));
 }
 
 .p-1 {
@@ -871,6 +884,11 @@ a, .btn-link {
   position: absolute;
   right: 0.75rem;
   top: 0.5rem;
+}
+
+.hover\:bg-slate-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 
 @media (min-width: 768px) {

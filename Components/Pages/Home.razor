@@ -1,4 +1,5 @@
 @page "/"
+@using EBrief.Models
 @using Microsoft.JSInterop
 
 @inject IJSRuntime JSRuntime
@@ -11,9 +12,10 @@
         </div>
         <div>
             <RadzenButton Text="Load New Court List" Style="margin-left: auto; margin-right: 1rem;" Click="OpenNewCourtListDialog" />
-            <RadzenButton Text="Open Previous Court List" Style="margin-right: auto; margin-left: 1rem;" Click="LoadPreviousCourtList" />
+            <RadzenButton Text="Open Previous Court List" Style="margin-right: auto; margin-left: 1rem;" Click="OpenPreviousCourtListDialog" />
         </div>
     </div>
+
     <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
 </div>
 
@@ -23,8 +25,26 @@
     </div>
 }
 
-<dialog @ref="LoadNewCourtListDialog" class="p-5">
-    <h3 class="text-lg">Copy the column of case file numbers from your court list into the box below</h3>
+<dialog @ref="NewCourtListDialog" class="p-5">
+    <h3 class="text-lg pb-2">Copy the column of case file numbers from your court list into the box below</h3>
+    <div class="flex items-center pb-2 gap-6">
+        <label>Court date: </label>
+        <input type="date" @bind=@CourtDate class="border border-black rounded-md p-2">
+    </div>
+    <div class="flex gap-6 justify-around">
+        <select @bind=CourtCode>
+            <option selected hidden disabled>Select a court</option>
+            @foreach (var courtCode in Enum.GetValues<CourtCode>()) {
+                <option value="@courtCode">@courtCode</option>
+            }
+        </select>
+        <select @bind=CourtRoom>
+            <option selected hidden disabled>Select a courtroom</option>
+            @foreach (var courtRoom in CourtRooms) {
+                <option value="@courtRoom">@courtRoom</option>
+            }
+        </select>
+    </div>
     <div class="w-full pb-4">
         <textarea @bind="@CaseFileNumbers" rows="15" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
     </div>
@@ -32,5 +52,38 @@
         <RadzenButton Text="Confirm" Click="FetchCourtList" />
         <RadzenButton Text="Cancel" Click="CloseLoadNewCourtListDialog" />
     </div>
+
+    @if (_error is not null) {
+        <p>@_error</p>
+    }
 </dialog>
 
+<dialog @ref="PreviousCourtListDialog" class="p-5">
+    <h3 class="text-lg pb-2">Choose from a previous court list</h3>
+    @if (PreviousCourtLists is null) {
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+    }
+
+    else if (PreviousCourtLists!.Count == 0) {
+        <h3 class="text-lg pb-2">No court previous court lists found in the database</h3>
+    }
+
+    else {
+        <div class="border border-black rounded-md">
+            @foreach (var courtList in PreviousCourtLists!) {
+                <p class="text-lg hover:bg-slate-200 @(courtList == SelectedCourtList ? "bg-slate-500" : "") cursor-pointer" 
+                   @onclick=@(() => HandleSelectCourtListEntry(courtList))>
+                    @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
+                </p>
+            }
+        </div>
+        <div class="flex w-full justify-end gap-3">
+            <RadzenButton Text="Confirm" Click="LoadPreviousCourtList" />
+            <RadzenButton Text="Cancel" Click="ClosePreviousCourtListDialog" />
+        </div>
+        @if (_error is not null) {
+            <p>@_error</p>
+        }
+
+    }
+</dialog>

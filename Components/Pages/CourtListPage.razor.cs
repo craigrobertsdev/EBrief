@@ -1,41 +1,39 @@
 ﻿using EBrief.Data;
 using EBrief.Helpers;
+using EBrief.Models;
 using EBrief.Models.UI;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 
 namespace EBrief.Components.Pages;
 public partial class CourtListPage {
-    [SupplyParameterFromQuery(Name = "newList")]
     public bool NewList { get; set; }
-    private ElementReference? UnsavedChangesDialog { get; set; }
     private CourtList CourtList { get; set; } = default!;
+    public CourtCode CourtCode { get; set; } = default!;
+    public DateTime CourtDate { get; set; } = default!;
+    public int CourtRoom { get; set; } = default!;
+    private ElementReference? UnsavedChangesDialog { get; set; }
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
     private string? _error;
     private readonly CourtListDataAccess _dataAccess = new();
-    private bool _returnHomeButtonVisible;
     private bool _loading;
 
     protected override async Task OnInitializedAsync() {
         _loading = true;
-        if (NewList) {
-            try {
-                await LoadNewCourtList();
-            }
-            catch (Exception e) {
-                _error = e.Message;
-                return;
-            }
+        var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
+        var isNewList = queries.TryGetValue("newList", out _);
+        CourtCode = Enum.Parse<CourtCode>(queries["courtCode"]!);
+        CourtDate = DateTime.Parse(queries["courtDate"]!);
+        CourtRoom = int.Parse(queries["courtRoom"]!);
+
+        try {
+            await LoadCourtList(isNewList, CourtCode, CourtDate, CourtRoom);
         }
-        else {
-            try {
-                LoadPreviousCourtList();
-            }
-            catch (Exception e) {
-                _error = e.Message;
-                return;
-            }
+        catch (Exception e) {
+            _error = e.Message;
+            return;
         }
 
         CourtList.GenerateInformations();
@@ -44,27 +42,21 @@ public partial class CourtListPage {
         _loading = false;
     }
 
-    private async Task LoadNewCourtList() {
-        var courtList = _dataAccess.GetCourtList()?.ToUIModel();
+    private async Task LoadCourtList(bool downloadDocuments, CourtCode courtCode, DateTime courtDate, int courtRoom) {
+        var courtList = _dataAccess.GetCourtList(courtCode, courtDate, courtRoom)?.ToUIModel();
 
         if (courtList is null) {
             throw new Exception("Failed to load court list.");
         }
 
         CourtList = courtList;
+        CourtList.CourtCode = courtCode;
+        CourtList.CourtDate = courtDate;
+        CourtList.CourtRoom = courtRoom;
 
-        await DownloadDocuments(courtList);
-    }
-
-    private void LoadPreviousCourtList() {
-        var courtList = _dataAccess.GetCourtList()?.ToUIModel();
-
-        if (courtList is null) {
-            _returnHomeButtonVisible = true;
-            throw new Exception("No previous court list in database");
+        if (downloadDocuments) {
+            await DownloadDocuments(courtList);
         }
-
-        CourtList = courtList;
     }
 
     private async Task HandleReturnHome() {
@@ -77,7 +69,7 @@ public partial class CourtListPage {
 
     private async Task CloseUnsavedChangesDialog() {
         await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
-    }   
+    }
     private void ActivateDefendant(Defendant defendant) {
         ActiveDefendant = defendant;
         if (ActiveDefendant.ActiveCaseFile is null) {
@@ -103,12 +95,18 @@ public partial class CourtListPage {
         _dataAccess.UpdateCourtList(CourtList);
     }
 
+    private void ExportCourtList() {
+        var courtList = CourtList.SerialiseToJson();
+        var fileName = $"Court {CourtRoom} {CourtCode} - {CourtList.CourtDate.Day} {CourtList.CourtDate:MMM} {CourtList.CourtDate.Year}.court";
+        File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), courtList);
+    }
+
     private bool UnsavedChanges() {
-        if (_returnHomeButtonVisible) {
+        // Handles the case where something has gone wrong and the user wants to go back to the start
+        if (_error is not null) {
             return false;
         }
-
-        var courtList = _dataAccess.GetCourtList()!;
+        var courtList = _dataAccess.GetCourtList(CourtCode, CourtDate, CourtRoom)!;
 
         foreach (var caseFile in CourtList.GetCaseFiles()) {
             var caseFileModel = courtList.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber);

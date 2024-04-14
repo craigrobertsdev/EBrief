@@ -6,6 +6,9 @@ public class CourtListModel {
     [Key]
     public int Id { get; set; }
     public List<CaseFileModel> CaseFiles { get; set; } = [];
+    public DateTime CourtDate { get; set; }
+    public CourtCode CourtCode { get; set; }
+    public int CourtRoom { get; set; }
 
     public CourtList ToUIModel() {
         var defendants = new List<Defendant>();
@@ -22,7 +25,11 @@ public class CourtListModel {
         }
 
         return new CourtList {
-            Defendants = defendants
+            Defendants = defendants,
+            CourtCode = CourtCode,
+            CourtDate = CourtDate,
+            CourtRoom = CourtRoom
+
         };
     }
 
