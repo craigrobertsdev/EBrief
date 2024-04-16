@@ -85,7 +85,7 @@ public partial class Home
         }
 
         var client = new HttpClient();
-        var caseFileNumbers = CaseFileNumbers.Split("\n").Where(e => !string.IsNullOrWhiteSpace(e));
+        var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         try
         {
             var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", caseFileNumbers);

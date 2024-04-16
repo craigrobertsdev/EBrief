@@ -5,6 +5,7 @@ using EBrief.Shared.Models.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 
 namespace EBrief.Shared.Pages;
 public partial class CourtListPage
@@ -15,6 +16,8 @@ public partial class CourtListPage
     public DateTime CourtDate { get; set; } = default!;
     public int CourtRoom { get; set; } = default!;
     private ElementReference? UnsavedChangesDialog { get; set; }
+    private ElementReference? AddCaseFilesDialog { get; set; }
+    private string CaseFilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
     private string? _error;
@@ -64,6 +67,12 @@ public partial class CourtListPage
         {
             await DownloadDocuments(courtList);
         }
+    }
+
+    private async Task AddCaseFiles()
+    {
+        CaseFilesToAdd = await JSRuntime.InvokeAsync<string>("openDialog", AddCaseFilesDialog);
+        var caseFileNumbers = CaseFilesToAdd.Split(' ', '\n');
     }
 
     private async Task HandleReturnHome()

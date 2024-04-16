@@ -36,6 +36,7 @@ else {
             <div class="pb-2 pr-4 w-full flex justify-between">
                 <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" Change="@CaseFileChanged" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
                 <div>
+                    <RadzenButton Text="Add Case Files" Click="AddCaseFiles" />
                     <RadzenButton Text="Save" Click="SaveCourtList" />
                     <RadzenButton Text="Export Court List" Click="ExportCourtList" />
                     <RadzenButton Text="Back to start" Click="HandleReturnHome" />
@@ -90,4 +91,11 @@ else {
         <RadzenButton Text="Confirm" Click="HandleReturnHome" />
         <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog" />
     </div>
+</dialog>
+
+<dialog @ref="AddCaseFilesDialog">
+    <h3 class="text-lg text-center">
+        Enter the case file numbers you want to add, separated by a space or new line
+    </h3>
+    <textarea rows="10" class="w-full" @bind=@CaseFilesToAdd />
 </dialog>
