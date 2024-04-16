@@ -2,7 +2,7 @@
   "profiles": {
     "Windows Machine": {
       "commandName": "MsixPackage",
-      "commandLineArgs": "C:/Users/craig/source/repos/EBrief/Todo.txt",
+      "commandLineArgs": "C:\\Users\\craig\\Desktop\\Court 22 AMC - 15 Apr 2024.court",
       "nativeDebugging": false
     }
   }

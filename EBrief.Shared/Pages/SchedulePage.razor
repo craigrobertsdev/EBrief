@@ -1,0 +1,16 @@
+<div class="flex-grow">
+    @if (Parent.ActiveDefendant?.ActiveCaseFile is not null) {
+        @foreach (var hearing in Parent.ActiveDefendant.ActiveCaseFile.PreviousHearings) {
+            <div class="border-b border-b-black pb-4 mb-4">
+                <p class="py-1 text-sm text-gray-700">@hearing.AppearanceType on @hearing.HearingDate</p>
+                <p>
+                    @hearing.Notes
+                </p>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+}

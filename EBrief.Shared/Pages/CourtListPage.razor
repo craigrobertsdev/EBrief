@@ -1,8 +1,7 @@
 @page "/court-list"
 
-@using EBrief.Components
-@using EBrief.Components.Pages
-@using EBrief.Models.UI
+@using EBrief.Shared.Components
+@using EBrief.Shared.Models.UI
 @using Microsoft.JSInterop
 @using Radzen.Blazor
 @inject IJSRuntime JSRuntime
@@ -12,6 +11,7 @@
     <p>@_error</p>
     <RadzenButton Text="Back to start" Click="HandleReturnHome" />
 }
+
 else if (_loading) {
     <div class="w-full h-full flex justify-center items-center">
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />

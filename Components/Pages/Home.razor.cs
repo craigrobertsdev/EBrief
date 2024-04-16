@@ -5,7 +5,7 @@ using EBrief.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Net.Http.Json;
-using System.Text;
+using System.Text.Json;
 
 namespace EBrief.Components.Pages;
 
@@ -44,7 +44,20 @@ public partial class Home {
     }
 
     protected override void OnInitialized() {
-        GetCmdArgs();
+        var args = Environment.GetCommandLineArgs();
+
+        if (args.Length == 0) {
+            return;
+        }
+
+        string filePath = string.Empty;
+        foreach (var arg in args[1..]) {
+            filePath += arg + " ";
+        }
+
+        var json = File.ReadAllText(filePath);
+        var courtList = JsonSerializer.Deserialize<CourtListModel>(json);
+        var context = new ApplicationDbContext();
     }
 
     private async Task FetchCourtList() {
@@ -98,19 +111,6 @@ public partial class Home {
     private async Task ClosePreviousCourtListDialog() {
         if (PreviousCourtListDialog is not null) {
             await JSRuntime.InvokeVoidAsync("closeDialog", PreviousCourtListDialog);
-        }
-    }
-
-    private void GetCmdArgs() {
-        var args = Environment.GetCommandLineArgs();
-        if (args.Length > 1) {
-            var stringBuilder = new StringBuilder();
-            var streamReader = new StreamReader(args[1]);
-
-            while (!streamReader.EndOfStream) {
-                stringBuilder.AppendLine(streamReader.ReadLine());
-            }
-
         }
     }
 

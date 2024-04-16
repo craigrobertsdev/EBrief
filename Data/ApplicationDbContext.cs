@@ -14,3 +14,4 @@ public class ApplicationDbContext : DbContext {
         options.UseSqlite($"Filename={dbPath}");
     }
 }
+
