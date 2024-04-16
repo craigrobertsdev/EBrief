@@ -15,12 +15,6 @@ public class CourtListDataAccess
 
     public void SaveCourtList(CourtListModel courtList)
     {
-        /* An error is occurring where the case files already exist in the database, but a court list with different details is trying to be added
-         * This results in an empty court list as all the pre-existing casefiles are filtered out leaving nothing to be associated with the 
-         * new court list.
-         * 
-         * A better solution would be to have a different key for case files so they can exist multiple times in the same database.
-         */
         var existingCourtList = _context.CourtLists
             .Where(cl => cl.CourtDate == courtList.CourtDate && cl.CourtCode == courtList.CourtCode && cl.CourtRoom == courtList.CourtRoom)
             .FirstOrDefault();
@@ -46,12 +40,20 @@ public class CourtListDataAccess
         _context.SaveChanges();
     }
 
+    public async Task AddCaseFiles(List<CaseFileModel> caseFiles, CourtList courtList)
+    {
+        // get courtlist from memory
+        // add case files to courtlist
+        // save courtlist to db
+        // check that defendants are correctly managed if there is a new case file for that defendant
+        // this should include checking that if they have the same ID, no new defendant is created
+
+    }
+
     public CourtListModel? GetCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
         return _context.CourtLists
-            .Where(cl => cl.CourtCode == courtCode)
-            .Where(cl => cl.CourtDate == courtDate)
-            .Where(cl => cl.CourtRoom == courtRoom)
+            .Where(cl => cl.CourtCode == courtCode && cl.CourtDate == courtDate && cl.CourtRoom == courtRoom)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.CaseFileDocuments)
             .Include(cl => cl.CaseFiles)

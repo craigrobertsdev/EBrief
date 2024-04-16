@@ -1,15 +1,17 @@
 ﻿using EBrief.Shared.Data;
 using EBrief.Shared.Helpers;
 using EBrief.Shared.Models;
+using EBrief.Shared.Models.Data;
 using EBrief.Shared.Models.UI;
+using EBrief.Shared.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
 
 namespace EBrief.Shared.Pages;
 public partial class CourtListPage
 {
+    public HttpService HttpService { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
     public CourtCode CourtCode { get; set; } = default!;
@@ -26,6 +28,7 @@ public partial class CourtListPage
 
     protected override async Task OnInitializedAsync()
     {
+        HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
         var isNewList = queries.TryGetValue("newList", out _);
@@ -72,7 +75,23 @@ public partial class CourtListPage
     private async Task AddCaseFiles()
     {
         CaseFilesToAdd = await JSRuntime.InvokeAsync<string>("openDialog", AddCaseFilesDialog);
-        var caseFileNumbers = CaseFilesToAdd.Split(' ', '\n');
+        var caseFileNumbers = CaseFilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
+        var newCaseFileNumbers = caseFileNumbers.Except(CourtList.GetCaseFiles().Select(cf => cf.CaseFileNumber)).ToList();
+
+        
+        try
+        {
+            var newCaseFiles = await HttpService.GetCaseFiles(newCaseFileNumbers);
+            await _dataAccess.AddCaseFiles(newCaseFiles, CourtList);
+            CourtList.AddCaseFiles(newCaseFiles.ToUIModels());
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _error = e.Message;
+            return;
+        }
+
     }
 
     private async Task HandleReturnHome()

@@ -38,3 +38,11 @@ public class CaseFileModel
         };
     }
 }
+
+public static class CaseFileModelExtensions
+{
+    public static List<CaseFile> ToUIModels(this IEnumerable<CaseFileModel> caseFiles)
+    {
+        return caseFiles.Select(cf => cf.ToUIModel()).ToList();
+    }
+}

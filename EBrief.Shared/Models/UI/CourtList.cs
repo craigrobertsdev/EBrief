@@ -22,6 +22,25 @@ public class CourtList
         }
     }
 
+    public void AddCaseFiles(List<CaseFile> caseFiles)
+    {
+        foreach (var caseFile in caseFiles)
+        {
+            var defendant = Defendants.FirstOrDefault(d => d.Id == caseFile.Defendant.Id);
+            if (defendant is null)
+            {
+                defendant = new Defendant
+                {
+                    LastName = caseFile.Defendant.LastName,
+                    FirstName = caseFile.Defendant.FirstName
+                };
+                Defendants.Add(defendant);
+            }
+
+            defendant.CaseFiles.Add(caseFile);
+        }
+    }
+
     public List<CaseFile> GetCaseFiles()
     {
         var caseFiles = new List<CaseFile>();
