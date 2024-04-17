@@ -50,6 +50,24 @@ public class CourtListDataAccess
 
     }
 
+    public void DeleteCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
+    {
+        var courtList = _context.CourtLists.FirstOrDefault(e => e.CourtCode == courtCode && e.CourtDate == courtDate && e.CourtRoom == courtRoom);
+        if (courtList is not null)
+        {
+            try
+            {
+                _context.CourtLists.Remove(courtList);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
+        }
+    }
+
     public CourtListModel? GetCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
         return _context.CourtLists

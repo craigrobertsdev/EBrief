@@ -6,7 +6,7 @@ public class CourtListModel
 {
     [Key]
     public int Id { get; set; }
-    public List<CaseFileModel> CaseFiles { get; set; } = [];
+    public ICollection<CaseFileModel> CaseFiles { get; set; } = new List<CaseFileModel>();
     public DateTime CourtDate { get; set; }
     public CourtCode CourtCode { get; set; }
     public int CourtRoom { get; set; }

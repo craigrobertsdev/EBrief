@@ -8,6 +8,8 @@ public class CaseFileModel
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
+    public CourtListModel CourtList { get; set; }
+    public int CourtListId { get; set; }
     public string CaseFileNumber { get; set; } = string.Empty;
     public DefendantModel Defendant { get; set; } = default!;
     [MaxLength(20)]

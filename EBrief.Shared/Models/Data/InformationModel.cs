@@ -8,6 +8,7 @@ public class InformationModel
 {
     [Key]
     public int Id { get; set; }
+    public Guid CaseFileId { get; set; }
     public List<InformationEntryModel> Charges { get; set; } = [];
 
     public Information ToUIModel()
