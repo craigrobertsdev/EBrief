@@ -7,12 +7,11 @@ FUNCTIONALITY:
 	- Handle situations where there already exists a court list with the corresponding date, courtCode and courtRoom
 
 STYLING:
-	- Add styling to select fields on NewCourtListDialog
-	- Add styling to the list of court lists in PreviousCourtListsDialog
 	- Handle scrolling in facts of charge
 	- Add colour coding for whether notes have been added to the case file
 	- Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
 	on screens that are the size of the work laptops
+	- Handle long defendant names, maybe by truncating them and adding tooltip
 
 DECISION LOG:
 	Options for storing court lists:

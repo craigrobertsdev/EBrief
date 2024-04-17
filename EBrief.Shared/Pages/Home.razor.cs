@@ -4,10 +4,7 @@ using EBrief.Shared.Models;
 using EBrief.Shared.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.IO;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace EBrief.Shared.Pages;
 
@@ -22,6 +19,8 @@ public partial class Home
     public string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
+    private CourtListDataAccess _dataAccess = new();
+
     private async Task OpenNewCourtListDialog()
     {
         if (NewCourtListDialog is not null)
@@ -50,6 +49,26 @@ public partial class Home
         }
 
         NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
+    }
+
+    private void DeletePreviousCourtList()
+    {
+        if (SelectedCourtList is null || PreviousCourtLists is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _dataAccess.DeleteCourtList(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom);
+        }
+        catch (Exception e)
+        {
+            _error = e.InnerException?.Message ?? e.Message;
+            return;
+        }
+
+        PreviousCourtLists.Remove(SelectedCourtList);
     }
 
     //protected override void OnInitialized() {
