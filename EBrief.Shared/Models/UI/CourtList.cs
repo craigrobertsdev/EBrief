@@ -31,6 +31,7 @@ public class CourtList
             {
                 defendant = new Defendant
                 {
+                    Id = caseFile.Defendant.Id,
                     LastName = caseFile.Defendant.LastName,
                     FirstName = caseFile.Defendant.FirstName
                 };

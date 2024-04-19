@@ -14,7 +14,5 @@ public class HttpService
         }
 
         return await response.Content.ReadFromJsonAsync<List<CaseFileModel>>() ?? [];
-
-
     }
 }

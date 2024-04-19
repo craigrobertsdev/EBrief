@@ -23,8 +23,11 @@ public partial class CourtListPage
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
     private string? _error;
-    private readonly CourtListDataAccess _dataAccess = new();
+    private string? _addCaseFilesError;
+    [Inject]
+    public CourtListDataAccess DataAccess { get; set; } = default!;
     private bool _loading;
+    private bool _loadingNewCaseFiles;
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,7 +57,7 @@ public partial class CourtListPage
 
     private async Task LoadCourtList(bool downloadDocuments, CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
-        var courtList = _dataAccess.GetCourtList(courtCode, courtDate, courtRoom)?.ToUIModel();
+        var courtList = DataAccess.GetCourtList(courtCode, courtDate, courtRoom)?.ToUIModel();
 
         if (courtList is null)
         {
@@ -72,23 +75,46 @@ public partial class CourtListPage
         }
     }
 
+    private async Task OpenAddCaseFilesDialog()
+    {
+        if (AddCaseFilesDialog is not null)
+        {
+            _error = null;
+            await JSRuntime.InvokeAsync<string>("openDialog", AddCaseFilesDialog);
+        }
+    }
+
+    private async Task CloseAddCaseFilesDialog()
+    {
+        CaseFilesToAdd = string.Empty;
+        await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
+    }
+
     private async Task AddCaseFiles()
     {
-        CaseFilesToAdd = await JSRuntime.InvokeAsync<string>("openDialog", AddCaseFilesDialog);
+        _loadingNewCaseFiles = true;
         var caseFileNumbers = CaseFilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         var newCaseFileNumbers = caseFileNumbers.Except(CourtList.GetCaseFiles().Select(cf => cf.CaseFileNumber)).ToList();
 
-        
+        if (newCaseFileNumbers.Count == 0)
+        {
+            _addCaseFilesError = "All of those case files are in the list already";
+            return;
+        }
+
         try
         {
+            _addCaseFilesError = null;
             var newCaseFiles = await HttpService.GetCaseFiles(newCaseFileNumbers);
-            await _dataAccess.AddCaseFiles(newCaseFiles, CourtList);
+
+            await DataAccess.AddCaseFiles(newCaseFiles, CourtList);
             CourtList.AddCaseFiles(newCaseFiles.ToUIModels());
-            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
+            _loadingNewCaseFiles = false;
         }
         catch (Exception e)
         {
-            _error = e.Message;
+            _addCaseFilesError = e.Message;
             return;
         }
 
@@ -136,7 +162,7 @@ public partial class CourtListPage
 
     private void SaveCourtList()
     {
-        _dataAccess.UpdateCourtList(CourtList);
+        DataAccess.UpdateCourtList(CourtList);
     }
 
     private void ExportCourtList()
@@ -153,7 +179,7 @@ public partial class CourtListPage
         {
             return false;
         }
-        var courtList = _dataAccess.GetCourtList(CourtCode, CourtDate, CourtRoom)!;
+        var courtList = DataAccess.GetCourtList(CourtCode, CourtDate, CourtRoom)!;
 
         foreach (var caseFile in CourtList.GetCaseFiles())
         {

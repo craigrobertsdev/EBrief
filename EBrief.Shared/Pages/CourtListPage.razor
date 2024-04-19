@@ -7,36 +7,42 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavManager
 
-@if (_error is not null) {
+@if (_error is not null)
+{
     <p>@_error</p>
     <RadzenButton Text="Back to start" Click="HandleReturnHome" />
 }
 
-else if (_loading) {
+else if (_loading)
+{
     <div class="w-full h-full flex justify-center items-center">
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     </div>
 }
-else {
+else
+{
     <div class="h-full grid grid-cols-[0.2fr_1fr] grid-rows-[auto_1fr] py-2">
         <div class="row-span-2 overflow-auto max-h-full pl-2">
             <div class="flex flex-col pr-2 border-r border-r-3 border-r-slate-500">
-                @foreach (var defendant in CourtList.Defendants) {
+                @foreach (var defendant in CourtList.Defendants)
+                {
                     <div class="text-sm lg:text-lg p-1 max-h-[6rem] border border-slate-500 bg-slate-200 cursor-pointer @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
                         @defendant.LastName.ToUpper(), @defendant.FirstName
                     </div>
                 }
             </div>
         </div>
-        @if (ActiveDefendant is null) {
+        @if (ActiveDefendant is null)
+        {
             <div class="pb-2">
             </div>
         }
-        else {
+        else
+        {
             <div class="pb-2 pr-4 w-full flex justify-between">
                 <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" Change="@CaseFileChanged" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
                 <div>
-                    <RadzenButton Text="Add Case Files" Click="AddCaseFiles" />
+                    <RadzenButton Text="Add Case Files" Click="OpenAddCaseFilesDialog" />
                     <RadzenButton Text="Save" Click="SaveCourtList" />
                     <RadzenButton Text="Export Court List" Click="ExportCourtList" />
                     <RadzenButton Text="Back to start" Click="HandleReturnHome" />
@@ -45,7 +51,7 @@ else {
         }
         <div class="h-full border-l border-l-3 border-l-slate-500">
             <CascadingValue Value="this">
-                <CascadingValue Value="_dataAccess">
+                <CascadingValue Value="DataAccess">
                     <TabControl>
                         <TabPage Title="CFEL">
                             <CfelPage />
@@ -93,9 +99,27 @@ else {
     </div>
 </dialog>
 
-<dialog @ref="AddCaseFilesDialog">
-    <h3 class="text-lg text-center">
-        Enter the case file numbers you want to add, separated by a space or new line
-    </h3>
-    <textarea rows="10" class="w-full" @bind=@CaseFilesToAdd />
+<dialog @ref="AddCaseFilesDialog" class="p-5">
+    @if (_loadingNewCaseFiles)
+    {
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+    }
+    else
+    {
+        <h3 class="text-lg text-center pb-2">
+            Enter the case file numbers you want to add, separated by a space or new line
+        </h3>
+        <div class="w-full pb-4">
+            <textarea @bind="@CaseFilesToAdd" rows="10" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
+        </div>
+        <div class="flex w-full justify-end gap-3 pb-2">
+            <RadzenButton Text="Add" Click="AddCaseFiles" />
+            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCaseFilesDialog" />
+        </div>
+
+        @if (_addCaseFilesError is not null)
+        {
+            <p class="text-red-500 text-center text-lg">@_addCaseFilesError</p>
+        }
+    }
 </dialog>

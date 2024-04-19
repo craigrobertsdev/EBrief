@@ -10,6 +10,8 @@ namespace EBrief.Shared.Pages;
 
 public partial class Home
 {
+    [Inject]
+    ApplicationDbContext _dbContext { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
@@ -19,7 +21,8 @@ public partial class Home
     public string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
-    private CourtListDataAccess _dataAccess = new();
+    [Inject]
+    private CourtListDataAccess DataAccess { get; set; } = default!;
 
     private async Task OpenNewCourtListDialog()
     {
@@ -31,8 +34,7 @@ public partial class Home
     }
     private async Task OpenPreviousCourtListDialog()
     {
-        var context = new ApplicationDbContext();
-        PreviousCourtLists = context.CourtLists.Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom)).ToList();
+        PreviousCourtLists = _dbContext.CourtLists.Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom)).ToList();
         if (PreviousCourtListDialog is not null)
         {
             _error = null;
@@ -60,7 +62,7 @@ public partial class Home
 
         try
         {
-            _dataAccess.DeleteCourtList(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom);
+            DataAccess.DeleteCourtList(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom);
         }
         catch (Exception e)
         {
@@ -131,10 +133,9 @@ public partial class Home
 
             courtList.CombineDefendantCaseFiles();
 
-            var courtDbAccess = new CourtListDataAccess();
             try
             {
-                courtDbAccess.SaveCourtList(courtList);
+                DataAccess.SaveCourtList(courtList);
             }
             catch (Exception e)
             {
