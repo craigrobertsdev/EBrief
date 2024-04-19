@@ -2,15 +2,18 @@
 using EBrief.Shared.Models.Data;
 using EBrief.Shared.Models.UI;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace EBrief.Shared.Data;
 public class CourtListDataAccess
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<CourtListDataAccess> _logger;
 
-    public CourtListDataAccess()
+    public CourtListDataAccess(ApplicationDbContext context, ILogger<CourtListDataAccess> logger)
     {
-        _context = new ApplicationDbContext();
+        _context = context;
+        _logger = logger;
     }
 
     public void SaveCourtList(CourtListModel courtList)
@@ -40,14 +43,20 @@ public class CourtListDataAccess
         _context.SaveChanges();
     }
 
-    public async Task AddCaseFiles(List<CaseFileModel> caseFiles, CourtList courtList)
+    public async Task AddCaseFiles(List<CaseFileModel> newCaseFiles, CourtList courtList)
     {
-        // get courtlist from memory
-        // add case files to courtlist
-        // save courtlist to db
-        // check that defendants are correctly managed if there is a new case file for that defendant
-        // this should include checking that if they have the same ID, no new defendant is created
+        var existingCourtList = await _context.CourtLists
+            .Where(cl => cl.CourtDate == courtList.CourtDate && cl.CourtCode == courtList.CourtCode && cl.CourtRoom == courtList.CourtRoom)
+            .FirstOrDefaultAsync();
 
+        if (existingCourtList is null)
+        {
+            _logger.LogError("AddCaseFiles - CourtListNotFound - {date:ddMMyyyy} / {courtCode} / {courtRoom}", courtList.CourtDate, courtList.CourtCode, courtList.CourtRoom);
+            throw new Exception("Error adding new case files.");
+        }
+
+        existingCourtList.CaseFiles.AddRange(newCaseFiles);
+        await _context.SaveChangesAsync();
     }
 
     public void DeleteCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
