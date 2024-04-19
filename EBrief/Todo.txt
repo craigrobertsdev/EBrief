@@ -5,6 +5,7 @@ FUNCTIONALITY:
 	- Properly implement functionality to export court lists to a file
 	- Implement functionality to import court lists from a file
 	- Handle situations where there already exists a court list with the corresponding date, courtCode and courtRoom
+	- Work out logging
 
 STYLING:
 	- Handle scrolling in facts of charge
