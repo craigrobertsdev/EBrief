@@ -1,7 +1,6 @@
 ﻿using EBrief.Shared.Helpers;
 using EBrief.Shared.Models.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace EBrief.Shared.Data;
 public class ApplicationDbContext : DbContext

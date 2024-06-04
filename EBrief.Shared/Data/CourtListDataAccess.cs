@@ -33,7 +33,7 @@ public class CourtListDataAccess
 
     public void UpdateCourtList(CourtList courtList)
     {
-        var courtListModel = _context.CourtLists.First();
+        var courtListModel = _context.CourtLists.First(cl => cl.Id == courtList.Id);
         foreach (var caseFile in courtList.GetCaseFiles())
         {
             courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes;

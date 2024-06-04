@@ -31,6 +31,7 @@ public class CourtListModel
 
         return new CourtList
         {
+            Id = Id,
             Defendants = defendants,
             CourtCode = CourtCode,
             CourtDate = CourtDate,

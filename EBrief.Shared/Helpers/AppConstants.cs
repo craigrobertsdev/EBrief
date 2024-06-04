@@ -1,5 +1,5 @@
 ﻿namespace EBrief.Shared.Helpers;
 public static class AppConstants
 {
-    public const string ApiBaseUrl = "https://localhost:7150";
+    public const string ApiBaseUrl = "http://localhost:5262";
 }
