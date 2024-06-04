@@ -13,6 +13,7 @@ STYLING:
 	- Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
 	on screens that are the size of the work laptops
 	- Handle long defendant names, maybe by truncating them and adding tooltip
+	- Work out why sometimes when there are a large number of case files the size of the top row is enormous
 
 DECISION LOG:
 	Options for storing court lists:

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBrief", "EBrief\EBrief.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBrief.Shared", "EBrief.Shared\EBrief.Shared.csproj", "{7765E27A-06D8-4711-82CD-D148EB01B191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBrief.WebClient", "EBrief.WebClient\EBrief.WebClient.csproj", "{26592DAC-EA8D-418A-B21C-31B6BF772283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBrief.WebClient", "EBrief.WebClient\EBrief.WebClient.csproj", "{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{7765E27A-06D8-4711-82CD-D148EB01B191}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7765E27A-06D8-4711-82CD-D148EB01B191}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7765E27A-06D8-4711-82CD-D148EB01B191}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26592DAC-EA8D-418A-B21C-31B6BF772283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26592DAC-EA8D-418A-B21C-31B6BF772283}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26592DAC-EA8D-418A-B21C-31B6BF772283}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26592DAC-EA8D-418A-B21C-31B6BF772283}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

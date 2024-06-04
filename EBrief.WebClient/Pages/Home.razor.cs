@@ -1,17 +1,15 @@
-﻿using EBrief.Shared.Data;
-using EBrief.Shared.Helpers;
-using EBrief.Shared.Models;
-using EBrief.Shared.Models.Data;
+﻿using EBrief.WebClient.Data;
+using EBrief.WebClient.Models;
+using EBrief.WebClient.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Net.Http.Json;
 
 namespace EBrief.WebClient.Pages;
 
 public partial class Home
 {
     [Inject]
-    ApplicationDbContext _dbContext { get; set; } = default!;
+    public LocalStorage _localStorage { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
@@ -21,8 +19,6 @@ public partial class Home
     public string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
-    [Inject]
-    private CourtListDataAccess DataAccess { get; set; } = default!;
 
     private async Task OpenNewCourtListDialog()
     {
@@ -34,7 +30,7 @@ public partial class Home
     }
     private async Task OpenPreviousCourtListDialog()
     {
-        PreviousCourtLists = _dbContext.CourtLists.Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom)).ToList();
+        PreviousCourtLists = (await _localStorage.GetPreviousCourtLists()).Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom)).ToList();
         if (PreviousCourtListDialog is not null)
         {
             _error = null;
@@ -53,7 +49,7 @@ public partial class Home
         NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
     }
 
-    private void DeletePreviousCourtList()
+    private async Task DeletePreviousCourtList()
     {
         if (SelectedCourtList is null || PreviousCourtLists is null)
         {
@@ -62,7 +58,7 @@ public partial class Home
 
         try
         {
-            DataAccess.DeleteCourtList(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom);
+            await _localStorage.DeleteCourtList(SelectedCourtList);
         }
         catch (Exception e)
         {
@@ -105,18 +101,10 @@ public partial class Home
             return;
         }
 
-        var client = new HttpClient();
         var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         try
         {
-            var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", caseFileNumbers);
-            if (!response.IsSuccessStatusCode)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Failed to fetch court list.");
-                return;
-            }
-
-            var caseFiles = await response.Content.ReadFromJsonAsync<List<CaseFileModel>>();
+            var caseFiles = DummyData.GenerateCaseFiles(caseFileNumbers);
             if (caseFiles is null)
             {
                 _error = "Failed to fetch court list.";
@@ -135,7 +123,7 @@ public partial class Home
 
             try
             {
-                DataAccess.SaveCourtList(courtList);
+                await _localStorage.SaveCourtList(courtList.ToUIModel());
             }
             catch (Exception e)
             {
@@ -178,14 +166,6 @@ public partial class Home
 
         SelectedCourtList = courtListEntry;
     }
-
-    // This was implemented for the case of needing to specify which case file numbers related to the current court list
-    // so they could be fetched from the database. Current implementation is that there will be the ability to only have one list at a time.
-    //private string BuildCaseFileQueryString(IEnumerable<string> caseFileNumbers) {
-    //    return string.Join("&", caseFileNumbers.Select(e => $"caseFileNumbers={e}"));
-    //}
-
-    record CourtListEntry(CourtCode CourtCode, DateTime CourtDate, int CourtRoom);
 
     private List<int> CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24];
 }
