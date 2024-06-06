@@ -46,7 +46,7 @@ public partial class Home
             return;
         }
 
-        NavManager.NavigateTo($"/EBrief/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
+        NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
     }
 
     private async Task DeletePreviousCourtList()
@@ -131,7 +131,7 @@ public partial class Home
                 return;
             }
 
-            NavManager.NavigateTo($"/EBrief/court-list/?newList=true&courtCode={CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
+            NavManager.NavigateTo($"/court-list/?newList=true&courtCode={CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
         }
         catch (Exception e)
         {
