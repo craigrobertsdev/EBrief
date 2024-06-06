@@ -117,7 +117,7 @@ public partial class CourtListPage
         //    await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
         //}
 
-        NavManager.NavigateTo("/");
+        NavManager.NavigateTo("/EBrief");
     }
 
     private async Task CloseUnsavedChangesDialog()
