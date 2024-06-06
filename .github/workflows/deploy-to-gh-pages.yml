@@ -1,0 +1,31 @@
+name: Deploy to GitHub Pages
+
+# Run the workflow on every push to the main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-to-ghthub-pages:
+    runs-on: ubuntu-latest
+    steps: 
+    # uses GibHub's checkout action to checkout code from the main branch
+    - uses: actions/checkout@2
+
+    # sets up .NET Core SDK
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4.0.0
+      with:
+        dotnet-version: 8.0
+
+    # publishes Blazor project to the release-folder
+    - name: Publish .NET Core project
+      run: dotnet publish ./EBrief.WebClient/EBreif.WebClient.csproj -c Release -o release --nologo
+
+    - name: Commit wwwroot to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@4.6.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: release/wwwroot
+      
