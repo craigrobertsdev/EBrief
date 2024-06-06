@@ -9,18 +9,6 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="css/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
-</head>
-
-<body class="h-full">
-    <div id="app" class="h-full">
-    </div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-
     <!-- Start Single Page Apps for GitHub Pages -->
     <script type="text/javascript">
         // Single Page Apps for GitHub Pages
@@ -60,10 +48,43 @@
         }(window.location))
     </script>
     <!-- End Single Page Apps for GitHub Pages -->
+</head>
 
+<body class="h-full">
+    <div id="app" class="h-full">
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="scripts/decode.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="scripts/Dialog.js"></script>
+    <script>
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                // For framework resources, use the precompressed .br files for faster downloads
+                // This is needed only because GitHub pages doesn't natively support Brotli (or even gzip for .dll files)
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray, { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
