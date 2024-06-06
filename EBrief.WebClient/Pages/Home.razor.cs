@@ -9,7 +9,7 @@ namespace EBrief.WebClient.Pages;
 public partial class Home
 {
     [Inject]
-    public LocalStorage _localStorage { get; set; } = default!;
+    public LocalStorage LocalStorage { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
@@ -30,7 +30,9 @@ public partial class Home
     }
     private async Task OpenPreviousCourtListDialog()
     {
-        PreviousCourtLists = (await _localStorage.GetPreviousCourtLists()).Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom)).ToList();
+        PreviousCourtLists = (await LocalStorage.GetPreviousCourtLists())
+            .Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom))
+            .ToList();
         if (PreviousCourtListDialog is not null)
         {
             _error = null;
@@ -58,7 +60,7 @@ public partial class Home
 
         try
         {
-            await _localStorage.DeleteCourtList(SelectedCourtList);
+            await LocalStorage.DeleteCourtList(SelectedCourtList);
         }
         catch (Exception e)
         {
@@ -123,7 +125,7 @@ public partial class Home
 
             try
             {
-                await _localStorage.SaveCourtList(courtList.ToUIModel());
+                await LocalStorage.SaveCourtList(courtList.ToUIModel());
             }
             catch (Exception e)
             {

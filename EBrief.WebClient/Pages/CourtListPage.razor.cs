@@ -1,5 +1,4 @@
 ﻿using EBrief.WebClient.Data;
-using EBrief.WebClient.Helpers;
 using EBrief.WebClient.Models;
 using EBrief.WebClient.Models.Data;
 using EBrief.WebClient.Models.UI;
@@ -11,7 +10,7 @@ namespace EBrief.WebClient.Pages;
 public partial class CourtListPage
 {
     [Inject]
-    private LocalStorage _localStorage { get; set; } = default!;
+    private LocalStorage LocalStorage { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
     public CourtCode CourtCode { get; set; } = default!;
@@ -53,7 +52,7 @@ public partial class CourtListPage
 
     private async Task LoadCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
-        var courtList = await _localStorage.GetCourtList(_localStorage.BuildKey(courtCode, courtDate, courtRoom));
+        var courtList = await LocalStorage.GetCourtList(LocalStorage.BuildKey(new CourtListEntry(courtCode, courtDate, courtRoom)));
 
         if (courtList is null)
         {
@@ -98,7 +97,7 @@ public partial class CourtListPage
             _addCaseFilesError = null;
             var newCaseFiles = DummyData.GenerateCaseFiles(newCaseFileNumbers);
             CourtList.AddCaseFiles(newCaseFiles.ToUIModels());
-            await _localStorage.SaveCourtList(CourtList);
+            await LocalStorage.SaveCourtList(CourtList);
             await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
             _loadingNewCaseFiles = false;
         }
@@ -152,7 +151,7 @@ public partial class CourtListPage
 
     private async Task SaveCourtList()
     {
-        await _localStorage.SaveCourtList(CourtList);
+        await LocalStorage.SaveCourtList(CourtList);
     }
 
     private void ExportCourtList()
@@ -169,7 +168,7 @@ public partial class CourtListPage
     //    {
     //        return false;
     //    }
-    //    var courtList = _localStorage.GetCourtList(_localStorage.BuildKey(CourtCode, CourtDate, CourtRoom))!;
+    //    var courtList = LocalStorage.GetCourtList(LocalStorage.BuildKey(CourtCode, CourtDate, CourtRoom))!;
 
     //    foreach (var caseFile in CourtList.GetCaseFiles())
     //    {

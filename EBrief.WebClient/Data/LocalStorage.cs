@@ -26,30 +26,30 @@ public class LocalStorage
         return json is null ? null : JsonSerializer.Deserialize<CourtList>(json, options)!;
     }
 
-    public string BuildKey(CourtCode courtCode, DateTime courtDate, int courtRoom)
+    public string BuildKey(CourtListEntry entry)
     {
-        return courtCode.ToString() + courtDate.ToString() + courtRoom;
+        return JsonSerializer.Serialize(entry); 
     }
 
     public async Task SaveCourtList(CourtList courtList)
     {
-        var key = BuildKey(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
+        var key = BuildKey(new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom));
         var options = new JsonSerializerOptions
         {
             ReferenceHandler = ReferenceHandler.Preserve
         };
 
-        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(courtList, options));
+        await _jsRuntime.InvokeVoidAsync("saveCourtList", [key, JsonSerializer.Serialize(courtList, options)]);
     }
 
     public async Task DeleteCourtList(CourtListEntry entry)
     {
-        var key = BuildKey(entry.CourtCode, entry.CourtDate, entry.CourtRoom);
+        var key = BuildKey(new CourtListEntry(entry.CourtCode, entry.CourtDate, entry.CourtRoom));
         await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
     }
 
-    public async Task<List<CourtListEntry>> GetPreviousCourtLists()
+    public async Task<IEnumerable<CourtListEntry>> GetPreviousCourtLists()
     {
-        var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "previousCourtLists");
-        return json is null ? new List<CourtListEntry>() : JsonSerializer.Deserialize<List<CourtListEntry>>(json)!; }
+        var json = await _jsRuntime.InvokeAsync<string>("getPreviousCourtLists");
+        return json is null ? new List<CourtListEntry>() : JsonSerializer.Deserialize<CourtListEntry[]>(json)!; }
 }
