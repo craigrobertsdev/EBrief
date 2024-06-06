@@ -25,6 +25,14 @@ jobs:
       - name: Publish .NET Core project
         run: dotnet publish ./EBrief.WebClient/EBrief.WebClient.csproj -c Release -o release --nologo
 
+      # changes the base tag in index.html from '/' to 'EBrief' to match Github pages repository subdirectory
+      - name: Change base tag in index.html from / to EBrief
+        run: sed -i 's/<base href="\/" \/>/<base href="\/EBrief\/" \/>/g' release/wwwroot/index.html
+
+      # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
+      - name: Add .nojekyll file
+        run: touch release/wwwroot/.nojekyll
+
       # Commits wwwroot to GitHub Pages
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.1
