@@ -71,23 +71,6 @@ public partial class Home
         PreviousCourtLists.Remove(SelectedCourtList);
     }
 
-    //protected override void OnInitialized() {
-    //    var args = Environment.GetCommandLineArgs();
-
-    //    if (args.Length == 0) {
-    //        return;
-    //    }
-
-    //    string filePath = string.Empty;
-    //    foreach (var arg in args[1..]) {
-    //        filePath += arg + " ";
-    //    }
-
-    //    var json = File.ReadAllText(filePath);
-    //    var courtList = JsonSerializer.Deserialize<CourtListModel>(json);
-    //    var context = new ApplicationDbContext();
-    //}
-
     private async Task FetchCourtList()
     {
         _error = null;
@@ -100,6 +83,19 @@ public partial class Home
         if (CourtCode is null)
         {
             _error = "Please select a court code.";
+            return;
+        }
+
+        if (CourtRoom is null)
+        {
+            _error = "Please select a court room.";
+            return;
+        }
+
+        var previousCourtList = await LocalStorage.GetCourtList(LocalStorage.BuildKey(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom!.Value)));
+        if (previousCourtList is not null)
+        {
+           _error = "Court list already exists.";
             return;
         }
 

@@ -1,6 +1,4 @@
-﻿using EBrief.WebClient.Models;
-using EBrief.WebClient.Models.Data;
-using EBrief.WebClient.Models.UI;
+﻿using EBrief.WebClient.Models.UI;
 using EBrief.WebClient.Pages;
 using Microsoft.JSInterop;
 using System.Text.Json;
@@ -8,25 +6,21 @@ using System.Text.Json.Serialization;
 
 namespace EBrief.WebClient.Data;
 
-public class LocalStorage
+public class LocalStorage(IServiceProvider serviceProvider)
 {
-    private readonly IJSRuntime _jsRuntime = default!;
-    public LocalStorage(IServiceProvider serviceProvider)
+    private readonly IJSRuntime _jsRuntime = serviceProvider.GetRequiredService<IJSRuntime>();
+    private static readonly JsonSerializerOptions _options = new()
     {
-        _jsRuntime = serviceProvider.GetRequiredService<IJSRuntime>(); 
-    }
+        ReferenceHandler = ReferenceHandler.Preserve
+    };
 
     public async Task<CourtList?> GetCourtList(string key)
     {
-        var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
-        var options = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.Preserve
-        };
-        return json is null ? null : JsonSerializer.Deserialize<CourtList>(json, options)!;
+        var json = await _jsRuntime.InvokeAsync<string>("getCourtList", key);
+        return json is null ? null : JsonSerializer.Deserialize<CourtList>(json, _options)!;
     }
 
-    public string BuildKey(CourtListEntry entry)
+    public static string BuildKey(CourtListEntry entry)
     {
         return JsonSerializer.Serialize(entry); 
     }
@@ -34,18 +28,13 @@ public class LocalStorage
     public async Task SaveCourtList(CourtList courtList)
     {
         var key = BuildKey(new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom));
-        var options = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.Preserve
-        };
-
-        await _jsRuntime.InvokeVoidAsync("saveCourtList", [key, JsonSerializer.Serialize(courtList, options)]);
+        await _jsRuntime.InvokeVoidAsync("saveCourtList", [key, JsonSerializer.Serialize(courtList, _options)]);
     }
 
     public async Task DeleteCourtList(CourtListEntry entry)
     {
         var key = BuildKey(new CourtListEntry(entry.CourtCode, entry.CourtDate, entry.CourtRoom));
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
+        await _jsRuntime.InvokeVoidAsync("removeCourtList", key);
     }
 
     public async Task<IEnumerable<CourtListEntry>> GetPreviousCourtLists()

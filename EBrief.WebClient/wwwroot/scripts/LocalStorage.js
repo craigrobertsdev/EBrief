@@ -19,3 +19,23 @@ function getPreviousCourtLists() {
 
     return JSON.stringify(lists);
 }
+
+function getCourtList(key) {
+    const courtLists = JSON.parse(localStorage.getItem("courtLists"));
+    if (!courtLists) {
+        return null;
+    }
+
+    for (const list of courtLists) {
+        if (list == key) {
+            return list;
+        }
+    }
+}
+
+function removeCourtList(key) {
+    localStorage.removeItem(key);
+    const courtLists = JSON.parse(localStorage.getItem("courtLists"));
+    const filteredCourtLists = courtLists.filter(list => list !== key);
+    localStorage.setItem("courtLists", JSON.stringify(filteredCourtLists));
+}
