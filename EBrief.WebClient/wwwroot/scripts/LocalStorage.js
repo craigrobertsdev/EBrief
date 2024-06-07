@@ -12,6 +12,10 @@
 function getPreviousCourtLists() {
     const courtLists = JSON.parse(localStorage.getItem("courtLists"));
     const lists = [];
+    if (!courtLists) {
+        return null;
+    }
+
     for (const list of courtLists) {
         const obj = JSON.parse(list);
         lists.push(obj);
