@@ -20,6 +20,11 @@ public class LocalStorage(IServiceProvider serviceProvider)
         return json is null ? null : JsonSerializer.Deserialize<CourtList>(json, _options)!;
     }
 
+    public async Task<bool> CheckCourtListExists(string key)
+    {
+        return await _jsRuntime.InvokeAsync<bool>("checkPreviousListExists", key);
+    }
+
     public static string BuildKey(CourtListEntry entry)
     {
         return JsonSerializer.Serialize(entry); 

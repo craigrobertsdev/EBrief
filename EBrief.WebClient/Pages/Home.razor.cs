@@ -92,8 +92,11 @@ public partial class Home
             return;
         }
 
-        var previousCourtList = await LocalStorage.GetCourtList(LocalStorage.BuildKey(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom!.Value)));
-        if (previousCourtList is not null)
+        // this should only check whether the previous court list exists, not retrieve the whole list
+        // the next call should save the court list to localStorage then the following call should 
+        // navigate to the court list page
+        var courtListExists = await LocalStorage.CheckCourtListExists(LocalStorage.BuildKey(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom!.Value)));
+        if (courtListExists)
         {
            _error = "Court list already exists.";
             return;

@@ -24,17 +24,28 @@ function getPreviousCourtLists() {
     return JSON.stringify(lists);
 }
 
+function checkPreviousListExists(key) {
+    const previousCourtLists = JSON.parse(localStorage.getItem("courtLists"));
+    if (!previousCourtLists) {
+        return false;
+    }
+
+    for (const list of previousCourtLists) {
+        if (list == key) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function getCourtList(key) {
-    const courtLists = JSON.parse(localStorage.getItem("courtLists"));
-    if (!courtLists) {
+    const courtList = JSON.parse(localStorage.getItem(key));
+    if (!courtList) {
         return null;
     }
 
-    for (const list of courtLists) {
-        if (list == key) {
-            return list;
-        }
-    }
+    return JSON.stringify(courtList);
 }
 
 function removeCourtList(key) {
