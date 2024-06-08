@@ -3,6 +3,7 @@ using EBrief.WebClient.Models;
 using EBrief.WebClient.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Net.Http.Json;
 
 namespace EBrief.WebClient.Pages;
 
@@ -12,6 +13,7 @@ public partial class Home
     public LocalStorage LocalStorage { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
+    public ElementReference? FeedbackDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
     public DateTime? CourtDate { get; set; }
     public CourtCode? CourtCode { get; set; }
@@ -19,6 +21,7 @@ public partial class Home
     public string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
+    private string Feedback { get; set; } = string.Empty;
 
     private async Task OpenNewCourtListDialog()
     {
@@ -40,6 +43,14 @@ public partial class Home
         }
     }
 
+    private async Task OpenFeedbackDialog()
+    {
+        if (FeedbackDialog is not null)
+        {
+            _error = null;
+            await JSRuntime.InvokeVoidAsync("openDialog", FeedbackDialog);
+        }
+    }
     private void LoadPreviousCourtList()
     {
         if (SelectedCourtList is null)
@@ -138,6 +149,28 @@ public partial class Home
 
     }
 
+    private async Task SendFeedback()
+    {
+
+       if (string.IsNullOrWhiteSpace(Feedback))
+        {
+            _error = "Please enter feedback.";
+            return;
+        }
+
+        try
+        {
+            var client = new HttpClient();
+            var response = await client.PostAsJsonAsync("https://")
+            Feedback = string.Empty;
+            await CloseFeedbackDialog();
+        }
+        catch (Exception e)
+        {
+            _error = e.InnerException?.Message ?? e.Message;
+        }
+    }
+
     private async Task CloseLoadNewCourtListDialog()
     {
         if (NewCourtListDialog is not null)
@@ -163,6 +196,14 @@ public partial class Home
         }
 
         SelectedCourtList = courtListEntry;
+    }
+
+    private async Task CloseFeedbackDialog()
+    {
+        if (FeedbackDialog is not null)
+        {
+            await JSRuntime.InvokeVoidAsync("closeDialog", FeedbackDialog);
+        }
     }
 
     private List<int> CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24];

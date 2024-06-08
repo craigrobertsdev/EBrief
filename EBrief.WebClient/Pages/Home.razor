@@ -6,20 +6,25 @@
 @inject NavigationManager NavManager
 
 <div class="h-full grid grid-rows-[1fr,_25px]">
-    <div class="w-full h-full flex flex-col grow justify-center items-center">
-        <div class="pb-4 text-2xl">
-            <h1>Choose an option to get started</h1>
+    <div class="w-full h-full flex flex-col grow justify-center items-center gap-6">
+        <div class="text-center">
+            <h1 class="text-xl font-bold pb-4">This is a demo of expected functionality of the application.</h1>
+            <ul class="text-left list-decimal">
+                <li class="text-lg">To get started, click "Load New Court List", complete the fields at the top of the pop up and enter case file numbers in the box below.</li>
+                <li class="text-lg">The case files entered can be random as this version of the application doesn't connect to any live data - it is all randomly generated at the time of request.</li>
+            </ul>
         </div>
         <div>
             <RadzenButton Text="Load New Court List" Style="margin-left: auto; margin-right: 1rem;" Click="OpenNewCourtListDialog" />
-            <RadzenButton Text="Open Previous Court List" Style="margin-right: auto; margin-left: 1rem;" Click="OpenPreviousCourtListDialog" />
+            <RadzenButton Text="Open Previous Court List" Style="margin-right: auto; margin-left: 0.5rem margin-right: 0.5rem;" Click="OpenPreviousCourtListDialog" />
         </div>
     </div>
 
     <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
 </div>
 
-@if (_error is not null) {
+@if (_error is not null)
+{
     <div class="w-full h-full flex justify-center items-center">
         <p class="text-red-500">@_error</p>
     </div>
@@ -36,7 +41,8 @@
             <label>Court code: </label>
             <select @bind=CourtCode class="border border-black p-2 rounded-md">
                 <option selected hidden disabled></option>
-                @foreach (var courtCode in Enum.GetValues<CourtCode>()) {
+                @foreach (var courtCode in Enum.GetValues<CourtCode>())
+                {
                     <option value="@courtCode">@courtCode</option>
                 }
             </select>
@@ -45,7 +51,8 @@
             <label>Court room: </label>
             <select @bind=CourtRoom class="border border-black p-2 rounded-md">
                 <option selected hidden disabled></option>
-                @foreach (var courtRoom in CourtRooms) {
+                @foreach (var courtRoom in CourtRooms)
+                {
                     <option value="@courtRoom">@courtRoom</option>
                 }
             </select>
@@ -60,39 +67,46 @@
         <RadzenButton Text="Cancel" Click="CloseLoadNewCourtListDialog" />
     </div>
 
-    @if (_error is not null) {
+    @if (_error is not null)
+    {
         <p>@_error</p>
     }
 </dialog>
 
 <dialog @ref="PreviousCourtListDialog" class="p-5">
     <h3 class="text-lg pb-2">Choose from a previous court list</h3>
-    @if (PreviousCourtLists is null) {
+    @if (PreviousCourtLists is null)
+    {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     }
 
-    else if (PreviousCourtLists!.Count == 0) {
+    else if (PreviousCourtLists!.Count == 0)
+    {
         <h3 class="text-lg pb-2">No court previous court lists found in the database</h3>
     }
 
-    else {
+    else
+    {
         <div class="border border-black mb-2 min-w-[500px] min-h-[400px]">
-            @foreach (var courtList in PreviousCourtLists!) {
+            @foreach (var courtList in PreviousCourtLists!)
+            {
                 <p class="text-lg text-center p-1 hover:bg-slate-200 hover:text-black @(courtList == SelectedCourtList ? "bg-blue-800 text-white hover:bg-blue-800 hover:text-white" : "") cursor-default border-b border-black"
                    @onclick=@(() => HandleSelectCourtListEntry(courtList))>
                     @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
                 </p>
             }
         </div>
-        @if (_error is not null) {
+        @if (_error is not null)
+        {
             <p>@_error</p>
         }
 
     }
     <div class="flex w-full justify-end gap-3">
-        @if (PreviousCourtLists?.Count != 0) {
+        @if (PreviousCourtLists?.Count != 0)
+        {
             <RadzenButton Text="Confirm" Click="LoadPreviousCourtList" />
-            <RadzenButton Text="Delete" Click="DeletePreviousCourtList" Disabled=@(SelectedCourtList == null)/>
+            <RadzenButton Text="Delete" Click="DeletePreviousCourtList" Disabled=@(SelectedCourtList == null) />
         }
         <RadzenButton Text="Cancel" Click="ClosePreviousCourtListDialog" />
     </div>
