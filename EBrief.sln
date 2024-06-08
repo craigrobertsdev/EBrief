@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBrief.Shared", "EBrief.Sha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBrief.WebClient", "EBrief.WebClient\EBrief.WebClient.csproj", "{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBrief.WebClient.Suggestions", "EBrief.WebClient.Suggestions\EBrief.WebClient.Suggestions.csproj", "{5C1EC778-E3C9-4D2E-B40F-A5BD459130B9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B09491F5-D990-4D35-ACDC-CAEC1B30BF14}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C1EC778-E3C9-4D2E-B40F-A5BD459130B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C1EC778-E3C9-4D2E-B40F-A5BD459130B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C1EC778-E3C9-4D2E-B40F-A5BD459130B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C1EC778-E3C9-4D2E-B40F-A5BD459130B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
