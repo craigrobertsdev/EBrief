@@ -8,6 +8,7 @@ public class Defendant
     public List<CaseFile> CaseFiles { get; set; } = [];
     public CaseFile? ActiveCaseFile { get; set; }
     public string? OffenderHistory { get; set; }
+    public string CfelText { get; set; } = string.Empty;
     public List<BailAgreement> BailAgreements { get; set; } = [];
     public List<InterventionOrder> InterventionOrders { get; set; } = [];
 }

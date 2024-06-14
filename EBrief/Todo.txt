@@ -6,6 +6,8 @@ FUNCTIONALITY:
 	- Implement functionality to import court lists from a file
 	- Handle situations where there already exists a court list with the corresponding date, courtCode and courtRoom
 	- Work out logging
+	- Sometimes when loading a court list, possibly where there are too many case files for a single defendant, the case files render
+	  as a row of extremely tall elements that push the buttons to the side, off the screen.
 
 STYLING:
 	- Handle scrolling in facts of charge
@@ -14,6 +16,7 @@ STYLING:
 	on screens that are the size of the work laptops
 	- Handle long defendant names, maybe by truncating them and adding tooltip
 	- Work out why sometimes when there are a large number of case files the size of the top row is enormous
+	- Move buttons to a different location. I'm thinking toaster menu
 
 DECISION LOG:
 	Options for storing court lists:

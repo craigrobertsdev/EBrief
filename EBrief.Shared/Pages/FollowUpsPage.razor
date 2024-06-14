@@ -11,14 +11,14 @@
     <div class="pb-4">
         @* Should be a flex box with the text section and case files side-by-side *@
         <h3 class="text-lg pb-2">Create follow up task</h3>
-        <textarea placeholder="Enter task remarks here..." @bind=RemarksText
+        <textarea placeholder="Enter task remarks here..." @bind=Parent.ActiveDefendant!.ActiveCaseFile!.FollowUpText
                   class="block mb-2 w-1/2 p-2 border border-black" rows="10" />
         <RadzenButton Text="Create follow up task" />
     </div>
     @* CFEL section *@
     <div>
         <h3 class="text-lg pb-2">Enter text to add to all selected case files' CFELs</h3>
-        <textarea name="cfel-entry" id="cfel-entry" @bind="@CfelText" class="block mb-2 w-1/2 p-2 border border-black" rows="10" />
+        <textarea name="cfel-entry" id="cfel-entry" @bind="@Parent.ActiveDefendant!.CfelText" class="block mb-2 w-1/2 p-2 border border-black" rows="10" />
         <RadzenButton Text="Update CFELs" />
     </div>
 </div>
