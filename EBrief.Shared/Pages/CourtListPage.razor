@@ -21,9 +21,10 @@ else if (_loading)
 }
 else
 {
-    <div class="h-full grid grid-cols-[0.2fr_1fr] grid-rows-[auto_1fr] py-2">
+    // Defendant column
+    <div class="h-full grid grid-cols-[0.2fr_1fr] grid-rows-[auto_1fr] pt-2">
         <div class="row-span-2 overflow-auto max-h-full pl-2">
-            <div class="flex flex-col pr-2 border-r border-r-3 border-r-slate-500">
+            <div class="flex flex-col pr-2 h-full border-r border-r-3 border-r-slate-500">
                 @foreach (var defendant in CourtList.Defendants)
                 {
                     <div class="text-sm lg:text-lg p-1 max-h-[6rem] border border-slate-500 bg-slate-200 cursor-pointer @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
@@ -39,17 +40,38 @@ else
         }
         else
         {
-            <div class="pb-2 pr-4 w-full flex justify-between">
-                <RadzenSelectBar Data="@ActiveDefendant!.CaseFiles" @bind-Value="@ActiveDefendant!.ActiveCaseFile" Change="@CaseFileChanged" TValue="CaseFile" TextProperty="CaseFileNumber" ValueProperty="ActiveCaseFile" />
-                <div>
-                    <RadzenButton Text="Add Case Files" Click="OpenAddCaseFilesDialog" />
-                    <RadzenButton Text="Save" Click="SaveCourtList" />
-                    <RadzenButton Text="Export Court List" Click="ExportCourtList" />
-                    <RadzenButton Text="Back to start" Click="HandleReturnHome" />
+            // Case files row
+            <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full border-l">
+                <div class="overflow-x-auto border-r border-b">
+                    <div class="flex w-auto w-full">
+                        @foreach (var caseFile in ActiveDefendant.CaseFiles)
+                        {
+                            <div class="border text-[0.8rem] min-w-[20ch] text-center @IsSelected(caseFile)" @onclick="() => CaseFileChanged(caseFile)">
+                                <p class="py-1">
+                                    @caseFile.CaseFileNumber
+                                </p>
+                                <p class="pb-1">
+                                    @caseFile.CourtFileNumber
+                                </p>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+                <div class="max-w-2xl">
+                    <RadzenMenu Style="margin: 5px 5px 0 0">
+                        <RadzenMenuItem Style="padding: 3px 6px; " Text="Menu">
+                            <RadzenMenuItem Text="Add Case Files" Click="OpenAddCaseFilesDialog" />
+                            <RadzenMenuItem Text="Save" Click="SaveCourtList" />
+                            <RadzenMenuItem Text="Export Court List" Click="ExportCourtList" />
+                            <RadzenMenuItem Text="Return Home" Click="HandleReturnHome" />
+                        </RadzenMenuItem>
+
+                    </RadzenMenu>
                 </div>
             </div>
         }
-        <div class="h-full border-l border-l-3 border-l-slate-500">
+        <div class="h-full ml-2 border-l border-l-3 border-l-slate-500">
             <CascadingValue Value="this">
                 <CascadingValue Value="DataAccess">
                     <TabControl>
@@ -89,6 +111,16 @@ else
         </div>
 
     </div>
+
+    <style>
+        .rz-menu .rz-navigation-item {
+            direction: rtl;
+        }
+
+        .rz-navigation-item-icon-children {
+            display: none !important;
+        }
+    </style>
 }
 
 <dialog @ref="UnsavedChangesDialog" class="p-5">

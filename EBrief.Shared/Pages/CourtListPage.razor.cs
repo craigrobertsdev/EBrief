@@ -145,14 +145,28 @@ public partial class CourtListPage
         OnDefendantChange?.Invoke();
     }
 
-    private void CaseFileChanged()
+    private void CaseFileChanged(CaseFile caseFile)
     {
+        if (ActiveDefendant is not null)
+        {
+            ActiveDefendant.ActiveCaseFile = caseFile;
+        }
         ActivateDefendant(ActiveDefendant!);
     }
 
     private string IsSelected(Defendant defendant)
     {
         if (ActiveDefendant?.Id == defendant.Id)
+        {
+            return "!bg-sky-700";
+        }
+
+        return "hover:bg-gray-500";
+    }
+
+    private string IsSelected(CaseFile caseFile)
+    {
+        if (ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber)
         {
             return "!bg-sky-700";
         }
