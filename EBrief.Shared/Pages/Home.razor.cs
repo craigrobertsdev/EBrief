@@ -102,6 +102,19 @@ public partial class Home
             _error = "Please select a court code.";
             return;
         }
+         
+        if (CourtRoom is null)
+        {
+            _error = "Please select a court room.";
+            return;
+        }
+
+        var listAlreadyExists = await DataAccess.CheckCourtListExists(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom.Value));
+        if (listAlreadyExists)
+        {
+            _error = "A court list for this date and location already exists";
+            return;
+        }
 
         var client = new HttpClient();
         var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
@@ -126,14 +139,14 @@ public partial class Home
                 CaseFiles = caseFiles,
                 CourtCode = CourtCode.Value,
                 CourtDate = CourtDate.Value,
-                CourtRoom = CourtRoom!.Value
+                CourtRoom = CourtRoom.Value
             };
 
             courtList.CombineDefendantCaseFiles();
 
             try
             {
-                DataAccess.CreateCourtList(courtList);
+                await DataAccess.CreateCourtList(courtList);
             }
             catch (Exception e)
             {
