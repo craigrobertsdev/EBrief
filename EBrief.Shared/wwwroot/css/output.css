@@ -588,8 +588,20 @@ video {
   max-height: 6rem;
 }
 
+.max-h-\[80dvh\] {
+  max-height: 80dvh;
+}
+
 .max-h-full {
   max-height: 100%;
+}
+
+.max-h-\[90dvh\] {
+  max-height: 90dvh;
+}
+
+.max-h-\[85dvh\] {
+  max-height: 85dvh;
 }
 
 .min-h-\[400px\] {

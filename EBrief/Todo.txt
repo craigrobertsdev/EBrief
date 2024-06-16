@@ -4,7 +4,6 @@ FUNCTIONALITY:
 	- Test that the court lists load correctly when moving between lists
 	- Properly implement functionality to export court lists to a file
 	- Implement functionality to import court lists from a file
-	- Handle situations where there already exists a court list with the corresponding date, courtCode and courtRoom
 	- Work out logging
 	- Search function for case files by either case file or courtfile number
 	- Tooltip to be added to case files on hover to give information about the charge names or other details
