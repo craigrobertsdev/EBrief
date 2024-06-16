@@ -1,6 +1,6 @@
 ﻿namespace EBrief.WebClient.Data;
 using Bogus;
-using EBrief.WebClient.Models.Data;
+using EBrief.Shared.Models.Data;
 
 public static class DummyData
 {

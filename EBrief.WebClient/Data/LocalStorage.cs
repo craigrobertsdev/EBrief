@@ -21,7 +21,7 @@ public class LocalStorage(IServiceProvider serviceProvider) : IDataAccess
         return JsonSerializer.Serialize(entry); 
     }
 
-    public async Task SaveCourtList(CourtListModel courtList)
+    public async Task CreateCourtList(CourtListModel courtList)
     {
         var key = BuildKey(new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom));
         await _jsRuntime.InvokeVoidAsync("saveCourtList", [key, JsonSerializer.Serialize(courtList, _options)]);

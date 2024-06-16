@@ -133,7 +133,7 @@ public partial class Home
 
             try
             {
-                DataAccess.SaveCourtList(courtList);
+                DataAccess.CreateCourtList(courtList);
             }
             catch (Exception e)
             {

@@ -125,7 +125,7 @@ public partial class Home
 
             try
             {
-                await DataAccess.SaveCourtList(courtList);
+                await DataAccess.CreateCourtList(courtList);
             }
             catch (Exception e)
             {

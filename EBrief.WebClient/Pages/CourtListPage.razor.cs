@@ -1,16 +1,17 @@
 ﻿using EBrief.WebClient.Data;
-using EBrief.WebClient.Models;
-using EBrief.WebClient.Models.Data;
-using EBrief.WebClient.Models.UI;
+using EBrief.Shared.Models;
+using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
+using EBrief.Shared.Data;
 
 namespace EBrief.WebClient.Pages;
 public partial class CourtListPage
 {
     [Inject]
-    private LocalStorage LocalStorage { get; set; } = default!;
+    private IDataAccess LocalStorage { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
     public CourtCode CourtCode { get; set; } = default!;
@@ -52,14 +53,14 @@ public partial class CourtListPage
 
     private async Task LoadCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
-        var courtList = await LocalStorage.GetCourtList(LocalStorage.BuildKey(new CourtListEntry(courtCode, courtDate, courtRoom)));
+        var courtList = await LocalStorage.GetCourtList(courtCode, courtDate, courtRoom);
 
         if (courtList is null)
         {
             throw new Exception("Failed to load court list.");
         }
 
-        CourtList = courtList;
+        CourtList = courtList.ToUIModel();
         CourtList.CourtCode = courtCode;
         CourtList.CourtDate = courtDate;
         CourtList.CourtRoom = courtRoom;
@@ -97,7 +98,7 @@ public partial class CourtListPage
             _addCaseFilesError = null;
             var newCaseFiles = DummyData.GenerateCaseFiles(newCaseFileNumbers);
             CourtList.AddCaseFiles(newCaseFiles.ToUIModels());
-            await LocalStorage.SaveCourtList(CourtList);
+            await LocalStorage.UpdateCourtList(CourtList);
             await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
             _loadingNewCaseFiles = false;
         }
@@ -139,6 +140,15 @@ public partial class CourtListPage
         ActivateDefendant(ActiveDefendant!);
     }
 
+    private void CaseFileChanged(CaseFile caseFile)
+    {
+        if (ActiveDefendant is not null)
+        {
+            ActiveDefendant.ActiveCaseFile = caseFile;
+        }
+        ActivateDefendant(ActiveDefendant!);
+    }
+
     private string IsSelected(Defendant defendant)
     {
         if (ActiveDefendant?.Id == defendant.Id)
@@ -149,9 +159,19 @@ public partial class CourtListPage
         return "hover:bg-gray-500";
     }
 
-    private async Task SaveCourtList()
+    private string IsSelected(CaseFile caseFile)
     {
-        await LocalStorage.SaveCourtList(CourtList);
+        if (ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber)
+        {
+            return "!bg-sky-700";
+        }
+
+        return "hover:bg-gray-500";
+    }
+
+    private async Task UpdateCourtList()
+    {
+        await LocalStorage.UpdateCourtList(CourtList);
     }
 
     private void ExportCourtList()

@@ -6,7 +6,7 @@ namespace EBrief.Shared.Data;
 
 public interface IDataAccess
 {
-    public Task SaveCourtList(CourtListModel courtList);
+    public Task CreateCourtList(CourtListModel courtList);
     public Task<List<CourtListEntry>> GetSavedCourtLists();
     public Task UpdateCourtList(CourtList courtList);
     public Task AddCaseFiles(List<CaseFileModel> newCaseFiles, CourtList courtList);

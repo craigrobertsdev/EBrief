@@ -17,7 +17,7 @@ public class CourtListDataAccess : IDataAccess
         _logger = logger;
     }
 
-    public async Task SaveCourtList(CourtListModel courtList)
+    public async Task CreateCourtList(CourtListModel courtList)
     {
         var existingCourtList = await _context.CourtLists
             .Where(cl => cl.CourtDate == courtList.CourtDate && cl.CourtCode == courtList.CourtCode && cl.CourtRoom == courtList.CourtRoom)
