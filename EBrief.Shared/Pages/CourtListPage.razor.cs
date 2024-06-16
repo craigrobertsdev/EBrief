@@ -25,7 +25,7 @@ public partial class CourtListPage
     private string? _error;
     private string? _addCaseFilesError;
     [Inject]
-    public CourtListDataAccess DataAccess { get; set; } = default!;
+    public IDataAccess DataAccess { get; set; } = default!;
     private bool _loading;
     private bool _loadingNewCaseFiles;
 
@@ -57,7 +57,7 @@ public partial class CourtListPage
 
     private async Task LoadCourtList(bool downloadDocuments, CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
-        var courtList = DataAccess.GetCourtList(courtCode, courtDate, courtRoom)?.ToUIModel();
+        var courtList = (await DataAccess.GetCourtList(courtCode, courtDate, courtRoom))?.ToUIModel();
 
         if (courtList is null)
         {
@@ -122,7 +122,7 @@ public partial class CourtListPage
 
     private async Task HandleReturnHome()
     {
-        if (UnsavedChanges())
+        if (await UnsavedChanges())
         {
             await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
         }
@@ -186,14 +186,14 @@ public partial class CourtListPage
         File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), courtList);
     }
 
-    private bool UnsavedChanges()
+    private async Task<bool> UnsavedChanges()
     {
         // Handles the case where something has gone wrong and the user wants to go back to the start
         if (_error is not null)
         {
             return false;
         }
-        var courtList = DataAccess.GetCourtList(CourtCode, CourtDate, CourtRoom)!;
+        var courtList = await DataAccess.GetCourtList(CourtCode, CourtDate, CourtRoom)!;
 
         foreach (var caseFile in CourtList.GetCaseFiles())
         {
