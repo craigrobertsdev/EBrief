@@ -6,17 +6,15 @@ FUNCTIONALITY:
 	- Implement functionality to import court lists from a file
 	- Handle situations where there already exists a court list with the corresponding date, courtCode and courtRoom
 	- Work out logging
-	- Sometimes when loading a court list, possibly where there are too many case files for a single defendant, the case files render
-	  as a row of extremely tall elements that push the buttons to the side, off the screen.
+	- Search function for case files by either case file or courtfile number
+	- Tooltip to be added to case files on hover to give information about the charge names or other details
+	- Order case files by first offence date
 
 STYLING:
 	- Handle scrolling in facts of charge
 	- Add colour coding for whether notes have been added to the case file
-	- Sometimes when the left column has too much content (maybe this is the reason?) the UI goes weird. Need to do testing
-	on screens that are the size of the work laptops
 	- Handle long defendant names, maybe by truncating them and adding tooltip
 	- Work out why sometimes when there are a large number of case files the size of the top row is enormous
-	- Move buttons to a different location. I'm thinking toaster menu
 
 DECISION LOG:
 	Options for storing court lists:

@@ -1,7 +1,9 @@
-﻿using EBrief.Shared.Data;
+﻿using EBrief.Data;
+using EBrief.Shared.Data;
 using EBrief.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using System.IO;
 using System.Windows;
@@ -19,6 +21,9 @@ public partial class MainWindow : Window
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
+#if DEBUG
+            serviceCollection.AddBlazorWebViewDeveloperTools();
+#endif
             serviceCollection.AddLogging(builder =>
             {
                 var loggerConfiguration = new LoggerConfiguration()
@@ -34,7 +39,7 @@ public partial class MainWindow : Window
                 string dbPath = Path.Combine(FileHelpers.AppDataPath, "EBrief.db");
                 builder.UseSqlite($"Filename={dbPath}");
             });
-            serviceCollection.AddScoped<CourtListDataAccess>();
+            serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
 
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 

@@ -1,3 +1,4 @@
+using EBrief.Shared.Data;
 using EBrief.WebClient;
 using EBrief.WebClient.Data;
 using Microsoft.AspNetCore.Components.Web;
@@ -8,5 +9,5 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<LocalStorage>();
+builder.Services.AddScoped<IDataAccess, LocalStorage>();
 await builder.Build().RunAsync();

@@ -1,15 +1,16 @@
 ﻿using EBrief.WebClient.Data;
-using EBrief.WebClient.Models;
-using EBrief.WebClient.Models.Data;
+using EBrief.Shared.Models;
+using EBrief.Shared.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using EBrief.Shared.Data;
 
 namespace EBrief.WebClient.Pages;
 
 public partial class Home
 {
     [Inject]
-    public LocalStorage LocalStorage { get; set; } = default!;
+    public IDataAccess DataAccess { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
@@ -30,7 +31,7 @@ public partial class Home
     }
     private async Task OpenPreviousCourtListDialog()
     {
-        PreviousCourtLists = (await LocalStorage.GetPreviousCourtLists())
+        PreviousCourtLists = (await DataAccess.GetSavedCourtLists())
             .Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom))
             .ToList();
         if (PreviousCourtListDialog is not null)
@@ -60,7 +61,7 @@ public partial class Home
 
         try
         {
-            await LocalStorage.DeleteCourtList(SelectedCourtList);
+            await DataAccess.DeleteCourtList(SelectedCourtList);
         }
         catch (Exception e)
         {
@@ -95,7 +96,7 @@ public partial class Home
         // this should only check whether the previous court list exists, not retrieve the whole list
         // the next call should save the court list to localStorage then the following call should 
         // navigate to the court list page
-        var courtListExists = await LocalStorage.CheckCourtListExists(LocalStorage.BuildKey(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom!.Value)));
+        var courtListExists = await DataAccess.CheckCourtListExists(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom!.Value));
         if (courtListExists)
         {
            _error = "Court list already exists.";
@@ -124,7 +125,7 @@ public partial class Home
 
             try
             {
-                await LocalStorage.SaveCourtList(courtList.ToUIModel());
+                await DataAccess.SaveCourtList(courtList);
             }
             catch (Exception e)
             {
