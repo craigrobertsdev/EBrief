@@ -7,10 +7,12 @@ using EBrief.Shared.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
+using Radzen;
 
 namespace EBrief.Shared.Pages;
 public partial class CourtListPage
 {
+    [Inject] public IDataAccess DataAccess { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
@@ -24,8 +26,6 @@ public partial class CourtListPage
     public event Func<Task>? OnDefendantChange;
     private string? _error;
     private string? _addCaseFilesError;
-    [Inject]
-    public IDataAccess DataAccess { get; set; } = default!;
     private bool _loading;
     private bool _loadingNewCaseFiles;
 
@@ -172,6 +172,11 @@ public partial class CourtListPage
         }
 
         return "hover:bg-gray-500";
+    }
+
+    private bool HasOverflow(string lastName, string firstName)
+    {
+        return $"{lastName}, {firstName}".Length > 20;
     }
 
     private void SaveCourtList()

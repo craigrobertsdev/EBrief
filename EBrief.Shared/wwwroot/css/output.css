@@ -544,6 +544,22 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+.left-full {
+  left: 100%;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
 .row-span-2 {
   grid-row: span 2 / span 2;
 }
@@ -588,20 +604,12 @@ video {
   max-height: 6rem;
 }
 
-.max-h-\[80dvh\] {
-  max-height: 80dvh;
+.max-h-\[85dvh\] {
+  max-height: 85dvh;
 }
 
 .max-h-full {
   max-height: 100%;
-}
-
-.max-h-\[90dvh\] {
-  max-height: 90dvh;
-}
-
-.max-h-\[85dvh\] {
-  max-height: 85dvh;
 }
 
 .min-h-\[400px\] {
@@ -650,6 +658,11 @@ video {
 
 .grow {
   flex-grow: 1;
+}
+
+.translate-x-full {
+  --tw-translate-x: 100%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .cursor-default {
@@ -726,6 +739,14 @@ video {
 
 .overflow-y-auto {
   overflow-y: auto;
+}
+
+.text-ellipsis {
+  text-overflow: ellipsis;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
 }
 
 .rounded-md {

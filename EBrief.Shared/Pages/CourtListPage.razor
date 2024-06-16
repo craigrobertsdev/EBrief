@@ -27,8 +27,11 @@ else
             <div class="flex flex-col mr-2 h-full border-t border-slate-500">
                 @foreach (var defendant in CourtList.Defendants)
                 {
-                    <div class="text-sm lg:text-lg p-1 max-h-[6rem] border-l border-r border-b border-slate-500 bg-slate-200 cursor-pointer @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
-                        @defendant.LastName.ToUpper(), @defendant.FirstName
+                    <div class="relative text-sm lg:text-lg p-1 border-l border-r border-b border-slate-500 bg-slate-200 @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
+                        <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
+                            title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
+                            @defendant.LastName.ToUpper(), @defendant.FirstName
+                        </p>
                     </div>
                 }
             </div>

@@ -10,7 +10,6 @@ FUNCTIONALITY:
 	- Order case files by first offence date
 
 STYLING:
-	- Handle scrolling in facts of charge
 	- Add colour coding for whether notes have been added to the case file
 	- Handle long defendant names, maybe by truncating them and adding tooltip
 	- Work out why sometimes when there are a large number of case files the size of the top row is enormous
