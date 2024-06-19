@@ -20,7 +20,7 @@ public class ChargeModel
             Name = Name,
             Date = Date,
             VictimName = VictimName,
-            ChargeWording = ChargeWording
+            ChargeWording = ChargeWording,
         };
     }
 }

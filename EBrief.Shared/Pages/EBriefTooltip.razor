@@ -1,0 +1,35 @@
+﻿<div class="" @onmouseover=ShowTooltip @onmouseleave=HideTooltip>
+    <div class="select-none">
+        @ChildContent
+    </div>
+    <div class="absolute bg-slate-200 border border-slate-400 mt-[1px] pb-[-0.5rem] pl-2 pr-2 pt-2 z-10 min-w-56 max-w-96"
+         style="display: @(_isVisible ? "block" : "none");">
+        @Text
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public MarkupString Text { get; set; }
+    private bool _isVisible = false;
+    private bool _isMouseOver = false;
+    private const int TooltipDelay = 200;
+
+    private async Task ShowTooltip(MouseEventArgs e)
+    {
+        _isMouseOver = true;
+        await Task.Delay(TooltipDelay);
+
+        if (_isMouseOver)
+        {
+            _isVisible = true;
+            StateHasChanged();
+        }
+    }
+
+    private void HideTooltip(MouseEventArgs e)
+    {
+        _isMouseOver = false;
+        _isVisible = false;
+    }
+}

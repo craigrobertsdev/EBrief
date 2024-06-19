@@ -12,6 +12,7 @@ using Radzen;
 namespace EBrief.Shared.Pages;
 public partial class CourtListPage
 {
+    [Inject] public TooltipService TooltipService { get; set; } = default!;
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
     public bool NewList { get; set; }
@@ -21,6 +22,11 @@ public partial class CourtListPage
     public int CourtRoom { get; set; } = default!;
     private ElementReference? UnsavedChangesDialog { get; set; }
     private ElementReference? AddCaseFilesDialog { get; set; }
+    private Dictionary<string, ElementReference?> CaseFileHeaderRefs { get; set; } = [];
+    private string RenderingCaseFileNumber { get; set; } = string.Empty;
+    private ElementReference CaseFileHeaderRef { 
+        set { CaseFileHeaderRefs.TryAdd(RenderingCaseFileNumber, value); }
+    }
     private string CaseFilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
@@ -52,6 +58,13 @@ public partial class CourtListPage
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
         ActivateDefendant(CourtList.Defendants.First());
+
+        // used on the front end for tooltips to attach to
+        //foreach (var caseFile in CourtList.GetCaseFiles())
+        //{
+        //    CaseFileHeaderRefs.Add(caseFile.CaseFileNumber, new ElementReference());
+        //}
+
         _loading = false;
     }
 
@@ -134,6 +147,7 @@ public partial class CourtListPage
     {
         await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
     }
+
     private void ActivateDefendant(Defendant defendant)
     {
         ActiveDefendant = defendant;

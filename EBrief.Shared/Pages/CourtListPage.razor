@@ -4,6 +4,7 @@
 @using EBrief.Shared.Models.UI
 @using Microsoft.JSInterop
 @using Radzen.Blazor
+@using System.Text
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavManager
 
@@ -29,7 +30,7 @@ else
                 {
                     <div class="relative text-sm lg:text-lg p-1 border-l border-r border-b border-slate-500 bg-slate-200 @IsSelected(defendant)" @onclick="() => ActivateDefendant(defendant)">
                         <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
-                            title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
+                           title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
                             @defendant.LastName.ToUpper(), @defendant.FirstName
                         </p>
                     </div>
@@ -44,21 +45,22 @@ else
         else
         {
             // Case files row
-            <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full border-l">
+            <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full border-l relative">
                 <div class="overflow-x-auto border-r border-b">
                     <div class="flex w-auto w-full">
                         @foreach (var caseFile in ActiveDefendant.CaseFiles)
                         {
-                            <div class="border text-[0.8rem] min-w-[20ch] text-center @IsSelected(caseFile)" @onclick="() => CaseFileChanged(caseFile)">
-                                <p class="py-1">
-                                    @caseFile.CaseFileNumber
-                                </p>
-                                <p class="pb-1">
-                                    @caseFile.CourtFileNumber
-                                </p>
-                            </div>
+                            <EBriefTooltip Text="@GenerateCaseFileTooltipText(caseFile)">
+                                <div class="border text-[0.8rem] min-w-[20ch] text-center @IsSelected(caseFile)" @onclick="() => CaseFileChanged(caseFile)">
+                                    <p class="py-1 select-none">
+                                        @caseFile.CaseFileNumber
+                                    </p>
+                                    <p class="pb-1 select-none">
+                                        @caseFile.CourtFileNumber
+                                    </p>
+                                </div>
+                            </EBriefTooltip>
                         }
-
                     </div>
                 </div>
                 <div class="max-w-2xl">
@@ -158,3 +160,37 @@ else
         }
     }
 </dialog>
+
+@code {
+    private TooltipOptions TooltipOptions => new TooltipOptions { Delay = 0, Duration = 0 };
+    private void ShowTooltip(CaseFile caseFile)
+    {
+        var text = GenerateCaseFileTooltipText(caseFile);
+        var elementReference = CaseFileHeaderRefs[caseFile.CaseFileNumber];
+        TooltipService.Open(elementReference!.Value, text.ToString(), TooltipOptions);
+    }
+
+    private MarkupString GenerateCaseFileTooltipText(CaseFile caseFile)
+    {
+        var markup = new StringBuilder();
+        int maxCharges = 4;
+
+        if (caseFile.Charges.Count > maxCharges)
+        {
+            markup.Append($"<p class=\"pb-2 text-sm\">{caseFile.Charges.Count} total charges</p>");
+        }
+        foreach (var (charge, i) in caseFile.Charges.Take(maxCharges).Select((c, i) => (c, i)))
+        {
+            if (i == maxCharges)
+            {
+                markup.Append($"<p>{i + 1}. {charge.Date:d}: {charge.Name}</p>");
+            }
+            else
+            {
+                markup.Append($"<p class=\"pb-2\">{i + 1}. {charge.Date:d}: {charge.Name}</p>");
+            }
+        }
+        return new MarkupString(markup.ToString());
+
+    }
+}
