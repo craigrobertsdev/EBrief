@@ -3,6 +3,7 @@ using EBrief.Shared.Data;
 using EBrief.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Radzen;
 using Serilog;
 using System.IO;
 using System.Windows;
@@ -22,16 +23,20 @@ public partial class MainWindow : Window
             serviceCollection.AddWpfBlazorWebView();
 #if DEBUG
             serviceCollection.AddBlazorWebViewDeveloperTools();
-#endif
+            serviceCollection.AddLogging();
+#else
+
             serviceCollection.AddLogging(builder =>
             {
                 var loggerConfiguration = new LoggerConfiguration()
                     .WriteTo.File("test.txt", rollingInterval: RollingInterval.Day)
+                    .WriteTo.Console()
                     .MinimumLevel.Information()
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning);
 
                 builder.AddSerilog(loggerConfiguration.CreateLogger());
             });
+#endif
 
             serviceCollection.AddDbContext<ApplicationDbContext>(builder =>
             {
@@ -39,6 +44,7 @@ public partial class MainWindow : Window
                 builder.UseSqlite($"Filename={dbPath}");
             });
             serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
+            serviceCollection.AddScoped<TooltipService>();
 
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 

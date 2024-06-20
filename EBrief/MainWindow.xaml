@@ -7,7 +7,7 @@
         xmlns:shared="clr-namespace:EBrief.Shared;assembly=EBrief.Shared"
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
         mc:Ignorable="d"
-        Title="EBrief" Height="450" Width="800">
+        Title="EBrief" Height="900" Width="1440">
     <Grid>
         <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>

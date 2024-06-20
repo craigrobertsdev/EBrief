@@ -22,9 +22,9 @@ else if (_loading)
 }
 else
 {
-    // Defendant column
     <div class="h-full grid grid-cols-[0.2fr_1fr] grid-rows-[auto_1fr] pt-2">
-        <div class="row-span-2 overflow-auto max-h-full pl-2">
+        @* Defendant column *@
+        <div id="defendant-container" class="row-span-2 overflow-auto max-h-full pl-2">
             <div class="flex flex-col mr-2 h-full border-t border-slate-500">
                 @foreach (var defendant in CourtList.Defendants)
                 {
@@ -46,11 +46,11 @@ else
         {
             // Case files row
             <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full border-l relative">
-                <div class="overflow-x-auto border-r border-b">
+                <div id="casefile-container" class="overflow-x-auto border-r border-b">
                     <div class="flex w-auto w-full">
                         @foreach (var caseFile in ActiveDefendant.CaseFiles)
                         {
-                            <EBriefTooltip Text="@GenerateCaseFileTooltipText(caseFile)">
+                            <Tooltip Text="@GenerateCaseFileTooltipText(caseFile)" Id="@caseFile.CaseFileNumber">
                                 <div class="border text-[0.8rem] min-w-[20ch] text-center @IsSelected(caseFile)" @onclick="() => CaseFileChanged(caseFile)">
                                     <p class="py-1 select-none">
                                         @caseFile.CaseFileNumber
@@ -59,7 +59,7 @@ else
                                         @caseFile.CourtFileNumber
                                     </p>
                                 </div>
-                            </EBriefTooltip>
+                            </Tooltip>
                         }
                     </div>
                 </div>

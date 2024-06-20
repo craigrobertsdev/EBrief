@@ -1,23 +1,28 @@
-﻿<div class="relative inline-block" @onmouseover=ShowTooltip @onmouseleave=HideTooltip>
+﻿@inject IJSRuntime JSRuntime
+
+<div id="tooltip-@Id"@onmouseenter:stopPropagation="true" @onmouseenter=ShowTooltip @onmouseleave=HideTooltip>
     <div class="select-none">
         @ChildContent
+        @_left
     </div>
-    <div class="hidden absolute bg-sky-700 text-white text-center p-2 z-10 bottom-full left-1/2 ml-[-60px]"
-         style="display: @(_isVisible ? "block" : "none");">
+    <div class="absolute bg-slate-200 border border-slate-400 mt-[1px] pb-[-0.5rem] pl-2 pr-2 pt-2 z-10 min-w-56 max-w-96"
+         style="display: @(_isVisible ? "block" : "none"); left: @(_left)px;">
         @Text
     </div>
 </div>
 
 @code {
-    [Parameter] public string Text { get; set; } = string.Empty;
     [Parameter] public RenderFragment ChildContent { get; set; } = default!;
-
+    [Parameter] public MarkupString Text { get; set; }
+    [Parameter] public string Id { get; set; } = string.Empty;
     private bool _isVisible = false;
     private bool _isMouseOver = false;
-    private const int TooltipDelay = 500;
+    private const int TooltipDelay = 100;
+    private int _left = 0;
 
     private async Task ShowTooltip(MouseEventArgs e)
     {
+        _left = await JSRuntime.InvokeAsync<int>("setTooltipPosition", $"tooltip-{Id}");
         _isMouseOver = true;
         await Task.Delay(TooltipDelay);
 
