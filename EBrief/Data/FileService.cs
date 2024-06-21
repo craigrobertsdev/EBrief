@@ -5,7 +5,7 @@ public class FileService : IFileService
 {
     public void SaveFile(string fileName, string json)
     {
-        SaveFileDialog dialog = new();
+        var dialog = new SaveFileDialog();
         dialog.FileName = fileName;
         dialog.DefaultExt = ".court";
         dialog.Filter = "Court files|*.court";
@@ -13,7 +13,8 @@ public class FileService : IFileService
         bool? result = dialog.ShowDialog();
         if (result == true)
         {
-            File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), json);
+            Console.WriteLine(dialog.FileName);
+            File.WriteAllText(dialog.FileName, json);
         }
     }
 }
