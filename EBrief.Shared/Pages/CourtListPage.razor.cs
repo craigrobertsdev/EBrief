@@ -40,14 +40,13 @@ public partial class CourtListPage
         HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
-        var isNewList = queries.TryGetValue("newList", out _);
         CourtCode = Enum.Parse<CourtCode>(queries["courtCode"]!);
         CourtDate = DateTime.Parse(queries["courtDate"]!);
         CourtRoom = int.Parse(queries["courtRoom"]!);
 
         try
         {
-            await LoadCourtList(isNewList, CourtCode, CourtDate, CourtRoom);
+            await LoadCourtList(CourtCode, CourtDate, CourtRoom);
         }
         catch (Exception e)
         {
@@ -59,16 +58,10 @@ public partial class CourtListPage
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
         ActivateDefendant(CourtList.Defendants.First());
 
-        // used on the front end for tooltips to attach to
-        //foreach (var caseFile in CourtList.GetCaseFiles())
-        //{
-        //    CaseFileHeaderRefs.Add(caseFile.CaseFileNumber, new ElementReference());
-        //}
-
         _loading = false;
     }
 
-    private async Task LoadCourtList(bool downloadDocuments, CourtCode courtCode, DateTime courtDate, int courtRoom)
+    private async Task LoadCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
         var courtList = (await DataAccess.GetCourtList(courtCode, courtDate, courtRoom))?.ToUIModel();
 
@@ -81,11 +74,6 @@ public partial class CourtListPage
         CourtList.CourtCode = courtCode;
         CourtList.CourtDate = courtDate;
         CourtList.CourtRoom = courtRoom;
-
-        if (downloadDocuments)
-        {
-            await DownloadDocuments(courtList);
-        }
     }
 
     private async Task OpenAddCaseFilesDialog()
@@ -186,11 +174,6 @@ public partial class CourtListPage
         }
 
         return "hover:bg-gray-500";
-    }
-
-    private bool HasOverflow(string lastName, string firstName)
-    {
-        return $"{lastName}, {firstName}".Length > 20;
     }
 
     private void SaveCourtList()

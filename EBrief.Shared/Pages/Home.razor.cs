@@ -10,6 +10,7 @@ namespace EBrief.Shared.Pages;
 
 public partial class Home
 {
+    [Inject] private IDataAccess DataAccess { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
@@ -19,8 +20,6 @@ public partial class Home
     public string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
-    [Inject]
-    private IDataAccess DataAccess { get; set; } = default!;
 
     private async Task OpenNewCourtListDialog()
     {
@@ -70,23 +69,6 @@ public partial class Home
 
         PreviousCourtLists.Remove(SelectedCourtList);
     }
-
-    //protected override void OnInitialized() {
-    //    var args = Environment.GetCommandLineArgs();
-
-    //    if (args.Length == 0) {
-    //        return;
-    //    }
-
-    //    string filePath = string.Empty;
-    //    foreach (var arg in args[1..]) {
-    //        filePath += arg + " ";
-    //    }
-
-    //    var json = File.ReadAllText(filePath);
-    //    var courtList = JsonSerializer.Deserialize<CourtListModel>(json);
-    //    var context = new ApplicationDbContext();
-    //}
 
     private async Task FetchCourtList()
     {
