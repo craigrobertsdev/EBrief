@@ -8,11 +8,10 @@ FUNCTIONALITY:
 	- Implement functionality to import court lists from a file
 	- Work out logging
 	- Search function for case files by either case file or courtfile number
-	- Tooltip to be added to case files on hover to give information about the charge names or other details
-		- When changing defendants the next tooltip throws a null reference exception. This looks to be due to the lack of elements being 
-		linked to the ElementReference list beyond the first defendant on load.
-		Got to work out a way to make these elements link to the ElementReference list on changing defendant
 	- Order case files by first offence date
+	- Change the way court lists are loaded to not load files immediately
+	- Add option to download documents from the server rather than just the text data.
+	- Add option to refresh local data from server
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file

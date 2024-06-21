@@ -14,12 +14,42 @@ public partial class Home
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
+    private List<Court> Courts = [];
+    private Court? SelectedCourt { get; set; }
     public DateTime? CourtDate { get; set; }
-    public CourtCode? CourtCode { get; set; }
     public int? CourtRoom { get; set; }
+    public bool IncludeDocuments { get; set; }
+    private bool _loadingCourtList;
     public string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.AMC,
+            CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24]
+        });
+
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.EMC,
+            CourtRooms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        });
+
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.CBMC,
+            CourtRooms = [1, 2, 3, 4, 5]
+        });
+
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.PAMC,
+            CourtRooms = [1, 2, 3, 4, 5]
+        });
+    }
 
     private async Task OpenNewCourtListDialog()
     {
@@ -79,19 +109,20 @@ public partial class Home
             return;
         }
 
-        if (CourtCode is null)
+        if (SelectedCourt is null)
         {
-            _error = "Please select a court code.";
+            _error = "Please select a court.";
             return;
         }
-         
+
         if (CourtRoom is null)
         {
             _error = "Please select a court room.";
             return;
         }
 
-        var listAlreadyExists = await DataAccess.CheckCourtListExists(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom.Value));
+        _loadingCourtList = true;
+        var listAlreadyExists = await DataAccess.CheckCourtListExists(new CourtListEntry(SelectedCourt.CourtCode, CourtDate.Value, CourtRoom.Value));
         if (listAlreadyExists)
         {
             _error = "A court list for this date and location already exists";
@@ -119,7 +150,7 @@ public partial class Home
             var courtList = new CourtListModel
             {
                 CaseFiles = caseFiles,
-                CourtCode = CourtCode.Value,
+                CourtCode = SelectedCourt.CourtCode,
                 CourtDate = CourtDate.Value,
                 CourtRoom = CourtRoom.Value
             };
@@ -136,7 +167,7 @@ public partial class Home
                 return;
             }
 
-            NavManager.NavigateTo($"/court-list/?newList=true&courtCode={CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
+            NavManager.NavigateTo($"/court-list/?newList=&courtCode={SelectedCourt.CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
         }
         catch (Exception e)
         {
@@ -172,5 +203,30 @@ public partial class Home
         SelectedCourtList = courtListEntry;
     }
 
-    private List<int> CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24];
+    private void HandleSelectCourt(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        var courtCode = Enum.Parse<CourtCode>(e.Value.ToString()!);
+        SelectedCourt = Courts.FirstOrDefault(e => e.CourtCode == courtCode);
+    }
+    
+    private void HandleSelectCourtRoom(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        CourtRoom = int.Parse(e.Value.ToString()!);
+    }
+
+    class Court
+    {
+        public CourtCode CourtCode { get; set; }
+        public List<int> CourtRooms { get; set; } = [];
+    }
+
+    
 }

@@ -35,9 +35,9 @@
         </div>
         <div>
             <label>Court code: </label>
-            <select @bind=CourtCode class="border border-black p-2 rounded-md">
+            <select @onchange="HandleSelectCourt" class="border border-black p-2 rounded-md">
                 <option selected hidden disabled></option>
-                @foreach (var courtCode in Enum.GetValues<CourtCode>())
+                @foreach (var courtCode in Courts.Select(c => c.CourtCode))
                 {
                     <option value="@courtCode">@courtCode</option>
                 }
@@ -45,15 +45,21 @@
         </div>
         <div>
             <label>Court room: </label>
-            <select @bind=CourtRoom class="border border-black p-2 rounded-md">
-                <option selected hidden disabled></option>
-                @foreach (var courtRoom in CourtRooms)
+            <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md" disabled="@(SelectedCourt == null)">
+                @if (SelectedCourt is not null)
                 {
-                    <option value="@courtRoom">@courtRoom</option>
+                    <option selected hidden disabled></option>
+                    foreach (var courtRoom in SelectedCourt!.CourtRooms)
+                    {
+                        <option value="@courtRoom">@courtRoom</option>
+                    }
                 }
             </select>
-
         </div>
+    </div>
+    <div class="py-2">
+        <label class="pr-2">Include documents</label>
+        <RadzenCheckBox Value="IncludeDocuments" />
     </div>
     <div class="w-full">
         <textarea @bind="@CaseFileNumbers" rows="15" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
@@ -67,7 +73,7 @@
     }
 
     <div class="flex w-full justify-end gap-3">
-        <RadzenButton Text="Confirm" Click="FetchCourtList" />
+        <RadzenButton Text="Confirm" Click="FetchCourtList" Disabled="_loadingCourtList" />
         <RadzenButton Text="Cancel" Click="CloseLoadNewCourtListDialog" />
     </div>
 </dialog>

@@ -20,6 +20,7 @@ public partial class CourtListPage
     public CourtCode CourtCode { get; set; } = default!;
     public DateTime CourtDate { get; set; } = default!;
     public int CourtRoom { get; set; } = default!;
+    private bool _includeDocuments;
     private ElementReference? UnsavedChangesDialog { get; set; }
     private ElementReference? AddCaseFilesDialog { get; set; }
     private Dictionary<string, ElementReference?> CaseFileHeaderRefs { get; set; } = [];
@@ -40,6 +41,7 @@ public partial class CourtListPage
         HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
+        _includeDocuments = queries.ContainsKey("includeDocuments");
         CourtCode = Enum.Parse<CourtCode>(queries["courtCode"]!);
         CourtDate = DateTime.Parse(queries["courtDate"]!);
         CourtRoom = int.Parse(queries["courtRoom"]!);
@@ -68,6 +70,11 @@ public partial class CourtListPage
         if (courtList is null)
         {
             throw new Exception("Failed to load court list.");
+        }
+
+        if (_includeDocuments)
+        {
+            await DownloadDocuments();
         }
 
         CourtList = courtList;
@@ -209,14 +216,14 @@ public partial class CourtListPage
         return false;
     }
 
-    private static async Task DownloadDocuments(CourtList courtList)
+    private async Task DownloadDocuments()
     {
         var client = new HttpClient();
 
         List<string> caseFileDocumentNames = [];
         List<string> occurrenceDocumentNames = [];
 
-        foreach (var defendant in courtList.Defendants)
+        foreach (var defendant in CourtList.Defendants)
         {
             foreach (var caseFile in defendant.CaseFiles)
             {
