@@ -1,0 +1,18 @@
+<div class="overflow-auto max-h-[85dvh]">
+    @if (Parent.ActiveDefendant?.ActiveCaseFile?.FactsOfCharge is not null)
+    {
+        @foreach (var paragraph in Parent.ActiveDefendant.ActiveCaseFile.FactsOfCharge.Split("\n"))
+        {
+            <p class="max-w-[120ch]">@paragraph</p>
+            <br />
+        }
+    }
+    else
+    {
+        <p>Error loading facts of charge</p>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+}

@@ -1,6 +1,5 @@
 ﻿using EBrief.Data;
-using EBrief.Shared.Data;
-using EBrief.Shared.Helpers;
+using EBrief.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen;

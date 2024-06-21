@@ -1,4 +1,4 @@
-﻿using EBrief.Shared.Helpers;
+﻿using EBrief.Helpers;
 using System.IO;
 using System.Windows;
 

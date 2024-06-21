@@ -1,0 +1,114 @@
+@page "/"
+@using EBrief.Models
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+<div class="h-full grid grid-rows-[1fr,_25px]">
+    <div class="w-full h-full flex flex-col grow justify-center items-center">
+        <div class="pb-4 text-2xl">
+            <h1>Choose an option to get started</h1>
+        </div>
+        <div>
+            <RadzenButton Text="Load New Court List" Style="margin-left: auto; margin-right: 1rem;" Click="OpenNewCourtListDialog" />
+            <RadzenButton Text="Open Previous Court List" Style="margin-right: auto; margin-left: 1rem;" Click="OpenPreviousCourtListDialog" />
+        </div>
+    </div>
+
+    <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
+</div>
+
+@if (_error is not null)
+{
+    <div class="w-full h-full flex justify-center items-center">
+        <p class="text-red-500">@_error</p>
+    </div>
+}
+
+<dialog @ref="NewCourtListDialog" class="p-5">
+    <h3 class="text-lg pb-2">Copy the column of case file numbers from your court list into the box below</h3>
+    <div class="flex gap-4">
+        <div class="flex items-center pb-2 gap-6">
+            <label>Court date: </label>
+            <input type="date" @bind=@CourtDate class="border border-black rounded-md p-1">
+        </div>
+        <div>
+            <label>Court code: </label>
+            <select @onchange="HandleSelectCourt" class="border border-black p-2 rounded-md">
+                <option selected hidden disabled></option>
+                @foreach (var courtCode in Courts.Select(c => c.CourtCode))
+                {
+                    <option value="@courtCode">@courtCode</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label>Court room: </label>
+            <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md" disabled="@(SelectedCourt == null)">
+                @if (SelectedCourt is not null)
+                {
+                    <option selected hidden disabled></option>
+                    foreach (var courtRoom in SelectedCourt!.CourtRooms)
+                    {
+                        <option value="@courtRoom">@courtRoom</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="py-2">
+        <label class="pr-2">Include documents</label>
+        <RadzenCheckBox Value="IncludeDocuments" />
+    </div>
+    <div class="w-full">
+        <textarea @bind="@CaseFileNumbers" rows="15" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
+    </div>
+
+    @if (_error is not null)
+    {
+        <div class="w-full h-full flex justify-center items-center py-2">
+            <p class="text-red-500">@_error</p>
+        </div>
+    }
+
+    <div class="flex w-full justify-end gap-3">
+        <RadzenButton Text="Confirm" Click="FetchCourtList" Disabled="_loadingCourtList" />
+        <RadzenButton Text="Cancel" Click="CloseLoadNewCourtListDialog" />
+    </div>
+</dialog>
+
+<dialog @ref="PreviousCourtListDialog" class="p-5">
+    <h3 class="text-lg pb-2">Choose from a previous court list</h3>
+    @if (PreviousCourtLists is null)
+    {
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+    }
+
+    else if (PreviousCourtLists!.Count == 0)
+    {
+        <h3 class="text-lg pb-2">No court previous court lists found in the database</h3>
+    }
+
+    else
+    {
+        <div class="border border-black mb-2 min-w-[500px] min-h-[400px]">
+            @foreach (var courtList in PreviousCourtLists!)
+            {
+                <p class="text-lg text-center p-1 hover:bg-slate-200 hover:text-black @(courtList == SelectedCourtList ? "bg-blue-800 text-white hover:bg-blue-800 hover:text-white" : "") cursor-default border-b border-black"
+                   @onclick=@(() => HandleSelectCourtListEntry(courtList))>
+                    @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
+                </p>
+            }
+        </div>
+
+    }
+    <div class="flex w-full justify-end gap-3">
+        @if (PreviousCourtLists?.Count != 0)
+        {
+            <RadzenButton Text="Confirm" Click="LoadPreviousCourtList" />
+            <RadzenButton Text="Delete" Click="DeletePreviousCourtList" Disabled=@(SelectedCourtList == null) />
+        }
+        <RadzenButton Text="Cancel" Click="ClosePreviousCourtListDialog" />
+    </div>
+</dialog>

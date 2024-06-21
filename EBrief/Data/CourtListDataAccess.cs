@@ -1,7 +1,6 @@
-﻿using EBrief.Shared.Data;
-using EBrief.Shared.Models;
-using EBrief.Shared.Models.Data;
-using EBrief.Shared.Models.UI;
+﻿using EBrief.Models;
+using EBrief.Models.Data;
+using EBrief.Models.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

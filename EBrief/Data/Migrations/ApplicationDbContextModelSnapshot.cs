@@ -17,7 +17,7 @@ namespace EBrief.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileDocumentModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileDocumentModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace EBrief.Migrations
                     b.ToTable("CaseFileDocumentModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileEnquiryLogModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,7 +68,7 @@ namespace EBrief.Migrations
                     b.ToTable("CaseFileEnquiryLogModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
                 {
                     b.Property<string>("CaseFileNumber")
                         .HasColumnType("TEXT");
@@ -105,7 +105,7 @@ namespace EBrief.Migrations
                     b.ToTable("CaseFiles");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.ChargeModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.ChargeModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -138,7 +138,7 @@ namespace EBrief.Migrations
                     b.ToTable("ChargeModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CourtListModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CourtListModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -152,7 +152,7 @@ namespace EBrief.Migrations
                     b.ToTable("CourtLists");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.DefendantModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.DefendantModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -171,7 +171,7 @@ namespace EBrief.Migrations
                     b.ToTable("DefendantModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.HearingEntryModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.HearingEntryModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -198,7 +198,7 @@ namespace EBrief.Migrations
                     b.ToTable("HearingEntryModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.InformationModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.InformationModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -209,7 +209,7 @@ namespace EBrief.Migrations
                     b.ToTable("InformationModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.OccurrenceDocumentModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.OccurrenceDocumentModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -233,33 +233,33 @@ namespace EBrief.Migrations
                     b.ToTable("OccurrenceDocumentModel");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileDocumentModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileDocumentModel", b =>
                 {
-                    b.HasOne("EBrief.Shared.Models.Data.CaseFileModel", null)
+                    b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("CaseFileDocuments")
                         .HasForeignKey("CaseFileModelCaseFileNumber");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileEnquiryLogModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogModel", b =>
                 {
-                    b.HasOne("EBrief.Shared.Models.Data.CaseFileModel", null)
+                    b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("CfelEntries")
                         .HasForeignKey("CaseFileModelCaseFileNumber");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
                 {
-                    b.HasOne("EBrief.Shared.Models.Data.CourtListModel", null)
+                    b.HasOne("EBrief.Models.Data.CourtListModel", null)
                         .WithMany("CaseFiles")
                         .HasForeignKey("CourtListModelId");
 
-                    b.HasOne("EBrief.Shared.Models.Data.DefendantModel", "Defendant")
+                    b.HasOne("EBrief.Models.Data.DefendantModel", "Defendant")
                         .WithMany()
                         .HasForeignKey("DefendantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EBrief.Shared.Models.Data.InformationModel", "Information")
+                    b.HasOne("EBrief.Models.Data.InformationModel", "Information")
                         .WithMany()
                         .HasForeignKey("InformationId");
 
@@ -268,23 +268,23 @@ namespace EBrief.Migrations
                     b.Navigation("Information");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.ChargeModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.ChargeModel", b =>
                 {
-                    b.HasOne("EBrief.Shared.Models.Data.CaseFileModel", null)
+                    b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("Charges")
                         .HasForeignKey("CaseFileModelCaseFileNumber");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.HearingEntryModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.HearingEntryModel", b =>
                 {
-                    b.HasOne("EBrief.Shared.Models.Data.CaseFileModel", null)
+                    b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("PreviousHearings")
                         .HasForeignKey("CaseFileModelCaseFileNumber");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.InformationModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.InformationModel", b =>
                 {
-                    b.OwnsMany("EBrief.Shared.Models.Data.InformationEntryModel", "Charges", b1 =>
+                    b.OwnsMany("EBrief.Models.Data.InformationEntryModel", "Charges", b1 =>
                         {
                             b1.Property<int>("InformationModelId")
                                 .HasColumnType("INTEGER");
@@ -311,14 +311,14 @@ namespace EBrief.Migrations
                     b.Navigation("Charges");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.OccurrenceDocumentModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.OccurrenceDocumentModel", b =>
                 {
-                    b.HasOne("EBrief.Shared.Models.Data.CaseFileModel", null)
+                    b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("OccurrenceDocuments")
                         .HasForeignKey("CaseFileModelCaseFileNumber");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CaseFileModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
                 {
                     b.Navigation("CaseFileDocuments");
 
@@ -331,7 +331,7 @@ namespace EBrief.Migrations
                     b.Navigation("PreviousHearings");
                 });
 
-            modelBuilder.Entity("EBrief.Shared.Models.Data.CourtListModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CourtListModel", b =>
                 {
                     b.Navigation("CaseFiles");
                 });
