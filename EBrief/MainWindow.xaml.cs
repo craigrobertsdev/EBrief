@@ -44,6 +44,7 @@ public partial class MainWindow : Window
             });
             serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
             serviceCollection.AddScoped<TooltipService>();
+            serviceCollection.AddScoped<IFileService, FileService>();
 
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 

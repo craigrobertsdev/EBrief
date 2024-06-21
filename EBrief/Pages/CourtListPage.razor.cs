@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
-using System.IO;
 using System.Net.Http;
 
 namespace EBrief.Pages;
@@ -16,6 +15,7 @@ public partial class CourtListPage
 {
     [Inject] public TooltipService TooltipService { get; set; } = default!;
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
+    [Inject] public IFileService FileService { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
@@ -193,9 +193,10 @@ public partial class CourtListPage
 
     private void ExportCourtList()
     {
-        var courtList = CourtList.SerialiseToJson();
         var fileName = $"Court {CourtRoom} {CourtCode} - {CourtList.CourtDate.Day} {CourtList.CourtDate:MMM} {CourtList.CourtDate.Year}.court";
-        File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), courtList);
+        var courtList = CourtList.SerialiseToJson();
+        FileService.SaveFile(fileName, courtList);
+        //File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), courtList);
     }
 
     private async Task<bool> UnsavedChanges()
