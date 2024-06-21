@@ -3,7 +3,6 @@
 <div id="tooltip-@Id"@onmouseenter:stopPropagation="true" @onmouseenter=ShowTooltip @onmouseleave=HideTooltip>
     <div class="select-none">
         @ChildContent
-        @_left
     </div>
     <div class="absolute bg-slate-200 border border-slate-400 mt-[1px] pb-[-0.5rem] pl-2 pr-2 pt-2 z-10 min-w-56 max-w-96"
          style="display: @(_isVisible ? "block" : "none"); left: @(_left)px;">
