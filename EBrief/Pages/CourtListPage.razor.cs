@@ -191,12 +191,9 @@ public partial class CourtListPage
         DataAccess.UpdateCourtList(CourtList);
     }
 
-    private void ExportCourtList()
+    private async Task ExportCourtList()
     {
-        var fileName = $"Court {CourtRoom} {CourtCode} - {CourtList.CourtDate.Day} {CourtList.CourtDate:MMM} {CourtList.CourtDate.Year}.court";
-        var courtList = CourtList.SerialiseToJson();
-        FileService.SaveFile(fileName, courtList);
-        //File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), courtList);
+        await FileService.SaveFile(CourtList);
     }
 
     private async Task<bool> UnsavedChanges()

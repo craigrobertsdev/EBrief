@@ -1,5 +1,7 @@
 ﻿using EBrief.Models.UI;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace EBrief.Models.Data;
 public class CourtListModel
@@ -49,5 +51,14 @@ public class CourtListModel
         {
             caseFile.Defendant = defendants.First(d => d.Id == caseFile.Defendant.Id);
         }
+    }
+
+    public string SerialiseToJson()
+    {
+        return JsonSerializer.Serialize(this, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        });
     }
 }

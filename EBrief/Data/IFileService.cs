@@ -1,5 +1,9 @@
-﻿namespace EBrief.Data;
+﻿using EBrief.Models;
+using EBrief.Models.UI;
+
+namespace EBrief.Data;
 public interface IFileService
 {
-    void SaveFile(string fileName, string json);
+    Task SaveFile(CourtList courtList);
+    Task<CourtListEntry?> LoadCourtFile();
 }

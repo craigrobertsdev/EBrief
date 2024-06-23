@@ -1,5 +1,4 @@
-﻿using EBrief.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace EBrief.Models.UI;
@@ -51,14 +50,5 @@ public class CourtList
         }
 
         return caseFiles;
-    }
-
-    public string SerialiseToJson()
-    {
-        return JsonSerializer.Serialize(this, new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles
-        });
     }
 }

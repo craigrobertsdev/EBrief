@@ -12,6 +12,7 @@ namespace EBrief.Pages;
 public partial class Home
 {
     [Inject] private IDataAccess DataAccess { get; set; } = default!;
+    [Inject] private IFileService FileService { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
@@ -60,6 +61,26 @@ public partial class Home
             await JSRuntime.InvokeVoidAsync("openDialog", NewCourtListDialog);
         }
     }
+
+    private async Task LoadCourtListFromFile()
+    {
+        try
+        {
+            var courtEntry = await FileService.LoadCourtFile();
+            if (courtEntry is null)
+            {
+                _error = "Failed to load court list.";
+                return;
+            }
+
+            NavManager.NavigateTo($"/court-list?courtCode={courtEntry.CourtCode}&courtDate={courtEntry.CourtDate}&courtRoom={courtEntry.CourtRoom}");
+        }
+        catch (Exception e)
+        {
+            _error = e.Message;
+        }
+    }
+
     private async Task OpenPreviousCourtListDialog()
     {
         PreviousCourtLists = await DataAccess.GetSavedCourtLists();
