@@ -38,6 +38,7 @@ public class CourtList
             }
 
             defendant.CaseFiles.Add(caseFile);
+            defendant.CaseFiles.Sort((cf1, cf2) => cf1.Charges.First().Date.CompareTo(cf2.Charges.First().Date));
         }
     }
 
