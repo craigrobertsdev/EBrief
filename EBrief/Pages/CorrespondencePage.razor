@@ -2,7 +2,7 @@
 @using EBrief.Models.UI
 @implements IDisposable
 
-<div class="flex flex-grow">
+<div class="flex h-full">
     @if (Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.Count == 0)
     {
         <p>No correspondence to display</p>
@@ -18,7 +18,7 @@
             }
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 h-full">
             <iframe src=@_pdfContent style="height: 100%; width: 100%;" />
         </div>
     }

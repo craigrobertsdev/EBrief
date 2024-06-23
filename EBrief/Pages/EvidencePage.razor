@@ -2,7 +2,7 @@
 @using EBrief.Models.UI
 @implements IDisposable
 
-<div class="flex flex-grow">
+<div class="flex h-full">
     @if (Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments.Count == 0) {
         <p>No correspondence to display</p>
     }
