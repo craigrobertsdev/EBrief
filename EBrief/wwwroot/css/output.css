@@ -596,8 +596,20 @@ video {
   display: none;
 }
 
+.h-\[95\%\] {
+  height: 95%;
+}
+
 .h-full {
   height: 100%;
+}
+
+.h-\[99\%\] {
+  height: 99%;
+}
+
+.h-\[98\%\] {
+  height: 98%;
 }
 
 .max-h-\[6rem\] {
@@ -616,8 +628,8 @@ video {
   min-height: 400px;
 }
 
-.w-1\/2 {
-  width: 50%;
+.w-3\/4 {
+  width: 75%;
 }
 
 .w-auto {
@@ -626,10 +638,6 @@ video {
 
 .w-full {
   width: 100%;
-}
-
-.w-3\/4 {
-  width: 75%;
 }
 
 .min-w-56 {
