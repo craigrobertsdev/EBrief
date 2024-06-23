@@ -37,8 +37,8 @@ public class CourtListDataAccess : IDataAccess
             .Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom))
             .ToListAsync();
 
-        courtListEntries.Sort((c1, c2) => c1.CourtDate.CompareTo(c2.CourtDate));
-        courtListEntries.Reverse();
+        // sort in descending order
+        courtListEntries.Sort((c1, c2) => c2.CourtDate.CompareTo(c1.CourtDate));
 
         return courtListEntries;
     }
@@ -81,7 +81,7 @@ public class CourtListDataAccess : IDataAccess
                 _context.CourtLists.Remove(courtList);
                 _context.SaveChanges();
             }
-            catch (Exception e)
+            catch
             {
                 throw;
             }

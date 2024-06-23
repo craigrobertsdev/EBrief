@@ -47,12 +47,14 @@ public class CourtListModel
     public void CombineDefendantCaseFiles()
     {
         var defendants = CaseFiles.Select(cf => cf.Defendant).DistinctBy(d => d.Id).ToList();
+        CaseFiles.Sort((a, b) => a.Charges.First().Date.CompareTo(b.Charges.First().Date));
+
         foreach (var caseFile in CaseFiles)
         {
             caseFile.Defendant = defendants.First(d => d.Id == caseFile.Defendant.Id);
         }
     }
-
+    
     public string SerialiseToJson()
     {
         return JsonSerializer.Serialize(this, new JsonSerializerOptions
