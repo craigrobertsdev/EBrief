@@ -84,6 +84,7 @@ public partial class Home
     private async Task OpenPreviousCourtListDialog()
     {
         PreviousCourtLists = await DataAccess.GetSavedCourtLists();
+        SelectedCourtList = PreviousCourtLists.FirstOrDefault();
         if (PreviousCourtListDialog is not null)
         {
             _error = null;
