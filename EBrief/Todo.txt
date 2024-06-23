@@ -3,11 +3,10 @@ npx tailwindcss -i .\wwwroot\css\app.css -o .\wwwroot\css\output.css --watch
 FUNCTIONALITY:
 	- Checking if there are changes when exiting doesn't work.
 	- Changing the case file doesn't cause the document to reload in the occurrence documents.
-	- Properly implement functionality to export court lists to a file
-	- Load from a .court file
 	- Work out logging
 	- Search function for case files by either case file or courtfile number
 	- Order case files by first offence date
+	- Order court lists by date
 	- Change the way court lists are loaded to not load files immediately
 	- Add option to refresh local data from server
 	- Add select all button to follow ups

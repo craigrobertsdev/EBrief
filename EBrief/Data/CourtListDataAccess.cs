@@ -33,7 +33,13 @@ public class CourtListDataAccess : IDataAccess
 
     public async Task<List<CourtListEntry>> GetSavedCourtLists()
     {
-        return await _context.CourtLists.Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom)).ToListAsync();
+        var courtListEntries = await _context.CourtLists
+            .Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom))
+            .ToListAsync();
+
+        courtListEntries.Sort((c1, c2) => c1.CourtDate.CompareTo(c2.CourtDate));
+
+        return courtListEntries;
     }
 
     public async Task UpdateCourtList(CourtList courtList)
@@ -114,7 +120,7 @@ public class CourtListDataAccess : IDataAccess
     public async Task<bool> CheckCourtListExists(CourtListEntry entry)
     {
         var courtListEntry = await _context.CourtLists
-            .Where(cl =>  cl.CourtDate == entry.CourtDate && cl.CourtCode == entry.CourtCode && cl.CourtRoom == entry.CourtRoom)
+            .Where(cl => cl.CourtDate == entry.CourtDate && cl.CourtCode == entry.CourtCode && cl.CourtRoom == entry.CourtRoom)
             .FirstOrDefaultAsync();
 
         return courtListEntry != null;
