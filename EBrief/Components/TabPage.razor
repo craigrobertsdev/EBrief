@@ -1,6 +1,8 @@
 @if (Parent.ActiveTab == this) {
-    <div class="px-4 flex flex-grow">
-        @ChildContent
+    <div class="px-2 flex flex-grow">
+        <div class="px-2 overflow-y-auto overflow-x-hidden max-h-[85dvh] flex-grow">
+            @ChildContent
+        </div>
     </div>
 }
 
