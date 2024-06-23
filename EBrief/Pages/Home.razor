@@ -86,20 +86,24 @@
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     }
 
-    else if (PreviousCourtLists!.Count == 0)
-    {
-        <h3 class="text-lg pb-2">No court previous court lists found in the database</h3>
-    }
-
     else
     {
-        <div class="border border-black mb-2 min-w-[500px] min-h-[400px]">
+        <div class="border border-black mb-2 w-[500px] h-[400px]">
+        @if (PreviousCourtLists!.Count == 0)
+        {
+            <div class="h-full w-full flex items-center justify-center">
+                <h3 class="text-center text-lg pb-2">No court previous court lists found in the database</h3>
+            </div>
+        }
+        else 
+        {
             @foreach (var courtList in PreviousCourtLists!)
             {
                 <p class="text-lg text-center p-1 @(courtList == SelectedCourtList ? "!bg-blue-800 !text-white hover:bg-blue-800 hover:text-white" : "") hover:bg-slate-200 hover:text-black cursor-default border-b border-black"
                    @onclick=@(() => HandleSelectCourtListEntry(courtList))>
                     @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
                 </p>
+            }
             }
         </div>
 
