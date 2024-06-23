@@ -85,6 +85,7 @@ public partial class Home
     {
         PreviousCourtLists = await DataAccess.GetSavedCourtLists();
         SelectedCourtList = PreviousCourtLists.FirstOrDefault();
+
         if (PreviousCourtListDialog is not null)
         {
             _error = null;
