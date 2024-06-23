@@ -38,6 +38,7 @@ public class CourtListDataAccess : IDataAccess
             .ToListAsync();
 
         courtListEntries.Sort((c1, c2) => c1.CourtDate.CompareTo(c2.CourtDate));
+        courtListEntries.Reverse();
 
         return courtListEntries;
     }
