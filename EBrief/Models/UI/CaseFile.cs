@@ -30,3 +30,8 @@ public class CaseFile
         };
     }
 }
+
+public static class CaseFileExtensions
+{
+    public static void AddReferenceToDefendants(this List<CaseFile> caseFiles) => caseFiles.ForEach(cf => cf.Defendant.CaseFiles.Add(cf));
+}

@@ -2,7 +2,9 @@
 using EBrief.Helpers;
 using EBrief.Models;
 using EBrief.Models.Data;
+using EBrief.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -252,7 +254,4 @@ public partial class Home
         public CourtCode CourtCode { get; set; }
         public List<int> CourtRooms { get; set; } = [];
     }
-
-    record CourtListDto(IEnumerable<string> CaseFileNumbers, DateTime CourtDate);
-
 }

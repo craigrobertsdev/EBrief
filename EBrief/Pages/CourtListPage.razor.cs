@@ -1,4 +1,5 @@
-﻿using EBrief.Data;
+﻿using EBrief.Components;
+using EBrief.Data;
 using EBrief.Helpers;
 using EBrief.Models;
 using EBrief.Models.Data;
@@ -27,11 +28,6 @@ public partial class CourtListPage
     private ElementReference? UnsavedChangesDialog { get; set; }
     private ElementReference? AddCaseFilesDialog { get; set; }
     private Dictionary<string, ElementReference?> CaseFileHeaderRefs { get; set; } = [];
-    private string RenderingCaseFileNumber { get; set; } = string.Empty;
-    private ElementReference CaseFileHeaderRef
-    {
-        set { CaseFileHeaderRefs.TryAdd(RenderingCaseFileNumber, value); }
-    }
     private string CaseFilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
@@ -136,19 +132,40 @@ public partial class CourtListPage
         try
         {
             _addCaseFilesError = null;
-            var newCaseFiles = await HttpService.GetCaseFiles(newCaseFileNumbers);
-
-            await DataAccess.AddCaseFiles(newCaseFiles, CourtList);
-            CourtList.AddCaseFiles(newCaseFiles.ToUIModels());
+            var newCaseFileModels = await HttpService.GetCaseFiles(newCaseFileNumbers, CourtDate);
+            await DataAccess.AddCaseFiles(newCaseFileModels, CourtList);
+            var newCaseFiles = newCaseFileModels.ToUIModels();
+            newCaseFiles.AddReferenceToDefendants();
+            CourtList.AddCaseFiles(newCaseFiles);
+            UpdateCourtSittings(newCaseFiles.Select(cf => cf.Defendant).ToList());
+            
+            CaseFilesToAdd = string.Empty;
             await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
             _loadingNewCaseFiles = false;
         }
         catch (Exception e)
         {
-            _addCaseFilesError = e.Message;
+            _addCaseFilesError = "Failed to add case files";
+            _loadingNewCaseFiles = false;
             return;
         }
 
+    }
+
+    private void UpdateCourtSittings(List<Defendant> defendants)
+    {
+        foreach (var defendant in defendants)
+        {
+            var courtSitting = CourtSittings.FirstOrDefault(cs => cs.SittingTime == defendant.CaseFiles.First().Schedule.Last().HearingDate);
+            if (courtSitting is null)
+            {
+                courtSitting = new(CourtSittings.Count, defendant.CaseFiles.First().Schedule.Last().HearingDate);
+            }
+
+            courtSitting.Defendants.Add(defendant);
+        }
+
+        OnDefendantChange?.Invoke();
     }
 
     private async Task HandleReturnHome()
