@@ -8,13 +8,13 @@ public class CaseFileModel
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    public CourtListModel CourtList { get; set; }
+    public CourtListModel CourtList { get; set; } = default!;
     public int CourtListId { get; set; }
     public string CaseFileNumber { get; set; } = string.Empty;
     public DefendantModel Defendant { get; set; } = default!;
     [MaxLength(20)]
     public string? CourtFileNumber { get; set; } = string.Empty;
-    public List<HearingEntryModel> PreviousHearings { get; set; } = [];
+    public List<HearingEntryModel> Schedule { get; set; } = [];
     public List<CaseFileEnquiryLogModel> CfelEntries { get; set; } = [];
     public string FactsOfCharge { get; set; } = default!;
     public InformationModel? Information { get; set; }
@@ -30,7 +30,7 @@ public class CaseFileModel
             CaseFileNumber = CaseFileNumber,
             Defendant = Defendant.ToUIModel(),
             CourtFileNumber = CourtFileNumber,
-            PreviousHearings = PreviousHearings.Select(hearing => hearing.ToUIModel()).ToList(),
+            Schedule = Schedule.Select(hearing => hearing.ToUIModel()).ToList(),
             CfelEntries = CfelEntries.Select(cfel => cfel.ToUIModel()).ToList(),
             FactsOfCharge = FactsOfCharge,
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),

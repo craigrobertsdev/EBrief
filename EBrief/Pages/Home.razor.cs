@@ -157,7 +157,8 @@ public partial class Home
         var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         try
         {
-            var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", caseFileNumbers);
+            var body = new CourtListDto(caseFileNumbers, CourtDate.Value);
+            var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body); 
             if (!response.IsSuccessStatusCode)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Failed to fetch court list.");
@@ -252,5 +253,6 @@ public partial class Home
         public List<int> CourtRooms { get; set; } = [];
     }
 
+    record CourtListDto(IEnumerable<string> CaseFileNumbers, DateTime CourtDate);
 
 }

@@ -1,0 +1,50 @@
+﻿@using EBrief.Helpers
+@using EBrief.Models.UI
+@using EBrief.Pages
+
+<ul class="select-none pb-2">
+    @foreach (var courtSitting in CourtSittings)
+    {
+        <li>
+            <div id="details-@courtSitting.Id" @onclick="() => ToggleCourtSitting(courtSitting)"
+                 class="text-lg text-center font-bold hover:bg-slate-100">
+                <p class="py-2 border-b border-slate-500 ">@courtSitting.Name</p>
+                <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
+                    @foreach (var defendant in courtSitting.Defendants)
+                    {
+                        <li class="relative text-sm text-left font-normal lg:text-lg p-1 border-l border-r border-b border-slate-500 bg-slate-200 @Parent.IsSelected(defendant)"
+                            @onclick="() => Parent.ActivateDefendant(defendant)"
+                            @onclick:stopPropagation="true">
+                            <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
+                               title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
+                                @defendant.LastName.ToUpper(), @defendant.FirstName
+                            </p>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </li>
+    }
+</ul>
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+    [Parameter] public List<CourtSitting> CourtSittings { get; set; } = [];
+    [Inject] public IJSRuntime JSRuntime { get; set; } = default!;
+    private Dictionary<int, bool> CourtSittingVisibility { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        CourtSittings.ForEach(cs => CourtSittingVisibility.Add(cs.Id, true));
+    }
+
+    private void ToggleCourtSitting(CourtSitting courtSitting)
+    {
+        CourtSittingVisibility[courtSitting.Id] = !CourtSittingVisibility[courtSitting.Id];
+    }
+
+    private bool IsVisible(CourtSitting courtSitting)
+    {
+        return CourtSittingVisibility[courtSitting.Id];
+    }
+}

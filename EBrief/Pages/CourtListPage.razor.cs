@@ -19,6 +19,7 @@ public partial class CourtListPage
     public HttpService HttpService { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
+    private List<CourtSitting> CourtSittings { get; set; } = [];
     public CourtCode CourtCode { get; set; } = default!;
     public DateTime CourtDate { get; set; } = default!;
     public int CourtRoom { get; set; } = default!;
@@ -61,6 +62,7 @@ public partial class CourtListPage
 
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
+        CourtSittings = GenerateCourtSittings();
         ActivateDefendant(CourtList.Defendants.First());
 
         _loading = false;
@@ -84,6 +86,24 @@ public partial class CourtListPage
         CourtList.CourtCode = courtCode;
         CourtList.CourtDate = courtDate;
         CourtList.CourtRoom = courtRoom;
+    }
+
+    private List<CourtSitting> GenerateCourtSittings()
+    {
+        // iterate over the list of defendants and group them by the appearance time of their first case file in the list
+        var courtSittings = CourtList.Defendants.SelectMany(d => d.CaseFiles)
+            .GroupBy(cf => cf.Schedule.Last().HearingDate)
+            .OrderBy(g => g.Key)
+            .Select((g, i) => new CourtSitting(i, g.Key))
+            .ToList();
+
+        foreach (var defendant in CourtList.Defendants)
+        {
+            var hearingTime = defendant.CaseFiles.First().Schedule.Last().HearingDate;
+            courtSittings.First(cs => cs.SittingTime.TimeOfDay == hearingTime.TimeOfDay).Defendants.Add(defendant);
+        }
+
+        return courtSittings;
     }
 
     private async Task OpenAddCaseFilesDialog()
@@ -146,7 +166,7 @@ public partial class CourtListPage
         await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
     }
 
-    private void ActivateDefendant(Defendant defendant)
+    internal void ActivateDefendant(Defendant defendant)
     {
         ActiveDefendant = defendant;
         if (ActiveDefendant.ActiveCaseFile is null)
@@ -155,6 +175,7 @@ public partial class CourtListPage
         }
 
         OnDefendantChange?.Invoke();
+        StateHasChanged();
     }
 
     private void CaseFileChanged(CaseFile caseFile)
@@ -166,7 +187,7 @@ public partial class CourtListPage
         ActivateDefendant(ActiveDefendant!);
     }
 
-    private string IsSelected(Defendant defendant)
+    internal string IsSelected(Defendant defendant)
     {
         if (ActiveDefendant?.Id == defendant.Id)
         {

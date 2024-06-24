@@ -41,7 +41,7 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CaseFileModel>()
-            .HasMany(cf => cf.PreviousHearings)
+            .HasMany(cf => cf.Schedule)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 

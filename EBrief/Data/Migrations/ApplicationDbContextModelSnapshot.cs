@@ -278,7 +278,7 @@ namespace EBrief.Migrations
             modelBuilder.Entity("EBrief.Models.Data.HearingEntryModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
-                        .WithMany("PreviousHearings")
+                        .WithMany("Schedule")
                         .HasForeignKey("CaseFileModelCaseFileNumber");
                 });
 
@@ -328,7 +328,7 @@ namespace EBrief.Migrations
 
                     b.Navigation("OccurrenceDocuments");
 
-                    b.Navigation("PreviousHearings");
+                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CourtListModel", b =>

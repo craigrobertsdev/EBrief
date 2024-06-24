@@ -113,7 +113,7 @@ public class CourtListDataAccess : IDataAccess
             .ThenInclude(d => d.InterventionOrders)
             .ThenInclude(io => io.Conditions)
             .Include(cl => cl.CaseFiles)
-            .ThenInclude(cf => cf.PreviousHearings)
+            .ThenInclude(cf => cf.Schedule)
             .AsSplitQuery()
             .FirstOrDefaultAsync();
     }

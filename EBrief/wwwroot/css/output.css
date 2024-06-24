@@ -596,20 +596,16 @@ video {
   display: none;
 }
 
-.h-\[95\%\] {
-  height: 95%;
-}
-
-.h-full {
-  height: 100%;
-}
-
-.h-\[99\%\] {
-  height: 99%;
+.h-\[400px\] {
+  height: 400px;
 }
 
 .h-\[98\%\] {
   height: 98%;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .max-h-\[6rem\] {
@@ -624,12 +620,12 @@ video {
   max-height: 100%;
 }
 
-.min-h-\[400px\] {
-  min-height: 400px;
-}
-
 .w-3\/4 {
   width: 75%;
+}
+
+.w-\[500px\] {
+  width: 500px;
 }
 
 .w-auto {
@@ -646,10 +642,6 @@ video {
 
 .min-w-\[20ch\] {
   min-width: 20ch;
-}
-
-.min-w-\[500px\] {
-  min-width: 500px;
 }
 
 .max-w-2xl {
@@ -794,10 +786,6 @@ video {
   border-right-width: 1px;
 }
 
-.border-t {
-  border-top-width: 1px;
-}
-
 .border-black {
   --tw-border-opacity: 1;
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
@@ -917,6 +905,10 @@ video {
   padding-top: 0.5rem;
 }
 
+.text-left {
+  text-align: left;
+}
+
 .text-center {
   text-align: center;
 }
@@ -942,6 +934,14 @@ video {
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-normal {
+  font-weight: 400;
 }
 
 .\!text-white {
@@ -1021,6 +1021,11 @@ a, .btn-link {
 .hover\:bg-blue-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(30 64 175 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-slate-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-slate-200:hover {
