@@ -6,15 +6,13 @@
     @foreach (var courtSitting in CourtSittings)
     {
         <li>
-            <div id="details-@courtSitting.Id" @onclick="() => ToggleCourtSitting(courtSitting)"
-                 class="text-lg text-center font-bold hover:bg-slate-100">
-                <p class="py-2 border-b border-slate-500 ">@courtSitting.Name</p>
+            <div class="text-lg text-center font-bold hover:bg-slate-100">
+                <p class="py-2 border-b border-slate-500" @onclick="() => ToggleCourtSitting(courtSitting)">@courtSitting.Name</p>
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
                     {
                         <li class="relative text-sm text-left font-normal lg:text-lg p-1 border-l border-r border-b border-slate-500 bg-slate-200 @Parent.IsSelected(defendant)"
-                            @onclick="() => Parent.ActivateDefendant(defendant)"
-                            @onclick:stopPropagation="true">
+                            @onclick="() => Parent.ActivateDefendant(defendant)">
                             <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
                                title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
                                 @defendant.LastName.ToUpper(), @defendant.FirstName

@@ -19,5 +19,13 @@ function setTooltipPosition(id) {
     } else {
         return caseFileCard.offsetLeft - container.scrollLeft;
     }
+}
 
+function printEvent(e) { 
+    console.log(e);
+}
+
+function wasTarget(el) {
+    console.log(el);
+    return e.target == el;
 }

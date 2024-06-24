@@ -14,6 +14,7 @@ FUNCTIONALITY:
 	- Update CFELs on server and on client optimistically
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back
 	- Use cancellation tokens to cancel requesting both court lists and documents
+	- TreeView closes when releasing mouse after slight drag
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
