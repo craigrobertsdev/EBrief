@@ -30,6 +30,7 @@ TESTING:
 NICE TO HAVES:
 	- Keyboard shortcuts
 	- Help popup with shortcuts and other info
+	- Progress indicator when getting data from the server
 
 DECISION LOG:
 	Options for storing court lists:

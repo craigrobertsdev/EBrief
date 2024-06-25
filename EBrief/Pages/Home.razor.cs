@@ -165,6 +165,7 @@ public partial class Home
         }
 
         PreviousCourtLists.Remove(SelectedCourtList);
+        SelectedCourtList = PreviousCourtLists.FirstOrDefault();
     }
 
     private async Task FetchCourtList()
