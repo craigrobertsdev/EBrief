@@ -13,6 +13,7 @@
 */Uploads
 .idea/
 **/*.crt
+EBrief.Installer/certs
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
