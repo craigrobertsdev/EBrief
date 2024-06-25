@@ -4,15 +4,16 @@ using EBrief.Models;
 using EBrief.Models.Data;
 using EBrief.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace EBrief.Pages;
 
 public partial class Home
 {
+    [Inject] private AppState AppState { get; set; } = default!;
     [Inject] private IDataAccess DataAccess { get; set; } = default!;
     [Inject] private IFileService FileService { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
@@ -28,8 +29,10 @@ public partial class Home
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        // This will be replaced when the application is in prod. Need to work out the actual court rooms
+        // or create a generic list of court rooms up to 25 to cover everything. Need to add all the courts too
         Courts.Add(new Court
         {
             CourtCode = CourtCode.AMC,
@@ -53,6 +56,14 @@ public partial class Home
             CourtCode = CourtCode.PAMC,
             CourtRooms = [1, 2, 3, 4, 5]
         });
+
+        if (Environment.GetCommandLineArgs().Length > 1)
+        {
+            if (AppState.IsFirstLoad)
+            {
+                await LoadFromCommandLine();
+            }
+        }
     }
 
     private async Task OpenNewCourtListDialog()
@@ -71,10 +82,39 @@ public partial class Home
             var courtEntry = await FileService.LoadCourtFile();
             if (courtEntry is null)
             {
+                _error = "Expected path to .court file. Failed to load court list.";
+                return;
+            }
+
+            NavManager.NavigateTo($"/court-list?courtCode={courtEntry.CourtCode}&courtDate={courtEntry.CourtDate}&courtRoom={courtEntry.CourtRoom}");
+        }
+        catch (Exception e)
+        {
+            _error = e.Message;
+        }
+    }
+
+    private async Task LoadFromCommandLine()
+    {
+        var args = Environment.GetCommandLineArgs();
+        try
+        {
+            var file = File.ReadAllText(args[1]);
+            var courtList = JsonSerializer.Deserialize<CourtListModel>(file);
+            if (courtList is null)
+            {
                 _error = "Failed to load court list.";
                 return;
             }
 
+            var courtEntry = new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
+            var previousCourtList = await DataAccess.CheckCourtListExists(courtEntry);
+            if (!previousCourtList)
+            {
+                await DataAccess.CreateCourtList(courtList);
+            }
+
+            AppState.ApplicationLoaded();
             NavManager.NavigateTo($"/court-list?courtCode={courtEntry.CourtCode}&courtDate={courtEntry.CourtDate}&courtRoom={courtEntry.CourtRoom}");
         }
         catch (Exception e)
@@ -160,7 +200,7 @@ public partial class Home
         try
         {
             var body = new CourtListDto(caseFileNumbers, CourtDate.Value);
-            var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body); 
+            var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body);
             if (!response.IsSuccessStatusCode)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Failed to fetch court list.");

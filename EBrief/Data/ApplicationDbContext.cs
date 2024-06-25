@@ -1,6 +1,7 @@
 ﻿using EBrief.Models.Data;
 using EBrief.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace EBrief.Data;
 public class ApplicationDbContext : DbContext
@@ -59,5 +60,15 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
+    }
+}
+
+public class DbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+{
+    public ApplicationDbContext CreateDbContext(string[] args)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<DbContext>();
+
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
 }

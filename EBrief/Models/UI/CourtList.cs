@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace EBrief.Models.UI;
 public class CourtList
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CourtDate { get; set; }
     public CourtCode CourtCode { get; set; }
     public int CourtRoom { get; set; }

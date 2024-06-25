@@ -1,10 +1,10 @@
 ﻿using EBrief.Data;
 using EBrief.Helpers;
+using EBrief.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen;
 using Serilog;
-using System.IO;
 using System.Windows;
 
 namespace EBrief;
@@ -37,19 +37,19 @@ public partial class MainWindow : Window
             });
 #endif
 
-            serviceCollection.AddDbContext<ApplicationDbContext>(builder =>
+            serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             {
                 string dbPath = Path.Combine(FileHelpers.AppDataPath, "EBrief.db");
-                builder.UseSqlite($"Filename={dbPath}");
+                options.UseSqlite($"Filename={dbPath}");
             });
             serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
             serviceCollection.AddScoped<TooltipService>();
             serviceCollection.AddScoped<IFileService, FileService>();
+            serviceCollection.AddSingleton(new AppState());
 
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 
             WindowState = WindowState.Maximized;
-
         }
         catch (Exception ex)
         {

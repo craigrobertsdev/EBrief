@@ -9,14 +9,18 @@ FUNCTIONALITY:
 	- Add Extra info page for time in custody, defendant's details, etc.
 	- Keyboard shortcuts
 	- Help popup with shortcuts and other info
-	- Associate .court files with this application on install
 	- Load .court files by double clicking them
 	- Update CFELs on server and on client optimistically
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back
 	- Use cancellation tokens to cancel requesting both court lists and documents
 	- PreviousCourtList delete button not disabled when there is no court list is selected
 	- Fix error on loading court list from file
-	- Fix the fact that the error message appears a full screen below the launch pad on home
+	- Add all courts to the list of courts
+	- Think of a way to represent regional courts where they only have 1 court room
+	- Where there is a network failure, reset state of load new court list dialog
+	- When cancelling load of court list because user doesn't want to overwrite data, don't set error to "failed to load court list"
+	- Add better error messages.
+		* when no server connection (home)
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file

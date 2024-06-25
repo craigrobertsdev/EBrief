@@ -1,5 +1,6 @@
 ﻿using EBrief.Models.UI;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -7,7 +8,8 @@ namespace EBrief.Models.Data;
 public class CourtListModel
 {
     [Key]
-    public int Id { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
     public List<CaseFileModel> CaseFiles { get; set; } = new List<CaseFileModel>();
     public DateTime CourtDate { get; set; }
     public CourtCode CourtCode { get; set; }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace EBrief.Migrations
+namespace EBrief.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -15,7 +15,26 @@ namespace EBrief.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
+
+            modelBuilder.Entity("EBrief.Models.Data.BailAgreementModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateEnteredInto")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DefendantModelDbKey")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefendantModelDbKey");
+
+                    b.ToTable("BailAgreementModel");
+                });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileDocumentModel", b =>
                 {
@@ -23,7 +42,7 @@ namespace EBrief.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("CaseFileModelCaseFileNumber")
+                    b.Property<Guid?>("CaseFileModelId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileName")
@@ -36,7 +55,7 @@ namespace EBrief.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CaseFileModelCaseFileNumber");
+                    b.HasIndex("CaseFileModelId");
 
                     b.ToTable("CaseFileDocumentModel");
                 });
@@ -47,7 +66,7 @@ namespace EBrief.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("CaseFileModelCaseFileNumber")
+                    b.Property<Guid?>("CaseFileModelId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("EnteredBy")
@@ -63,44 +82,44 @@ namespace EBrief.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CaseFileModelCaseFileNumber");
+                    b.HasIndex("CaseFileModelId");
 
                     b.ToTable("CaseFileEnquiryLogModel");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CaseFileNumber")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CourtFileNumber")
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("CourtListModelId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("CourtListId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("DefendantId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("DefendantDbKey")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FactsOfCharge")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("InformationId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("CaseFileNumber");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CourtListModelId");
+                    b.HasIndex("CourtListId");
 
-                    b.HasIndex("DefendantId");
-
-                    b.HasIndex("InformationId");
+                    b.HasIndex("DefendantDbKey");
 
                     b.ToTable("CaseFiles");
                 });
@@ -111,7 +130,7 @@ namespace EBrief.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("CaseFileModelCaseFileNumber")
+                    b.Property<Guid?>("CaseFileModelId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ChargeWording")
@@ -133,19 +152,25 @@ namespace EBrief.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CaseFileModelCaseFileNumber");
+                    b.HasIndex("CaseFileModelId");
 
                     b.ToTable("ChargeModel");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CourtListModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CourtCode")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CourtDate")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("CourtRoom")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -154,19 +179,25 @@ namespace EBrief.Migrations
 
             modelBuilder.Entity("EBrief.Models.Data.DefendantModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("DbKey")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.Property<string>("OffenderHistory")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DbKey");
 
                     b.ToTable("DefendantModel");
                 });
@@ -181,7 +212,7 @@ namespace EBrief.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CaseFileModelCaseFileNumber")
+                    b.Property<Guid?>("CaseFileModelId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("HearingDate")
@@ -193,20 +224,37 @@ namespace EBrief.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CaseFileModelCaseFileNumber");
+                    b.HasIndex("CaseFileModelId");
 
                     b.ToTable("HearingEntryModel");
                 });
 
-            modelBuilder.Entity("EBrief.Models.Data.InformationModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.InterventionOrderModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("DateIssued")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DefendantModelDbKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProtectedPersonId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("InformationModel");
+                    b.HasIndex("DefendantModelDbKey");
+
+                    b.HasIndex("ProtectedPersonId");
+
+                    b.ToTable("InterventionOrderModel");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.OccurrenceDocumentModel", b =>
@@ -215,7 +263,7 @@ namespace EBrief.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("CaseFileModelCaseFileNumber")
+                    b.Property<Guid?>("CaseFileModelId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileName")
@@ -228,94 +276,156 @@ namespace EBrief.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CaseFileModelCaseFileNumber");
+                    b.HasIndex("CaseFileModelId");
 
                     b.ToTable("OccurrenceDocumentModel");
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.OrderConditionModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("BailAgreementModelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("InterventionOrderModelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BailAgreementModelId");
+
+                    b.HasIndex("InterventionOrderModelId");
+
+                    b.ToTable("OrderConditionModel");
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.PersonModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonModel");
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.BailAgreementModel", b =>
+                {
+                    b.HasOne("EBrief.Models.Data.DefendantModel", null)
+                        .WithMany("BailAgreements")
+                        .HasForeignKey("DefendantModelDbKey");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileDocumentModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("CaseFileDocuments")
-                        .HasForeignKey("CaseFileModelCaseFileNumber");
+                        .HasForeignKey("CaseFileModelId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("CfelEntries")
-                        .HasForeignKey("CaseFileModelCaseFileNumber");
+                        .HasForeignKey("CaseFileModelId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
                 {
-                    b.HasOne("EBrief.Models.Data.CourtListModel", null)
+                    b.HasOne("EBrief.Models.Data.CourtListModel", "CourtList")
                         .WithMany("CaseFiles")
-                        .HasForeignKey("CourtListModelId");
-
-                    b.HasOne("EBrief.Models.Data.DefendantModel", "Defendant")
-                        .WithMany()
-                        .HasForeignKey("DefendantId")
+                        .HasForeignKey("CourtListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EBrief.Models.Data.InformationModel", "Information")
+                    b.HasOne("EBrief.Models.Data.DefendantModel", "Defendant")
                         .WithMany()
-                        .HasForeignKey("InformationId");
+                        .HasForeignKey("DefendantDbKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourtList");
 
                     b.Navigation("Defendant");
-
-                    b.Navigation("Information");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.ChargeModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("Charges")
-                        .HasForeignKey("CaseFileModelCaseFileNumber");
+                        .HasForeignKey("CaseFileModelId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.HearingEntryModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("Schedule")
-                        .HasForeignKey("CaseFileModelCaseFileNumber");
+                        .HasForeignKey("CaseFileModelId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("EBrief.Models.Data.InformationModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.InterventionOrderModel", b =>
                 {
-                    b.OwnsMany("EBrief.Models.Data.InformationEntryModel", "Charges", b1 =>
-                        {
-                            b1.Property<int>("InformationModelId")
-                                .HasColumnType("INTEGER");
+                    b.HasOne("EBrief.Models.Data.DefendantModel", null)
+                        .WithMany("InterventionOrders")
+                        .HasForeignKey("DefendantModelDbKey");
 
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
+                    b.HasOne("EBrief.Models.Data.PersonModel", "ProtectedPerson")
+                        .WithMany()
+                        .HasForeignKey("ProtectedPersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                            b1.Property<int>("Sequence")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("Text")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("InformationModelId", "Id");
-
-                            b1.ToTable("InformationEntryModel");
-
-                            b1.WithOwner()
-                                .HasForeignKey("InformationModelId");
-                        });
-
-                    b.Navigation("Charges");
+                    b.Navigation("ProtectedPerson");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.OccurrenceDocumentModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
                         .WithMany("OccurrenceDocuments")
-                        .HasForeignKey("CaseFileModelCaseFileNumber");
+                        .HasForeignKey("CaseFileModelId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.OrderConditionModel", b =>
+                {
+                    b.HasOne("EBrief.Models.Data.BailAgreementModel", null)
+                        .WithMany("Conditions")
+                        .HasForeignKey("BailAgreementModelId");
+
+                    b.HasOne("EBrief.Models.Data.InterventionOrderModel", null)
+                        .WithMany("Conditions")
+                        .HasForeignKey("InterventionOrderModelId");
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.BailAgreementModel", b =>
+                {
+                    b.Navigation("Conditions");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
@@ -334,6 +444,18 @@ namespace EBrief.Migrations
             modelBuilder.Entity("EBrief.Models.Data.CourtListModel", b =>
                 {
                     b.Navigation("CaseFiles");
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.DefendantModel", b =>
+                {
+                    b.Navigation("BailAgreements");
+
+                    b.Navigation("InterventionOrders");
+                });
+
+            modelBuilder.Entity("EBrief.Models.Data.InterventionOrderModel", b =>
+                {
+                    b.Navigation("Conditions");
                 });
 #pragma warning restore 612, 618
         }
