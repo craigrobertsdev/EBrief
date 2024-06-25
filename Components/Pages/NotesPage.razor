@@ -1,0 +1,7 @@
+<textarea @bind="Parent.ActiveDefendant!.ActiveCaseFile!.Notes" 
+          @bind:event="oninput" placeholder="Enter any case notes here" 
+          class="w-full border border-black p-2" rows="15" />
+
+@code {
+    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+}

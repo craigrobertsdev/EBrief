@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Net.Sockets;
 using System.Text.Json;
 
 namespace EBrief.Pages;
@@ -19,6 +18,7 @@ public partial class Home
     [Inject] private IFileService FileService { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
+    public ElementReference? ConfirmDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
     private List<Court> Courts = [];
     private Court? SelectedCourt { get; set; }
@@ -72,7 +72,17 @@ public partial class Home
         if (NewCourtListDialog is not null)
         {
             _error = null;
-            await JSRuntime.InvokeVoidAsync("openDialog", NewCourtListDialog);
+            var obj = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("openDialog", NewCourtListDialog, obj);
+        }
+    }
+
+    private async Task OpenConfirmDialog()
+    {
+        if (ConfirmDialog is not null)
+        {
+            _error = null;
+            await JSRuntime.InvokeVoidAsync("openDialog", ConfirmDialog);
         }
     }
 
@@ -147,8 +157,13 @@ public partial class Home
         NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
     }
 
-    private void DeletePreviousCourtList()
+    private async Task DeletePreviousCourtList(bool confirmDeletion)
     {
+        await CloseConfirmDialog();
+        if (!confirmDeletion)
+        {
+            return;
+        }
         if (SelectedCourtList is null || PreviousCourtLists is null)
         {
             return;
@@ -156,7 +171,7 @@ public partial class Home
 
         try
         {
-            DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom));
+            await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom));
         }
         catch (Exception e)
         {
@@ -233,6 +248,7 @@ public partial class Home
             catch (Exception e)
             {
                 _error = e.InnerException?.Message ?? e.Message;
+                // not put in a finally block as the button flashes back to being enabled before the page changes
                 _loadingCourtList = false;
                 return;
             }
@@ -242,13 +258,11 @@ public partial class Home
         catch (HttpRequestException e)
         {
             _error = "Failed to connect to the server";
+            _loadingCourtList = false;
         }
         catch (Exception e)
         {
             _error = e.InnerException?.Message ?? e.Message;
-        }
-        finally
-        {
             _loadingCourtList = false;
         }
 
@@ -256,20 +270,13 @@ public partial class Home
 
     private async Task CloseLoadNewCourtListDialog()
     {
-        if (NewCourtListDialog is not null)
-        {
-            await JSRuntime.InvokeVoidAsync("closeDialog", NewCourtListDialog);
-        }
+        await JSRuntime.InvokeVoidAsync("closeDialog", NewCourtListDialog);
     }
 
-    private async Task ClosePreviousCourtListDialog()
-    {
-        if (PreviousCourtListDialog is not null)
-        {
-            await JSRuntime.InvokeVoidAsync("closeDialog", PreviousCourtListDialog);
-        }
-    }
+    private async Task ClosePreviousCourtListDialog() =>
+        await JSRuntime.InvokeVoidAsync("closeDialog", PreviousCourtListDialog);
 
+    private async Task CloseConfirmDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", ConfirmDialog);
     private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
     {
         if (SelectedCourtList == courtListEntry)
