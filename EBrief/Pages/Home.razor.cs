@@ -79,10 +79,10 @@ public partial class Home
     {
         try
         {
-            var courtEntry = await FileService.LoadCourtFile();
+            var (courtEntry, errorMessage) = await FileService.LoadCourtFile();
             if (courtEntry is null)
             {
-                _error = "Expected path to .court file. Failed to load court list.";
+                _error = errorMessage;
                 return;
             }
 

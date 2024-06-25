@@ -1,8 +1,7 @@
 {
   "profiles": {
     "EBrief": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\craig\\Desktop\\Court 2 AMC - 15 May 2024.court\""
+      "commandName": "Project"
     }
   }
 }

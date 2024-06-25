@@ -5,5 +5,5 @@ namespace EBrief.Data;
 public interface IFileService
 {
     Task SaveFile(CourtList courtList);
-    Task<CourtListEntry?> LoadCourtFile();
+    Task<(CourtListEntry?, string)> LoadCourtFile();
 }

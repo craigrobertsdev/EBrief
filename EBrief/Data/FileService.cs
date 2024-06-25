@@ -28,25 +28,25 @@ public class FileService : IFileService
         }
     }
 
-    public async Task<CourtListEntry?> LoadCourtFile()
+    public async Task<(CourtListEntry?, string?)> LoadCourtFile()
     {
         var dialog = new OpenFileDialog();
         var result = dialog.ShowDialog();
-        if (result is null || result == false) return null;
+        if (result is null || result == false) return (null, null);
 
         if (!File.Exists(dialog.FileName))
         {
             throw new FileNotFoundException("File does not exist");
         }
 
-        string json = File.ReadAllText(dialog.FileName);
         try
         {
+            string json = File.ReadAllText(dialog.FileName);
             var courtList = JsonSerializer.Deserialize<CourtListModel>(json);
 
             if (courtList is null)
             {
-                return null;
+                return (null, "Expected .court file. Loading court list failed");
             }
 
             var courtListEntry = new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
@@ -56,17 +56,16 @@ public class FileService : IFileService
                 var proceed = MessageBox.Show("Court list already exists. Do you want to overwrite?", "Confirmation", button, MessageBoxImage.Question);
                 if (proceed == MessageBoxResult.No)
                 {
-                    return null;
+                    return (null, null);
                 }
             }
 
             await _dataAccess.CreateCourtList(courtList);
-            return courtListEntry;
+            return (courtListEntry, null);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
-            return null;
+            return (null, e.Message);
         }
     }
 }
