@@ -690,6 +690,10 @@ video {
   resize: none;
 }
 
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .grid-cols-\[0\.2fr_1fr\] {
   grid-template-columns: 0.2fr 1fr;
 }

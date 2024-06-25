@@ -10,22 +10,22 @@
         <div class="pb-4 text-2xl">
             <h1>Choose an option to get started</h1>
         </div>
-        <div>
-            <RadzenButton Text="Load New Court List" Style="margin-left: auto; margin-right: 1rem;" Click="OpenNewCourtListDialog" />
-            <RadzenButton Text="Load Previous Court List" Style="margin-inline: auto; margin-left: 1rem;" Click="OpenPreviousCourtListDialog" />
-            <RadzenButton Text="Open Court List From File" Style="margin-right: auto; margin-left: 1rem;" Click="LoadCourtListFromFile" />
+        <div class="grid grid-cols-3 gap-3">
+            <RadzenButton Text="Load New Court List" Click="OpenNewCourtListDialog" />
+            <RadzenButton Text="Load Previous Court List" Click="OpenPreviousCourtListDialog" />
+            <RadzenButton Text="Open Court List From File" Click="LoadCourtListFromFile" />
         </div>
+        @if (_error is not null)
+        {
+            <div class="pt-2 text-left">
+                <p class="text-red-500">@_error</p>
+            </div>
+        }
     </div>
+
 
     <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
 </div>
-
-@if (_error is not null)
-{
-    <div class="w-full h-full flex justify-center items-center">
-        <p class="text-red-500">@_error</p>
-    </div>
-}
 
 <dialog @ref="NewCourtListDialog" class="p-5">
     <h3 class="text-lg pb-2">Copy the column of case file numbers from your court list into the box below</h3>
@@ -89,21 +89,21 @@
     else
     {
         <div class="border border-black mb-2 w-[500px] h-[400px]">
-        @if (PreviousCourtLists!.Count == 0)
-        {
-            <div class="h-full w-full flex items-center justify-center">
-                <h3 class="text-center text-lg pb-2">No court previous court lists found in the database</h3>
-            </div>
-        }
-        else 
-        {
-            @foreach (var courtList in PreviousCourtLists!)
+            @if (PreviousCourtLists!.Count == 0)
             {
-                <p class="text-lg text-center p-1 @(courtList == SelectedCourtList ? "!bg-blue-800 !text-white hover:bg-blue-800 hover:text-white" : "") hover:bg-slate-200 hover:text-black cursor-default border-b border-black"
-                   @onclick=@(() => HandleSelectCourtListEntry(courtList))>
-                    @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
-                </p>
+                <div class="h-full w-full flex items-center justify-center">
+                    <h3 class="text-center text-lg pb-2">No court previous court lists found in the database</h3>
+                </div>
             }
+            else
+            {
+                @foreach (var courtList in PreviousCourtLists!)
+                {
+                    <p class="text-lg text-center p-1 @(courtList == SelectedCourtList ? "!bg-blue-800 !text-white hover:bg-blue-800 hover:text-white" : "") hover:bg-slate-200 hover:text-black cursor-default border-b border-black"
+                       @onclick=@(() => HandleSelectCourtListEntry(courtList))>
+                        @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
+                    </p>
+                }
             }
         </div>
 

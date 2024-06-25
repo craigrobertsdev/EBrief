@@ -15,11 +15,18 @@ FUNCTIONALITY:
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back
 	- Use cancellation tokens to cancel requesting both court lists and documents
 	- PreviousCourtList delete button not disabled when there is no court list is selected
+	- Fix error on loading court list from file
+	- Fix the fact that the error message appears a full screen below the launch pad on home
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
 	- Add groups to defendants list to put them in hearing slots (both hearing time and additions/custodies)
-
+	- Go through every date and time and format them consistently
+	- Add transition to opening and closing of tree view sections
+	- Add visual indicator that tree view section is open (like an arrow to the right that turns down when open)
+	- Add border (maybe) to the top of the second and onwards tree view sections to separate them from the previous section
+	- Put "loading" on home page in the middle of the screen
+	
 TESTING:
 	- Add tests for models and data access where it makes sense
 
