@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Sockets;
 using System.Text.Json;
 
 namespace EBrief.Pages;
@@ -203,7 +204,7 @@ public partial class Home
             var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body);
             if (!response.IsSuccessStatusCode)
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Failed to fetch court list.");
+                _error = "Failed to connect to the server";
                 return;
             }
 
@@ -231,14 +232,23 @@ public partial class Home
             catch (Exception e)
             {
                 _error = e.InnerException?.Message ?? e.Message;
+                _loadingCourtList = false;
                 return;
             }
 
             NavManager.NavigateTo($"/court-list/?newList=&courtCode={SelectedCourt.CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
         }
+        catch (HttpRequestException e)
+        {
+            _error = "Failed to connect to the server";
+        }
         catch (Exception e)
         {
             _error = e.InnerException?.Message ?? e.Message;
+        }
+        finally
+        {
+            _loadingCourtList = false;
         }
 
     }

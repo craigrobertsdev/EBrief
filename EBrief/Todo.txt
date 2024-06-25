@@ -4,6 +4,7 @@ FUNCTIONALITY:
 	- Checking if there are changes when exiting doesn't work.
 	- Changing the case file doesn't cause the document to reload in the occurrence documents.
 	- Work out logging
+		* Add logging to all catch blocks
 	- Search function for case files by either case file or courtfile number
 	- Add option to refresh local data from server
 	- Add Extra info page for time in custody, defendant's details, etc.
@@ -11,13 +12,8 @@ FUNCTIONALITY:
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back
 	- Use cancellation tokens to cancel requesting both court lists and documents
 	- PreviousCourtList delete button not disabled when there is no court list is selected
-	- Fix error on loading court list from file
 	- Add all courts to the list of courts
 	- Think of a way to represent regional courts where they only have 1 court room
-	- Where there is a network failure, reset state of load new court list dialog
-	- When cancelling load of court list because user doesn't want to overwrite data, don't set error to "failed to load court list"
-	- Add better error messages.
-		* when no server connection (home)
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
