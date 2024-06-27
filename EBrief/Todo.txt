@@ -25,7 +25,6 @@ STYLING:
 	- Add transition to opening and closing of tree view sections
 	- Add visual indicator that tree view section is open (like an arrow to the right that turns down when open)
 	- Add border (maybe) to the top of the second and onwards tree view sections to separate them from the previous section
-	- Put "loading" on home page in the middle of the screen
 	
 TESTING:
 	- Add tests for models and data access where it makes sense

@@ -3,15 +3,22 @@
 @using EBrief.Pages
 
 <ul class="select-none pb-2">
-    @foreach (var courtSitting in CourtSittings)
+    @for (int i = 0; i < CourtSittings.Count; i++)
     {
-        <li>
-            <div class="text-lg text-center font-bold hover:bg-slate-100">
-                <p class="py-2 border-b border-slate-500" @onclick="() => ToggleCourtSitting(courtSitting)">@courtSitting.Name</p>
+        int idx = i;
+        var courtSitting = CourtSittings[idx];
+        <li class="tree">
+            <div id="court-sitting-@idx" class="text-lg relative text-center font-bold ">
+                <p class="mt-2 py-1 text-center underline border-slate-500 hover:bg-slate-100 active:bg-slate-200"
+                   @onclick="async () => await ToggleCourtSitting(courtSitting, idx)">
+                    @courtSitting.Name
+                </p>
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
                     {
-                        <li class="relative text-sm text-left font-normal lg:text-lg p-1 border-l border-r border-b border-slate-500 bg-slate-200 @Parent.IsSelected(defendant)"
+                        <li class="relative text-sm text-left font-normal lg:text-lg p-1 first:border-t 
+                            border-l border-r border-b border-slate-500 bg-slate-200 @Parent.IsSelected(defendant)
+                            hover:bg-slate-300 active:bg-slate-400"
                             @onclick="() => Parent.ActivateDefendant(defendant)">
                             <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
                                title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
@@ -36,7 +43,7 @@
         CourtSittings.ForEach(cs => CourtSittingVisibility.Add(cs.Id, true));
     }
 
-    private void ToggleCourtSitting(CourtSitting courtSitting)
+    private async Task ToggleCourtSitting(CourtSitting courtSitting, int id)
     {
         CourtSittingVisibility[courtSitting.Id] = !CourtSittingVisibility[courtSitting.Id];
     }

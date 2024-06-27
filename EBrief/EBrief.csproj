@@ -36,6 +36,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Update="wwwroot\images\down-arrow.svg">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Update="wwwroot\index.html">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
