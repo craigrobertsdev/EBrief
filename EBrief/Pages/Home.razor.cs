@@ -239,8 +239,6 @@ public partial class Home
                 CourtRoom = CourtRoom.Value
             };
 
-            courtList.CombineDefendantCaseFiles();
-
             try
             {
                 await DataAccess.CreateCourtList(courtList);

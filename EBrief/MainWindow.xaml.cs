@@ -41,6 +41,7 @@ public partial class MainWindow : Window
             {
                 string dbPath = Path.Combine(FileHelpers.AppDataPath, "EBrief.db");
                 options.UseSqlite($"Filename={dbPath}");
+                options.EnableSensitiveDataLogging();
             });
             serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
             serviceCollection.AddScoped<TooltipService>();

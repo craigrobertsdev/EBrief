@@ -65,4 +65,9 @@ public class CourtListModel
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         });
     }
+
+    public void FlattenDefendants()
+    {
+
+    }
 }
