@@ -16,6 +16,7 @@ FUNCTIONALITY:
 	- PreviousCourtList delete button not disabled when there is no court list is selected
 	- Add all courts to the list of courts
 	- Think of a way to represent regional courts where they only have 1 court room
+	- What kind of auth do we use?
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
