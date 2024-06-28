@@ -2,7 +2,7 @@
     <div class="pb-4">
         @foreach (var tabPage in TabPages) {
             <button type="button"
-                    class="p-2 border-r border-t border-b border-slate-500 cursor-pointer @GetButtonClass(tabPage) 
+                    class="p-2 first:border-l border-r border-t border-b border-slate-500 cursor-pointer @GetButtonClass(tabPage) 
                     text-sm md:text-base"
                     @onclick="() => ActivateTab(tabPage)">
                 @tabPage.Title

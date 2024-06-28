@@ -38,7 +38,7 @@ else
             else
             {
                 // Case files row
-                <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full border-l relative">
+                <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full relative">
                     <div id="casefile-container" class="overflow-x-auto">
                         <div class="flex w-auto w-full">
                             @foreach (var caseFile in ActiveDefendant.CaseFiles)
@@ -71,7 +71,7 @@ else
                     </div>
                 </div>
             }
-            <div class="h-full ml-2 border-l border-l-3 border-l-slate-500">
+            <div class="h-full ml-2">
                 <CascadingValue Value="DataAccess">
                     <TabControl>
                         <TabPage Title="CFEL">
