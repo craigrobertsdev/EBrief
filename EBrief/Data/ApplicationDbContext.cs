@@ -13,6 +13,16 @@ public class ApplicationDbContext : DbContext
         Database.EnsureCreated();
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+
+            string dbPath = Path.Combine(FileHelpers.AppDataPath, "EBrief.db");
+            optionsBuilder.UseSqlite($"Filename={dbPath}");
+        }
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CourtListModel>()

@@ -8,6 +8,7 @@ public class CaseFile
     public List<CaseFileEnquiryLog> CfelEntries { get; set; } = [];
     public string FactsOfCharge { get; set; } = default!;
     public Information Information { get; set; } = default!;
+    public TimeSpan? TimeInCustody { get; set; }
     public List<Charge> Charges { get; set; } = [];
     public List<CaseFileDocument> CaseFileDocuments { get; set; } = [];
     public CaseFileDocument? SelectedCaseFileDocument { get; set; } = default!;

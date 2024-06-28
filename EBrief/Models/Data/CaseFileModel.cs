@@ -18,6 +18,7 @@ public class CaseFileModel
     public List<CaseFileEnquiryLogModel> CfelEntries { get; set; } = [];
     public string FactsOfCharge { get; set; } = default!;
     public InformationModel? Information { get; set; }
+    public TimeSpan? TimeInCustody { get; set; }
     public List<ChargeModel> Charges { get; set; } = [];
     public List<CaseFileDocumentModel> CaseFileDocuments { get; set; } = [];
     public List<OccurrenceDocumentModel> OccurrenceDocuments { get; set; } = [];
@@ -33,6 +34,7 @@ public class CaseFileModel
             Schedule = Schedule.Select(hearing => hearing.ToUIModel()).ToList(),
             CfelEntries = CfelEntries.Select(cfel => cfel.ToUIModel()).ToList(),
             FactsOfCharge = FactsOfCharge,
+            TimeInCustody = TimeInCustody,
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),
             CaseFileDocuments = CaseFileDocuments.Select(doc => doc.ToUIModel()).ToList(),
             OccurrenceDocuments = OccurrenceDocuments.Select(doc => doc.ToUIModel()).ToList(),
