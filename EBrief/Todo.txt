@@ -9,14 +9,12 @@ FUNCTIONALITY:
 	- Add option to refresh local data from server
 	- Find a way to handle where files are double clicked when the user already has the app open
 		https://www.codeproject.com/Articles/5247406/Double-Clicking-a-File-in-Explorer-and-Adding-It-t
-	- Add Extra info page for time in custody, defendant's details, etc.
 	- Update CFELs on server and on client optimistically
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back
 	- Use cancellation tokens to cancel requesting both court lists and documents
 	- Add all courts to the list of courts
 	- Think of a way to represent regional courts where they only have 1 court room
 	- What kind of auth do we use? OAuth2 with Azure Entra Id
-	- Update phone and emails from other info page
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
