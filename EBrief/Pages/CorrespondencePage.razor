@@ -1,5 +1,6 @@
 @using EBrief.Helpers
 @using EBrief.Models.UI
+@using System.IO
 @implements IDisposable
 
 <div class="flex h-full">
@@ -28,7 +29,6 @@
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
     public CaseFileDocument? SelectedDocument { get; set; }
     private string _pdfContent = "";
-    private bool _loading;
 
     protected override async Task OnInitializedAsync()
     {

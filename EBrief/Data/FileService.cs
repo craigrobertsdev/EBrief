@@ -2,6 +2,7 @@
 using EBrief.Models.Data;
 using EBrief.Models.UI;
 using Microsoft.Win32;
+using System.IO;
 using System.Text.Json;
 using System.Windows;
 
@@ -9,6 +10,8 @@ namespace EBrief.Data;
 public class FileService : IFileService
 {
     private readonly IDataAccess _dataAccess;
+    private static readonly string _correspondenceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief", "correspondence");
+    private static readonly string _evidenceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief", "evidence");
     public FileService(IDataAccess dataAccess)
     {
         _dataAccess = dataAccess;
@@ -68,4 +71,54 @@ public class FileService : IFileService
             return (null, e.Message);
         }
     }
+
+    public void CreateCorrespondenceDirectory()
+    {
+        var correspondenceDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "EBrief",
+            "correspondence");
+
+        if (!Directory.Exists(correspondenceDirectory))
+        {
+            Directory.CreateDirectory(correspondenceDirectory);
+        }
+    }
+
+    public void CreateEvidenceDirectory()
+    {
+
+        var evidenceDirectory = Path.Combine(Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData),
+            "EBrief",
+            "evidence");
+
+        if (!Directory.Exists(evidenceDirectory))
+        {
+            Directory.CreateDirectory(evidenceDirectory);
+        }
+    }
+
+    public async Task SaveDocument(Stream stream, string fileName, FolderType folderType)
+    {
+
+        var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+
+        var directory = folderType switch
+        {
+            FolderType.Correspondence => _correspondenceDirectory,
+            FolderType.Evidence => _evidenceDirectory,
+            _ => throw new ArgumentOutOfRangeException(nameof(folderType), folderType, null)
+        };
+
+        using var fileStream = new FileStream($"{directory}/{fileName}", FileMode.Create, FileAccess.Write);
+        fileStream.Write(memoryStream.ToArray());
+    }
+}
+
+public enum FolderType
+{
+    Correspondence,
+    Evidence
 }
