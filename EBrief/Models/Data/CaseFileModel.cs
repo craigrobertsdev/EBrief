@@ -38,7 +38,7 @@ public class CaseFileModel
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),
             CaseFileDocuments = CaseFileDocuments.Select(doc => doc.ToUIModel()).ToList(),
             OccurrenceDocuments = OccurrenceDocuments.Select(doc => doc.ToUIModel()).ToList(),
-            Notes = Notes
+            Notes = new() { Text = Notes, HasChanged = false }
         };
     }
 }

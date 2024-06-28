@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen;
 using Serilog;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 
 namespace EBrief;
@@ -22,9 +24,8 @@ public partial class MainWindow : Window
             serviceCollection.AddWpfBlazorWebView();
 #if DEBUG
             serviceCollection.AddBlazorWebViewDeveloperTools();
-            serviceCollection.AddLogging();
-#else
-
+            //serviceCollection.AddLogging();
+#endif
             serviceCollection.AddLogging(builder =>
             {
                 var loggerConfiguration = new LoggerConfiguration()
@@ -35,7 +36,6 @@ public partial class MainWindow : Window
 
                 builder.AddSerilog(loggerConfiguration.CreateLogger());
             });
-#endif
 
             serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             {
@@ -51,6 +51,7 @@ public partial class MainWindow : Window
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 
             WindowState = WindowState.Maximized;
+            Closing += OnWindowClosing;
         }
         catch (Exception ex)
         {
@@ -61,5 +62,55 @@ public partial class MainWindow : Window
         {
             Log.CloseAndFlush();
         }
+    }
+
+    private void OnWindowClosing(object? sender, CancelEventArgs e)
+    {
+        var dbContext = ((IServiceProvider)Resources["services"])?.GetRequiredService<ApplicationDbContext>();
+        var appState = ((IServiceProvider)Resources["services"])?.GetRequiredService<AppState>();
+        if (appState == null || dbContext == null)
+        {
+            return;
+        }
+
+        if (appState.CurrentCourtList == null)
+        {
+            return;
+        }
+
+        foreach (var caseFile in appState.CurrentCourtList.GetCaseFiles())
+        {
+            if (caseFile.Notes.HasChanged)
+            {
+                var button = MessageBoxButton.YesNoCancel;
+                var result = MessageBox.Show($"You have unsaved changes to your court list. Save before closing?", "Save changes", button, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.No)
+                {
+                    return;
+                }
+
+                if (result == MessageBoxResult.Cancel)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                break;
+            }
+        }
+
+        var courtListModel = dbContext.CourtLists
+            .Where(cl => cl.Id == appState.CurrentCourtList.Id)
+            .Include(cl => cl.CaseFiles)
+            .First();
+
+        foreach (var caseFile in appState.CurrentCourtList.GetCaseFiles())
+        {
+            courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes.Text;
+        }
+
+        dbContext.CourtLists.Update(courtListModel);
+        dbContext.SaveChanges();
     }
 }

@@ -10,7 +10,7 @@
         <li class="tree">
             <div id="court-sitting-@idx" class="text-lg relative text-center font-bold ">
                 <p class="mt-2 py-1 text-center underline border-slate-500 hover:bg-slate-100 active:bg-slate-200"
-                   @onclick="async () => await ToggleCourtSitting(courtSitting, idx)">
+                   @onclick="() => ToggleCourtSitting(courtSitting, idx)">
                     @courtSitting.Name
                 </p>
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
@@ -43,7 +43,7 @@
         CourtSittings.ForEach(cs => CourtSittingVisibility.Add(cs.Id, true));
     }
 
-    private async Task ToggleCourtSitting(CourtSitting courtSitting, int id)
+    private void ToggleCourtSitting(CourtSitting courtSitting, int id)
     {
         CourtSittingVisibility[courtSitting.Id] = !CourtSittingVisibility[courtSitting.Id];
     }

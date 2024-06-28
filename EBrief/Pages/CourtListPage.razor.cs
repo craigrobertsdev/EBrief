@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
+using System.IO;
 using System.Net.Http;
 
 namespace EBrief.Pages;
@@ -17,6 +18,7 @@ public partial class CourtListPage
     [Inject] public TooltipService TooltipService { get; set; } = default!;
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
     [Inject] public IFileService FileService { get; set; } = default!;
+    [Inject] public AppState AppState { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
@@ -61,6 +63,7 @@ public partial class CourtListPage
         CourtSittings = GenerateCourtSittings();
         ActivateDefendant(CourtList.Defendants.First());
 
+        AppState.CurrentCourtList = CourtList;
         _loading = false;
     }
 
@@ -143,7 +146,7 @@ public partial class CourtListPage
             await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
             _loadingNewCaseFiles = false;
         }
-        catch (Exception e)
+        catch
         {
             _addCaseFilesError = "Failed to add case files";
             _loadingNewCaseFiles = false;
@@ -170,11 +173,15 @@ public partial class CourtListPage
 
     private async Task HandleReturnHome()
     {
-        if (await UnsavedChanges())
+        if (UnsavedChanges())
         {
             await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
         }
+    }
 
+    private async Task SaveChanges()
+    {
+        await DataAccess.UpdateCourtList(CourtList);
         NavManager.NavigateTo("/");
     }
 
@@ -234,19 +241,17 @@ public partial class CourtListPage
         await FileService.SaveFile(CourtList);
     }
 
-    private async Task<bool> UnsavedChanges()
+    private bool UnsavedChanges()
     {
         // Handles the case where something has gone wrong and the user wants to go back to the start
         if (_error is not null)
         {
             return false;
         }
-        var courtList = await DataAccess.GetCourtList(CourtCode, CourtDate, CourtRoom)!;
 
         foreach (var caseFile in CourtList.GetCaseFiles())
         {
-            var caseFileModel = courtList.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber);
-            if (caseFileModel.Notes != caseFile.Notes)
+            if (caseFile.Notes.HasChanged)
             {
                 return true;
             }
@@ -289,45 +294,25 @@ public partial class CourtListPage
         }
     }
 
-    private static async Task DownloadCaseFileDocument(string fileName, HttpClient client)
+    private async Task DownloadCaseFileDocument(string fileName, HttpClient client)
     {
         var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/correspondence/?fileName={fileName}");
-        var correspondenceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief", "correspondence");
-
-        if (!Directory.Exists(correspondenceDirectory))
-        {
-            Directory.CreateDirectory(correspondenceDirectory);
-        }
-
+        FileService.CreateCorrespondenceDirectory();
         if (response.IsSuccessStatusCode)
         {
             var pdfStream = await response.Content.ReadAsStreamAsync();
-            var memoryStream = new MemoryStream();
-            await pdfStream.CopyToAsync(memoryStream);
-
-            using var fileStream = new FileStream($"{correspondenceDirectory}/{fileName}", FileMode.Create, FileAccess.Write);
-            fileStream.Write(memoryStream.ToArray());
+            await FileService.SaveDocument(pdfStream, fileName, FolderType.Correspondence);
         }
     }
 
-    private static async Task DownloadEvidence(string fileName, HttpClient client)
+    private async Task DownloadEvidence(string fileName, HttpClient client)
     {
         var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/evidence/?fileName={fileName}");
-        var evidenceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief", "evidence");
-
-        if (!Directory.Exists(evidenceDirectory))
-        {
-            Directory.CreateDirectory(evidenceDirectory);
-        }
-
+        FileService.CreateEvidenceDirectory();
         if (response.IsSuccessStatusCode)
         {
             var pdfStream = await response.Content.ReadAsStreamAsync();
-            var memoryStream = new MemoryStream();
-            await pdfStream.CopyToAsync(memoryStream);
-
-            using var fileStream = new FileStream($"{evidenceDirectory}/{fileName}", FileMode.Create, FileAccess.Write);
-            fileStream.Write(memoryStream.ToArray());
+            await FileService.SaveDocument(pdfStream, fileName, FolderType.Evidence);
         }
     }
 }

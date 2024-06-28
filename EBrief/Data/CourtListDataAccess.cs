@@ -50,7 +50,7 @@ public class CourtListDataAccess : IDataAccess
         var courtListModel = await _context.CourtLists.FirstAsync(cl => cl.Id == courtList.Id);
         foreach (var caseFile in courtList.GetCaseFiles())
         {
-            courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes;
+            courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes.Text;
         }
 
         _context.CourtLists.Update(courtListModel);

@@ -14,7 +14,7 @@ public class CaseFile
     public CaseFileDocument? SelectedCaseFileDocument { get; set; } = default!;
     public List<OccurrenceDocument> OccurrenceDocuments { get; set; } = [];
     public OccurrenceDocument? SelectedOccurrenceDocument { get; set; } = default!;
-    public string Notes { get; set; } = string.Empty;
+    public CaseFileNote Notes { get; set; } = default!;
     public string FollowUpText { get; set; } = string.Empty;
 
     public void GenerateInformationFromCharges()
