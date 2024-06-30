@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace EBrief.Models.Data;
-public class CaseFileEnquiryLogModel
+public class CaseFileEnquiryLogEntryModel
 {
     [Key]
     public int Id { get; set; }
@@ -11,14 +11,8 @@ public class CaseFileEnquiryLogModel
 
     public DateTime EntryDate { get; set; }
 
-    public CaseFileEnquiryLog ToUIModel()
+    public CaseFileEnquiryLogEntry ToUIModel()
     {
-        return new CaseFileEnquiryLog
-        {
-            Id = Id,
-            EntryText = EntryText,
-            EnteredBy = EnteredBy,
-            EntryDate = EntryDate
-        };
+        return new CaseFileEnquiryLogEntry(Id, EntryText, EnteredBy, EntryDate);
     }
 }

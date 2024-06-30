@@ -1,6 +1,7 @@
 ﻿using EBrief.Models;
 using EBrief.Models.Data;
 using EBrief.Models.UI;
+using EBrief.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -9,11 +10,13 @@ public class CourtListDataAccess : IDataAccess
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<CourtListDataAccess> _logger;
+    private readonly AppState _appState;
 
-    public CourtListDataAccess(ApplicationDbContext context, ILogger<CourtListDataAccess> logger)
+    public CourtListDataAccess(ApplicationDbContext context, ILogger<CourtListDataAccess> logger, AppState appState)
     {
         _context = context;
         _logger = logger;
+        _appState = appState; 
     }
 
     public async Task CreateCourtList(CourtListModel courtList)
@@ -54,6 +57,25 @@ public class CourtListDataAccess : IDataAccess
         }
 
         _context.CourtLists.Update(courtListModel);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateCaseFiles(IEnumerable<string> caseFileNumbers, string updateText)
+    {
+        var caseFilesToUpdate = _context.CaseFiles.Where(cf => caseFileNumbers.Contains(cf.CaseFileNumber))
+            .ToDictionary(cf => cf.CaseFileNumber);
+
+        foreach (var caseFile in caseFileNumbers)
+        {
+            caseFilesToUpdate[caseFile].CfelEntries
+                .Add(new()
+                {
+                    EntryText = updateText,
+                    EnteredBy = _appState.CurrentUser,
+                    EntryDate = DateTime.Now,
+                });
+        }
+
         await _context.SaveChangesAsync();
     }
 

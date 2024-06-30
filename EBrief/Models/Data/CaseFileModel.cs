@@ -15,7 +15,7 @@ public class CaseFileModel
     [MaxLength(20)]
     public string? CourtFileNumber { get; set; } = string.Empty;
     public List<HearingEntryModel> Schedule { get; set; } = [];
-    public List<CaseFileEnquiryLogModel> CfelEntries { get; set; } = [];
+    public List<CaseFileEnquiryLogEntryModel> CfelEntries { get; set; } = [];
     public string FactsOfCharge { get; set; } = default!;
     public InformationModel? Information { get; set; }
     public TimeSpan? TimeInCustody { get; set; }
@@ -32,7 +32,7 @@ public class CaseFileModel
             Defendant = Defendant.ToUIModel(),
             CourtFileNumber = CourtFileNumber,
             Schedule = Schedule.Select(hearing => hearing.ToUIModel()).ToList(),
-            CfelEntries = CfelEntries.Select(cfel => cfel.ToUIModel()).ToList(),
+            Cfel = CfelEntries.Select(cfel => cfel.ToUIModel()).ToList(),
             FactsOfCharge = FactsOfCharge,
             TimeInCustody = TimeInCustody,
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),

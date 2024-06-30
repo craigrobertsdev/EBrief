@@ -1,5 +1,4 @@
-﻿using EBrief.Components;
-using EBrief.Data;
+﻿using EBrief.Data;
 using EBrief.Helpers;
 using EBrief.Models;
 using EBrief.Models.Data;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
-using System.IO;
 using System.Net.Http;
 
 namespace EBrief.Pages;
@@ -141,7 +139,7 @@ public partial class CourtListPage
             newCaseFiles.AddReferenceToDefendants();
             CourtList.AddCaseFiles(newCaseFiles);
             UpdateCourtSittings(newCaseFiles.Select(cf => cf.Defendant).ToList());
-            
+
             CaseFilesToAdd = string.Empty;
             await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
             _loadingNewCaseFiles = false;
@@ -176,6 +174,10 @@ public partial class CourtListPage
         if (UnsavedChanges())
         {
             await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
+        }
+        else
+        {
+            NavManager.NavigateTo("/");
         }
     }
 

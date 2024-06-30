@@ -11,8 +11,8 @@ public class Defendant
     public string? Email { get; set; }
     public List<CaseFile> CaseFiles { get; set; } = [];
     public CaseFile? ActiveCaseFile { get; set; }
+    public string AddCfelText { get; set; } = string.Empty; 
     public string? OffenderHistory { get; set; }
-    public string CfelText { get; set; } = string.Empty;
     public List<BailAgreement> BailAgreements { get; set; } = [];
     public List<InterventionOrder> InterventionOrders { get; set; } = [];
 }

@@ -60,7 +60,7 @@ namespace EBrief.Data.Migrations
                     b.ToTable("CaseFileDocumentModel");
                 });
 
-            modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogEntryModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,7 +84,7 @@ namespace EBrief.Data.Migrations
 
                     b.HasIndex("CaseFileModelId");
 
-                    b.ToTable("CaseFileEnquiryLogModel");
+                    b.ToTable("CaseFileEnquiryLogEntryModel");
                 });
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
@@ -358,10 +358,10 @@ namespace EBrief.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogModel", b =>
+            modelBuilder.Entity("EBrief.Models.Data.CaseFileEnquiryLogEntryModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
-                        .WithMany("CfelEntries")
+                        .WithMany("Cfel")
                         .HasForeignKey("CaseFileModelId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -444,7 +444,7 @@ namespace EBrief.Data.Migrations
                 {
                     b.Navigation("CaseFileDocuments");
 
-                    b.Navigation("CfelEntries");
+                    b.Navigation("Cfel");
 
                     b.Navigation("Charges");
 

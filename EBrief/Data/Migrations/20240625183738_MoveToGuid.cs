@@ -152,7 +152,7 @@ namespace EBrief.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CaseFileEnquiryLogModel",
+                name: "CaseFileEnquiryLogEntryModel",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -278,7 +278,7 @@ namespace EBrief.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseFileEnquiryLogModel_CaseFileModelId",
-                table: "CaseFileEnquiryLogModel",
+                table: "CaseFileEnquiryLogEntryModel",
                 column: "CaseFileModelId");
 
             migrationBuilder.CreateIndex(
@@ -334,7 +334,7 @@ namespace EBrief.Data.Migrations
                 name: "CaseFileDocumentModel");
 
             migrationBuilder.DropTable(
-                name: "CaseFileEnquiryLogModel");
+                name: "CaseFileEnquiryLogEntryModel");
 
             migrationBuilder.DropTable(
                 name: "ChargeModel");
