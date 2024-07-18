@@ -59,7 +59,14 @@ public class FileService : IFileService
                 var proceed = MessageBox.Show("Court list already exists. Do you want to overwrite?", "Confirmation", button, MessageBoxImage.Question);
                 if (proceed == MessageBoxResult.No)
                 {
-                    return (null, null);
+                    var entries = await _dataAccess.GetSavedCourtLists();
+                    var entry = entries.Where(
+                        cl => cl.CourtDate == courtListEntry.CourtDate
+                        && cl.CourtCode == courtListEntry.CourtCode
+                        && cl.CourtRoom == courtListEntry.CourtRoom)
+                    .First();
+
+                    return (entry, null);
                 }
             }
 
