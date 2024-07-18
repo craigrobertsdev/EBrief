@@ -94,7 +94,6 @@ public class FileService : IFileService
 
     public void CreateEvidenceDirectory()
     {
-
         var evidenceDirectory = Path.Combine(Environment.GetFolderPath(
             Environment.SpecialFolder.ApplicationData),
             "EBrief",
@@ -108,7 +107,6 @@ public class FileService : IFileService
 
     public async Task SaveDocument(Stream stream, string fileName, FolderType folderType)
     {
-
         var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
 

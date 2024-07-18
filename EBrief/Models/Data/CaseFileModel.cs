@@ -1,12 +1,14 @@
 ﻿using EBrief.Models.UI;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace EBrief.Models.Data;
 public class CaseFileModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [JsonIgnore]
     public Guid Id { get; set; }
     public CourtListModel CourtList { get; set; } = default!;
     public Guid CourtListId { get; set; }

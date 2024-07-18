@@ -21,11 +21,8 @@ public class CourtListDataAccess : IDataAccess
 
     public async Task CreateCourtList(CourtListModel courtList)
     {
-        var existingCourtList = await _context.CourtLists
-            .Where(cl => cl.CourtDate == courtList.CourtDate && cl.CourtCode == courtList.CourtCode && cl.CourtRoom == courtList.CourtRoom)
-            .FirstOrDefaultAsync();
-
-        if (existingCourtList != null)
+        var courtListEntry = new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
+        if (await CheckCourtListExists(courtListEntry))
         {
             return;
         }

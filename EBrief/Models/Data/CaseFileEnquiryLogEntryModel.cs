@@ -1,10 +1,12 @@
 ﻿using EBrief.Models.UI;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EBrief.Models.Data;
 public class CaseFileEnquiryLogEntryModel
 {
     [Key]
+    [JsonIgnore]
     public int Id { get; set; }
     public string EntryText { get; set; } = string.Empty;
     public string EnteredBy { get; set; } = string.Empty;
