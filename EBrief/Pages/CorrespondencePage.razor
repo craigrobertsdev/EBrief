@@ -27,7 +27,7 @@
 
 @code {
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
-    public CaseFileDocument? SelectedDocument { get; set; }
+    private CaseFileDocument? _selectedDocument { get; set; }
     private string _pdfContent = "";
 
     protected override async Task OnInitializedAsync()
@@ -48,8 +48,8 @@
 
     private async Task SelectDocument(CaseFileDocument document)
     {
-        SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
-        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = SelectedDocument;
+        _selectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
+        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = _selectedDocument;
         await LoadDocument(document.FileName);
     }
 
@@ -65,7 +65,7 @@
 
     private string IsSelected(CaseFileDocument document)
     {
-        if (SelectedDocument?.FileName == document.FileName)
+        if (_selectedDocument?.FileName == document.FileName)
         {
             return "bg-sky-700 text-white";
         }
@@ -76,7 +76,7 @@
     public void Dispose()
     {
         Parent.OnDefendantChange -= HandleDefendantChange;
-        SelectedDocument = null;
+        _selectedDocument = null;
         GC.Collect();
     }
 }

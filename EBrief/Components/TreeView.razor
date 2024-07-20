@@ -1,6 +1,7 @@
 ﻿@using EBrief.Helpers
 @using EBrief.Models.UI
 @using EBrief.Pages
+@inject IJSRuntime JSRuntime
 
 <ul class="select-none pb-2">
     @for (int i = 0; i < CourtSittings.Count; i++)
@@ -16,7 +17,7 @@
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
                     {
-                        <li class="relative text-sm text-left font-normal lg:text-lg p-1 first:border-t 
+                        <li class="relative text-sm text-left font-normal lg:text-lg p-1 first:border-t
                             border-l border-r border-b border-slate-500 bg-slate-200 @Parent.IsSelected(defendant)
                             hover:bg-slate-300 active:bg-slate-400"
                             @onclick="() => Parent.ActivateDefendant(defendant)">
@@ -35,21 +36,24 @@
 @code {
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
     [Parameter] public List<CourtSitting> CourtSittings { get; set; } = [];
-    [Inject] public IJSRuntime JSRuntime { get; set; } = default!;
-    private Dictionary<int, bool> CourtSittingVisibility { get; set; } = new();
+    private Dictionary<int, bool> _courtSittingVisibility { get; set; } = [];
 
     protected override void OnInitialized()
     {
-        CourtSittings.ForEach(cs => CourtSittingVisibility.Add(cs.Id, true));
+        CourtSittings.ForEach(cs => _courtSittingVisibility.Add(cs.Id, true));
     }
 
-    private void ToggleCourtSitting(CourtSitting courtSitting, int id)
+    private async Task ToggleCourtSitting(CourtSitting courtSitting, int id)
     {
-        CourtSittingVisibility[courtSitting.Id] = !CourtSittingVisibility[courtSitting.Id];
+        _courtSittingVisibility[courtSitting.Id] = !_courtSittingVisibility[courtSitting.Id];
+        if (_courtSittingVisibility[courtSitting.Id])
+        {
+            await JSRuntime.InvokeVoidAsync("scrollToBottomOfCourtSitting", $"court-sitting-{courtSitting.Id}");
+        }
     }
 
     private bool IsVisible(CourtSitting courtSitting)
     {
-        return CourtSittingVisibility[courtSitting.Id];
+        return _courtSittingVisibility[courtSitting.Id];
     }
 }

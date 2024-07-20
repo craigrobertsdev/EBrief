@@ -1,6 +1,6 @@
 <div class="flex flex-col h-full">
     <div class="pb-4">
-        @foreach (var tabPage in TabPages) {
+        @foreach (var tabPage in _tabPages) {
             <button type="button"
                     class="p-2 first:border-l border-r border-t border-b border-slate-500 cursor-pointer @GetButtonClass(tabPage) 
                     text-sm md:text-base"
@@ -18,15 +18,14 @@
 </div>
 
 @code {
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     public TabPage ActiveTab = default!;
-    List<TabPage> TabPages = [];
+    private List<TabPage> _tabPages = [];
 
     internal void AddPage(TabPage tabPage) {
-        TabPages.Add(tabPage);
-        if (TabPages.Count == 1) {
+        _tabPages.Add(tabPage);
+        if (_tabPages.Count == 1) {
             ActiveTab = tabPage;
         }
         StateHasChanged();

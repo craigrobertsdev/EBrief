@@ -163,13 +163,13 @@ namespace EBrief.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CourtCode")
+                    b.Property<int>("_courtCode")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CourtDate")
+                    b.Property<DateTime>("_courtDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CourtRoom")
+                    b.Property<int>("_courtRoom")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

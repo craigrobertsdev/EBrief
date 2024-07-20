@@ -13,21 +13,18 @@ using System.Net.Http;
 namespace EBrief.Pages;
 public partial class CourtListPage
 {
-    [Inject] public TooltipService TooltipService { get; set; } = default!;
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
     [Inject] public IFileService FileService { get; set; } = default!;
     [Inject] public AppState AppState { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
-    public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
     private List<CourtSitting> CourtSittings { get; set; } = [];
-    public CourtCode CourtCode { get; set; } = default!;
-    public DateTime CourtDate { get; set; } = default!;
-    public int CourtRoom { get; set; } = default!;
+    private CourtCode CourtCode { get; set; } = default!;
+    private DateTime CourtDate { get; set; } = default!;
+    private int CourtRoom { get; set; } = default!;
     private bool _includeDocuments;
-    private ElementReference? UnsavedChangesDialog { get; set; }
-    private ElementReference? AddCaseFilesDialog { get; set; }
-    private Dictionary<string, ElementReference?> CaseFileHeaderRefs { get; set; } = [];
+    private ElementReference? _unsavedChangesDialog { get; set; }
+    private ElementReference? _addCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
@@ -105,17 +102,17 @@ public partial class CourtListPage
 
     private async Task OpenAddCaseFilesDialog()
     {
-        if (AddCaseFilesDialog is not null)
+        if (_addCaseFilesDialog is not null)
         {
             _error = null;
-            await JSRuntime.InvokeAsync<string>("openDialog", AddCaseFilesDialog);
+            await JSRuntime.InvokeAsync<string>("openDialog", _addCaseFilesDialog);
         }
     }
 
     private async Task CloseAddCaseFilesDialog()
     {
         CaseFilesToAdd = string.Empty;
-        await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
+        await JSRuntime.InvokeVoidAsync("closeDialog", _addCaseFilesDialog);
     }
 
     private async Task AddCaseFiles()
@@ -141,7 +138,7 @@ public partial class CourtListPage
             UpdateCourtSittings(newCaseFiles.Select(cf => cf.Defendant).ToList());
 
             CaseFilesToAdd = string.Empty;
-            await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
+            await JSRuntime.InvokeVoidAsync("closeDialog", _addCaseFilesDialog);
             _loadingNewCaseFiles = false;
         }
         catch
@@ -173,7 +170,7 @@ public partial class CourtListPage
     {
         if (UnsavedChanges())
         {
-            await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
+            await JSRuntime.InvokeVoidAsync("openDialog", _unsavedChangesDialog);
         }
         else
         {
@@ -189,7 +186,7 @@ public partial class CourtListPage
 
     private async Task CloseUnsavedChangesDialog()
     {
-        await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
+        await JSRuntime.InvokeVoidAsync("closeDialog", _unsavedChangesDialog);
     }
 
     internal void ActivateDefendant(Defendant defendant)

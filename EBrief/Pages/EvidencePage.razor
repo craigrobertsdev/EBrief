@@ -23,7 +23,7 @@
 
 @code {
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
-    public OccurrenceDocument? SelectedDocument { get; set; }
+    private OccurrenceDocument? SelectedDocument { get; set; }
     private string _pdfContent = "";
 
     protected override async Task OnInitializedAsync() {

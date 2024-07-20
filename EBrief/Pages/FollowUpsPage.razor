@@ -38,10 +38,10 @@
 @code {
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
     [Inject] IDataAccess DataAccess { get; set; } = default!;
-    public string? RemarksText { get; set; }
-    public string? CfelText { get; set; }
-    public IEnumerable<string> SelectedCaseFiles { get; set; } = [];
-    public List<CaseFile> CaseFiles { get; set; } = [];
+    private string? RemarksText { get; set; }
+    private string? CfelText { get; set; }
+    private IEnumerable<string> SelectedCaseFiles { get; set; } = [];
+    private List<CaseFile> CaseFiles { get; set; } = [];
     private string? _error;
 
     protected override async Task OnInitializedAsync()

@@ -22,10 +22,11 @@ public partial class MainWindow : Window
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
+
 #if DEBUG
             serviceCollection.AddBlazorWebViewDeveloperTools();
-            //serviceCollection.AddLogging();
 #endif
+
             serviceCollection.AddLogging(builder =>
             {
                 var loggerConfiguration = new LoggerConfiguration()
@@ -66,8 +67,9 @@ public partial class MainWindow : Window
 
     private void OnWindowClosing(object? sender, CancelEventArgs e)
     {
-        var dbContext = ((IServiceProvider)Resources["services"])?.GetRequiredService<ApplicationDbContext>();
-        var appState = ((IServiceProvider)Resources["services"])?.GetRequiredService<AppState>();
+        var serviceProvider = (IServiceProvider)Resources["services"];
+        var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+        var appState = serviceProvider.GetRequiredService<AppState>();
         if (appState == null || dbContext == null)
         {
             return;

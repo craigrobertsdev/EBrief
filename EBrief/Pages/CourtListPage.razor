@@ -66,7 +66,6 @@ else
                                 <RadzenMenuItem Text="Export Court List" Click="ExportCourtList" />
                                 <RadzenMenuItem Text="Return Home" Click="HandleReturnHome" />
                             </RadzenMenuItem>
-
                         </RadzenMenu>
                     </div>
                 </div>
@@ -125,7 +124,7 @@ else
     </style>
 }
 
-<dialog @ref="UnsavedChangesDialog" class="p-5">
+<dialog @ref="_unsavedChangesDialog" class="p-5">
     <h3 class="text-lg">You have unsaved changes. Do you wish to continue?</h3>
     <div class="flex w-full justify-end gap-3">
         <RadzenButton Text="Confirm" Click="SaveChanges" />
@@ -133,7 +132,7 @@ else
     </div>
 </dialog>
 
-<dialog @ref="AddCaseFilesDialog" class="p-5">
+<dialog @ref="_addCaseFilesDialog" class="p-5">
     @if (_loadingNewCaseFiles)
     {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
@@ -159,14 +158,6 @@ else
 </dialog>
 
 @code {
-    private TooltipOptions TooltipOptions => new TooltipOptions { Delay = 0, Duration = 0 };
-    private void ShowTooltip(CaseFile caseFile)
-    {
-        var text = GenerateCaseFileTooltipText(caseFile);
-        var elementReference = CaseFileHeaderRefs[caseFile.CaseFileNumber];
-        TooltipService.Open(elementReference!.Value, text.ToString(), TooltipOptions);
-    }
-
     private MarkupString GenerateCaseFileTooltipText(CaseFile caseFile)
     {
         var markup = new StringBuilder();
@@ -188,6 +179,5 @@ else
             }
         }
         return new MarkupString(markup.ToString());
-
     }
 }

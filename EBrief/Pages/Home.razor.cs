@@ -17,17 +17,17 @@ public partial class Home
     [Inject] private AppState AppState { get; set; } = default!;
     [Inject] private IDataAccess DataAccess { get; set; } = default!;
     [Inject] private IFileService FileService { get; set; } = default!;
-    public ElementReference? NewCourtListDialog { get; set; }
-    public ElementReference? PreviousCourtListDialog { get; set; }
-    public ElementReference? ConfirmDialog { get; set; }
-    public string CaseFileNumbers { get; set; } = string.Empty;
+    private ElementReference? NewCourtListDialog { get; set; }
+    private ElementReference? PreviousCourtListDialog { get; set; }
+    private ElementReference? ConfirmDialog { get; set; }
+    private string CaseFileNumbers { get; set; } = string.Empty;
     private List<Court> Courts = [];
     private Court? SelectedCourt { get; set; }
     public DateTime? CourtDate { get; set; }
-    public int? CourtRoom { get; set; }
-    public bool IncludeDocuments { get; set; }
+    private int? CourtRoom { get; set; }
+    private bool IncludeDocuments { get; set; }
     private bool _loadingCourtList;
-    public string? _error;
+    private string? _error;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
 
