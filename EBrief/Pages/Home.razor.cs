@@ -210,6 +210,7 @@ public partial class Home
         if (listAlreadyExists)
         {
             _error = "A court list for this date and location already exists";
+            _loadingCourtList = false;
             return;
         }
 
@@ -242,19 +243,23 @@ public partial class Home
 
             try
             {
+                if (IncludeDocuments)
+                {
+                    await DownloadDocuments(courtList);
+                }
+
                 await DataAccess.CreateCourtList(courtList);
             }
             catch (Exception e)
             {
                 _error = e.InnerException?.Message ?? e.Message;
-                // not put in a finally block as the button flashes back to being enabled before the page changes
                 _loadingCourtList = false;
                 return;
             }
 
-            NavManager.NavigateTo($"/court-list/?newList=&courtCode={SelectedCourt.CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
+            NavManager.NavigateTo($"/court-list/?newList=&courtCode={SelectedCourt.CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}&includeDocuments={IncludeDocuments}");
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException)
         {
             _error = "Failed to connect to the server";
             _loadingCourtList = false;
@@ -287,12 +292,29 @@ public partial class Home
         SelectedCourtList = courtListEntry;
     }
 
+    private void HandleSelectCourtDate(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        try
+        {
+            CourtDate = DateTime.Parse(e.Value.ToString()!);
+        }
+        catch (Exception)
+        {
+            CourtDate = null;
+        }
+    }
+
     private void HandleSelectCourt(ChangeEventArgs e)
     {
         if (e.Value is null)
         {
             return;
         }
+        _error = null;
         var courtCode = Enum.Parse<CourtCode>(e.Value.ToString()!);
         SelectedCourt = Courts.FirstOrDefault(e => e.CourtCode == courtCode);
     }
@@ -303,7 +325,43 @@ public partial class Home
         {
             return;
         }
+        _error = null;
         CourtRoom = int.Parse(e.Value.ToString()!);
+    }
+
+    private void HandleIncludeDocuments(bool? value)
+    {
+
+    }
+
+    private async Task DownloadDocuments(CourtListModel courtList)
+    {
+        var client = new HttpClient();
+        FileService.CreateDocumentDirectory();
+
+        foreach (var caseFile in courtList.CaseFiles)
+        {
+            foreach (var document in caseFile.Documents)
+            {
+                var endpoint = document.DocumentType == DocumentType.CaseFile ? "correspondence" : "evidence";
+                await DownloadDocument(document, client, endpoint);
+            }
+        }
+    }
+
+    private async Task DownloadDocument(DocumentModel document, HttpClient client, string endpoint)
+    {
+        var fileName = document.FileName;
+        var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/{endpoint}/?fileName={fileName}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var pdfStream = await response.Content.ReadAsStreamAsync();
+            var ext = Path.GetExtension(fileName);
+            var newFileName = Path.GetFileNameWithoutExtension(fileName) + $"-{Guid.NewGuid()}{ext}";
+            await FileService.SaveDocument(pdfStream, newFileName);
+            document.FileName = newFileName;
+        }
     }
 
     class Court

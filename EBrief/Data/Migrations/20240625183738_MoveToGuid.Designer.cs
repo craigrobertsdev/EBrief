@@ -344,7 +344,7 @@ namespace EBrief.Data.Migrations
             modelBuilder.Entity("EBrief.Models.Data.CaseFileDocumentModel", b =>
                 {
                     b.HasOne("EBrief.Models.Data.CaseFileModel", null)
-                        .WithMany("CaseFileDocuments")
+                        .WithMany("Documents")
                         .HasForeignKey("CaseFileModelId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -433,7 +433,7 @@ namespace EBrief.Data.Migrations
 
             modelBuilder.Entity("EBrief.Models.Data.CaseFileModel", b =>
                 {
-                    b.Navigation("CaseFileDocuments");
+                    b.Navigation("Documents");
 
                     b.Navigation("Cfel");
 

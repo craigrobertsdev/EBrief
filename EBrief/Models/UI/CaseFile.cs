@@ -10,10 +10,10 @@ public class CaseFile
     public Information Information { get; set; } = default!;
     public TimeSpan? TimeInCustody { get; set; }
     public List<Charge> Charges { get; set; } = [];
-    public List<CaseFileDocument> CaseFileDocuments { get; set; } = [];
-    public CaseFileDocument? SelectedCaseFileDocument { get; set; } = default!;
-    public List<OccurrenceDocument> OccurrenceDocuments { get; set; } = [];
-    public OccurrenceDocument? SelectedOccurrenceDocument { get; set; } = default!;
+    public List<Document> CaseFileDocuments { get; set; } = [];
+    public Document? SelectedCaseFileDocument { get; set; } = default!;
+    public List<Document> OccurrenceDocuments { get; set; } = [];
+    public Document? SelectedOccurrenceDocument { get; set; } = default!;
     public CaseFileNote Notes { get; set; } = default!;
     public string FollowUpText { get; set; } = string.Empty;
 

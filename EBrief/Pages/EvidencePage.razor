@@ -8,7 +8,7 @@
         <p>No correspondence to display</p>
     }
     else {
-        <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto">
+        <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto w-64">
             @foreach (var document in Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments!) {
                 <div class="text-sm lg:text-lg p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" @onclick=@(() => SelectDocument(document))>
                     @document.Title
@@ -16,15 +16,15 @@
             }
         </div>
         <div class="flex-1">
-            <iframe src=@_pdfContent style="height: 100%; width: 100%;" />
+            <iframe src=@PdfContent style="height: 100%; width: 100%;" />
         </div>
     }
 </div>
 
 @code {
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
-    private OccurrenceDocument? SelectedDocument { get; set; }
-    private string _pdfContent = "";
+    private Document? SelectedDocument { get; set; }
+    private string? PdfContent { get; set; } = null;
 
     protected override async Task OnInitializedAsync() {
         await HandleDefendantChange();
@@ -36,25 +36,26 @@
             Parent.ActiveDefendant?.ActiveCaseFile?.OccurrenceDocuments.First();
         if (file != null) {
             await SelectDocument(file);
+            StateHasChanged();
         }
     }
 
-    private async Task SelectDocument(OccurrenceDocument document) {
-        SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.OccurrenceDocuments.FirstOrDefault(d => d.Title == document.Title);
+    private async Task SelectDocument(Document document) {
+        SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.OccurrenceDocuments.FirstOrDefault(d => d.FileName == document.FileName);
         Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedOccurrenceDocument = SelectedDocument;
         await LoadDocument(document.FileName);
     }
 
     private async Task LoadDocument(string fileName) {
-        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/evidence/{fileName}", FileMode.Open, FileAccess.Read);
+        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/documents/{fileName}", FileMode.Open, FileAccess.Read);
         var memoryStream = new MemoryStream();
         await fileStream.CopyToAsync(memoryStream);
         var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
         var mimeType = FileHelpers.GetMimeType(fileExtension);
-        _pdfContent = $"data:{mimeType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+        PdfContent = $"data:{mimeType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
     }
 
-    private string IsSelected(OccurrenceDocument document) {
+    private string IsSelected(Document document) {
         if (SelectedDocument?.FileName == document.FileName) {
             return "bg-sky-700 text-white";
         }

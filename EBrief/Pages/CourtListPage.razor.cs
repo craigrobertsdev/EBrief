@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
-using System.Net.Http;
 
 namespace EBrief.Pages;
 public partial class CourtListPage
@@ -22,7 +21,7 @@ public partial class CourtListPage
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
-    private bool _includeDocuments;
+    private bool IncludeDocuments { get; set; }
     private ElementReference? _unsavedChangesDialog { get; set; }
     private ElementReference? _addCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
@@ -38,7 +37,7 @@ public partial class CourtListPage
         HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
-        _includeDocuments = queries.ContainsKey("includeDocuments");
+        IncludeDocuments = queries.ContainsKey("includeDocuments");
         CourtCode = Enum.Parse<CourtCode>(queries["courtCode"]!);
         CourtDate = DateTime.Parse(queries["courtDate"]!);
         CourtRoom = int.Parse(queries["courtRoom"]!);
@@ -56,7 +55,7 @@ public partial class CourtListPage
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
         CourtSittings = GenerateCourtSittings();
-        ActivateDefendant(CourtList.Defendants.First());
+        ActivateDefendant(CourtSittings[0].Defendants.First());
 
         AppState.CurrentCourtList = CourtList;
         _loading = false;
@@ -69,11 +68,6 @@ public partial class CourtListPage
         if (courtList is null)
         {
             throw new Exception("Failed to load court list.");
-        }
-
-        if (_includeDocuments)
-        {
-            await DownloadDocuments();
         }
 
         CourtList = courtList;
@@ -259,59 +253,4 @@ public partial class CourtListPage
         return false;
     }
 
-    private async Task DownloadDocuments()
-    {
-        var client = new HttpClient();
-
-        List<string> caseFileDocumentNames = [];
-        List<string> occurrenceDocumentNames = [];
-
-        foreach (var defendant in CourtList.Defendants)
-        {
-            foreach (var caseFile in defendant.CaseFiles)
-            {
-                foreach (var caseFileDocument in caseFile.CaseFileDocuments)
-                {
-                    caseFileDocumentNames.Add(caseFileDocument.FileName);
-                }
-
-                foreach (var occurrenceDocument in caseFile.OccurrenceDocuments)
-                {
-                    occurrenceDocumentNames.Add(occurrenceDocument.FileName);
-                }
-            }
-        }
-
-        foreach (var document in caseFileDocumentNames)
-        {
-            await DownloadCaseFileDocument(document, client);
-        }
-
-        foreach (var document in occurrenceDocumentNames)
-        {
-            await DownloadEvidence(document, client);
-        }
-    }
-
-    private async Task DownloadCaseFileDocument(string fileName, HttpClient client)
-    {
-        var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/correspondence/?fileName={fileName}");
-        FileService.CreateCorrespondenceDirectory();
-        if (response.IsSuccessStatusCode)
-        {
-            var pdfStream = await response.Content.ReadAsStreamAsync();
-            await FileService.SaveDocument(pdfStream, fileName, FolderType.Correspondence);
-        }
-    }
-
-    private async Task DownloadEvidence(string fileName, HttpClient client)
-    {
-        var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/evidence/?fileName={fileName}");
-        FileService.CreateEvidenceDirectory();
-        if (response.IsSuccessStatusCode)
-        {
-            var pdfStream = await response.Content.ReadAsStreamAsync();
-            await FileService.SaveDocument(pdfStream, fileName, FolderType.Evidence);
-        }
-    }
 }

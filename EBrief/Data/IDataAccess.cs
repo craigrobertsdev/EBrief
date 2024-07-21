@@ -14,4 +14,5 @@ public interface IDataAccess
     Task DeleteCourtList(CourtListEntry courtList);
     Task<CourtListModel?> GetCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom);
     Task<bool> CheckCourtListExists(CourtListEntry entry);
+    Task UpdateDocumentName(string fileName, string newFileName);
 }

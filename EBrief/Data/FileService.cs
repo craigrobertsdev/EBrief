@@ -1,4 +1,5 @@
-﻿using EBrief.Models;
+﻿using EBrief.Helpers;
+using EBrief.Models;
 using EBrief.Models.Data;
 using EBrief.Models.UI;
 using Microsoft.Win32;
@@ -79,51 +80,20 @@ public class FileService : IFileService
         }
     }
 
-    public void CreateCorrespondenceDirectory()
+    public void CreateDocumentDirectory()
     {
-        var correspondenceDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "EBrief",
-            "correspondence");
-
-        if (!Directory.Exists(correspondenceDirectory))
+        if (!Directory.Exists(FileHelpers.DocumentPath))
         {
-            Directory.CreateDirectory(correspondenceDirectory);
+            Directory.CreateDirectory(FileHelpers.DocumentPath);
         }
     }
 
-    public void CreateEvidenceDirectory()
-    {
-        var evidenceDirectory = Path.Combine(Environment.GetFolderPath(
-            Environment.SpecialFolder.ApplicationData),
-            "EBrief",
-            "evidence");
-
-        if (!Directory.Exists(evidenceDirectory))
-        {
-            Directory.CreateDirectory(evidenceDirectory);
-        }
-    }
-
-    public async Task SaveDocument(Stream stream, string fileName, FolderType folderType)
+    public async Task SaveDocument(Stream stream, string fileName)
     {
         var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
 
-        var directory = folderType switch
-        {
-            FolderType.Correspondence => _correspondenceDirectory,
-            FolderType.Evidence => _evidenceDirectory,
-            _ => throw new ArgumentOutOfRangeException(nameof(folderType), folderType, null)
-        };
-
-        using var fileStream = new FileStream($"{directory}/{fileName}", FileMode.Create, FileAccess.Write);
+        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/documents/{fileName}", FileMode.Create, FileAccess.Write);
         fileStream.Write(memoryStream.ToArray());
     }
-}
-
-public enum FolderType
-{
-    Correspondence,
-    Evidence
 }

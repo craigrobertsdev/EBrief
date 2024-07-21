@@ -8,9 +8,13 @@
     {
         <p>No correspondence to display</p>
     }
+    else if (_selectedDocument is null)
+    {
+        <p>Loading...</p>
+    }
     else
     {
-        <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto">
+        <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto w-64">
             @foreach (var document in Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments!)
             {
                 <div class="text-sm lg:text-lg p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" @onclick=@(() => SelectDocument(document))>
@@ -19,16 +23,23 @@
             }
         </div>
 
-        <div class="flex-1 h-full">
-            <iframe src=@_pdfContent style="height: 100%; width: 100%;" />
-        </div>
+        if (_pdfContent is null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="flex-1 h-full">
+                <iframe src=@_pdfContent style="height: 100%; width: 100%;" />
+            </div>
+        }
     }
 </div>
 
 @code {
     [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
-    private CaseFileDocument? _selectedDocument { get; set; }
-    private string _pdfContent = "";
+    private Document? _selectedDocument { get; set; }
+    private string? _pdfContent = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,14 +50,15 @@
     private async Task HandleDefendantChange()
     {
         var file = Parent.ActiveDefendant?.ActiveCaseFile?.SelectedCaseFileDocument ??
-            Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.First();
+            Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.FirstOrDefault();
         if (file != null)
         {
             await SelectDocument(file);
+            StateHasChanged();
         }
     }
 
-    private async Task SelectDocument(CaseFileDocument document)
+    private async Task SelectDocument(Document document)
     {
         _selectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
         Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = _selectedDocument;
@@ -55,7 +67,7 @@
 
     private async Task LoadDocument(string fileName)
     {
-        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/correspondence/{fileName}", FileMode.Open, FileAccess.Read);
+        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/documents/{fileName}", FileMode.Open, FileAccess.Read);
         var memoryStream = new MemoryStream();
         await fileStream.CopyToAsync(memoryStream);
         var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
@@ -63,7 +75,7 @@
         _pdfContent = $"data:{mimeType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
     }
 
-    private string IsSelected(CaseFileDocument document)
+    private string IsSelected(Document document)
     {
         if (_selectedDocument?.FileName == document.FileName)
         {

@@ -7,7 +7,6 @@ public interface IFileService
 {
     Task SaveFile(CourtList courtList);
     Task<(CourtListEntry?, string?)> LoadCourtFile();
-    void CreateCorrespondenceDirectory();
-    void CreateEvidenceDirectory();
-    Task SaveDocument(Stream stream, string fileName, FolderType folderType);
+    void CreateDocumentDirectory();
+    Task SaveDocument(Stream stream, string fileName);
 }

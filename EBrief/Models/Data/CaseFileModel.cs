@@ -22,8 +22,7 @@ public class CaseFileModel
     public InformationModel? Information { get; set; }
     public TimeSpan? TimeInCustody { get; set; }
     public List<ChargeModel> Charges { get; set; } = [];
-    public List<CaseFileDocumentModel> CaseFileDocuments { get; set; } = [];
-    public List<OccurrenceDocumentModel> OccurrenceDocuments { get; set; } = [];
+    public List<DocumentModel> Documents { get; set; } = [];
     public string Notes { get; set; } = string.Empty;
 
     public CaseFile ToUIModel()
@@ -38,8 +37,8 @@ public class CaseFileModel
             FactsOfCharge = FactsOfCharge,
             TimeInCustody = TimeInCustody,
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),
-            CaseFileDocuments = CaseFileDocuments.Select(doc => doc.ToUIModel()).ToList(),
-            OccurrenceDocuments = OccurrenceDocuments.Select(doc => doc.ToUIModel()).ToList(),
+            CaseFileDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.CaseFile).Select(doc => doc.ToUIModel()).ToList(),
+            OccurrenceDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.Occurrence).Select(doc => doc.ToUIModel()).ToList(),
             Notes = new() { Text = Notes, HasChanged = false }
         };
     }

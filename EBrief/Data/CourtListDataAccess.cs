@@ -114,13 +114,11 @@ public class CourtListDataAccess : IDataAccess
         return await _context.CourtLists
             .Where(cl => cl.CourtCode == courtCode && cl.CourtDate == courtDate && cl.CourtRoom == courtRoom)
             .Include(cl => cl.CaseFiles)
-            .ThenInclude(cf => cf.CaseFileDocuments)
+            .ThenInclude(cf => cf.Documents)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.CfelEntries)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.Charges)
-            .Include(cl => cl.CaseFiles)
-            .ThenInclude(cf => cf.OccurrenceDocuments)
             .Include(cl => cl.CaseFiles)
             .ThenInclude(cf => cf.Defendant)
             .ThenInclude(d => d.BailAgreements)
@@ -146,5 +144,15 @@ public class CourtListDataAccess : IDataAccess
             .FirstOrDefaultAsync();
 
         return courtListEntry != null;
+    }
+
+    public async Task UpdateDocumentName(string fileName, string newFileName)
+    {
+        var document = _context.Documents.FirstOrDefault(d => d.FileName == fileName);
+        if (document is not null)
+        {
+            document.FileName = newFileName;
+            await _context.SaveChangesAsync();
+        }
     }
 }

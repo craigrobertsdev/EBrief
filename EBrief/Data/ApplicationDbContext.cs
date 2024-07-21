@@ -9,6 +9,8 @@ public class ApplicationDbContext : DbContext
 {
     public DbSet<CourtListModel> CourtLists { get; set; }
     public DbSet<CaseFileModel> CaseFiles { get; set; }
+    public DbSet<DefendantModel> Defendants { get; set; }
+    public DbSet<DocumentModel> Documents { get; set; }
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {
         Database.EnsureCreated();
@@ -43,12 +45,7 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CaseFileModel>()
-            .HasMany(cf => cf.OccurrenceDocuments)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<CaseFileModel>()
-            .HasMany(cf => cf.CaseFileDocuments)
+            .HasMany(cf => cf.Documents)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 
