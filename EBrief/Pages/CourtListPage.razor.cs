@@ -1,5 +1,4 @@
 ﻿using EBrief.Data;
-using EBrief.Helpers;
 using EBrief.Models;
 using EBrief.Models.Data;
 using EBrief.Models.UI;
@@ -227,6 +226,11 @@ public partial class CourtListPage
     private void SaveCourtList()
     {
         DataAccess.UpdateCourtList(CourtList);
+
+        foreach (var caseFile in CourtList.GetCaseFiles())
+        {
+            caseFile.Notes.HasChanged = false;
+        }
     }
 
     private async Task ExportCourtList()
@@ -252,5 +256,4 @@ public partial class CourtListPage
 
         return false;
     }
-
 }

@@ -329,11 +329,6 @@ public partial class Home
         CourtRoom = int.Parse(e.Value.ToString()!);
     }
 
-    private void HandleIncludeDocuments(bool? value)
-    {
-
-    }
-
     private async Task DownloadDocuments(CourtListModel courtList)
     {
         var client = new HttpClient();
@@ -346,6 +341,8 @@ public partial class Home
                 var endpoint = document.DocumentType == DocumentType.CaseFile ? "correspondence" : "evidence";
                 await DownloadDocument(document, client, endpoint);
             }
+
+            caseFile.DocumentsLoaded = true;
         }
     }
 
