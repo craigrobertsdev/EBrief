@@ -1,7 +1,8 @@
-﻿using EBrief.Models;
-using EBrief.Models.Data;
-using EBrief.Models.UI;
-using EBrief.Services;
+﻿using EBrief.Shared.Data;
+using EBrief.Shared.Models;
+using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.UI;
+using EBrief.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -16,7 +17,7 @@ public class CourtListDataAccess : IDataAccess
     {
         _context = context;
         _logger = logger;
-        _appState = appState; 
+        _appState = appState;
     }
 
     public async Task CreateCourtList(CourtListModel courtList)

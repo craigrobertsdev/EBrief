@@ -1,15 +1,21 @@
 @using EBrief.Shared.Helpers
+@using EBrief.Shared.Models
 @using EBrief.Shared.Models.UI
+@using System.IO
 @implements IDisposable
 
-<div class="flex flex-grow">
+<div class="flex h-full">
     @if (Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.Count == 0)
     {
         <p>No correspondence to display</p>
     }
+    else if (Parent.ActiveDefendant?.ActiveCaseFile?.DocumentsLoaded == false)
+    {
+        <p>No documents loaded for this court list</p>
+    }
     else
     {
-        <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto">
+        <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto w-64">
             @foreach (var document in Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments!)
             {
                 <div class="text-sm lg:text-lg p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" @onclick=@(() => SelectDocument(document))>
@@ -18,20 +24,31 @@
             }
         </div>
 
-        <div class="flex-1">
-            <iframe src=@_pdfContent style="height: 100%; width: 100%;" />
-        </div>
+        if (PdfContent is null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="flex-1 h-full">
+                <iframe src=@PdfContent style="height: 100%; width: 100%;" />
+            </div>
+        }
     }
 </div>
 
 @code {
-    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
-    public CaseFileDocument? SelectedDocument { get; set; }
-    private string _pdfContent = "";
-    private bool _loading;
+    [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
+    private Document? _selectedDocument { get; set; }
+    private string? PdfContent { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
+        if (Parent.ActiveDefendant?.ActiveCaseFile?.DocumentsLoaded == false)
+        {
+            return;
+        }
+
         await HandleDefendantChange();
         Parent.OnDefendantChange += HandleDefendantChange;
     }
@@ -39,33 +56,34 @@
     private async Task HandleDefendantChange()
     {
         var file = Parent.ActiveDefendant?.ActiveCaseFile?.SelectedCaseFileDocument ??
-            Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.First();
+            Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.FirstOrDefault();
         if (file != null)
         {
             await SelectDocument(file);
+            StateHasChanged();
         }
     }
 
-    private async Task SelectDocument(CaseFileDocument document)
+    private async Task SelectDocument(Document document)
     {
-        SelectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
-        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = SelectedDocument;
+        _selectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
+        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = _selectedDocument;
         await LoadDocument(document.FileName);
     }
 
     private async Task LoadDocument(string fileName)
     {
-        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/correspondence/{fileName}", FileMode.Open, FileAccess.Read);
+        using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/documents/{fileName}", FileMode.Open, FileAccess.Read);
         var memoryStream = new MemoryStream();
         await fileStream.CopyToAsync(memoryStream);
         var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
         var mimeType = FileHelpers.GetMimeType(fileExtension);
-        _pdfContent = $"data:{mimeType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+        PdfContent = $"data:{mimeType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
     }
 
-    private string IsSelected(CaseFileDocument document)
+    private string IsSelected(Document document)
     {
-        if (SelectedDocument?.FileName == document.FileName)
+        if (_selectedDocument?.FileName == document.FileName)
         {
             return "bg-sky-700 text-white";
         }
@@ -76,7 +94,7 @@
     public void Dispose()
     {
         Parent.OnDefendantChange -= HandleDefendantChange;
-        SelectedDocument = null;
+        _selectedDocument = null;
         GC.Collect();
     }
 }

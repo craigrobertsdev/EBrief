@@ -1,3 +1,5 @@
+@using EBrief.Shared.Models
+
 <div class="flex-grow">
     @if (Parent?.ActiveDefendant?.OffenderHistory is null) {
         <p>The accused has no priors</p>
@@ -8,6 +10,5 @@
 </div>
 
 @code {
-    [CascadingParameter]
-    public CourtListPage Parent { get; set; } = default!;
+    [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
 }

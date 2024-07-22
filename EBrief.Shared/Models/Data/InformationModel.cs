@@ -1,12 +1,14 @@
 ﻿using EBrief.Shared.Models.UI;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EBrief.Shared.Models.Data;
 
 public class InformationModel
 {
     [Key]
+    [JsonIgnore]
     public int Id { get; set; }
     public Guid CaseFileId { get; set; }
     public List<InformationEntryModel> Charges { get; set; } = [];

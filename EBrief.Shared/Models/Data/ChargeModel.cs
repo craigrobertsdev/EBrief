@@ -1,10 +1,12 @@
 ﻿using EBrief.Shared.Models.UI;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EBrief.Shared.Models.Data;
 public class ChargeModel
 {
     [Key]
+    [JsonIgnore]
     public int Id { get; set; }
     public int Sequence { get; set; }
     public string Name { get; set; } = string.Empty;

@@ -1,5 +1,5 @@
-﻿using EBrief.Models.Data;
-using EBrief.Helpers;
+﻿using EBrief.Shared.Models.Data;
+using EBrief.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;

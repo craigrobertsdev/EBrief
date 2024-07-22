@@ -1,4 +1,4 @@
-﻿using EBrief.Models.Data;
+﻿using EBrief.Shared.Models.Data;
 
 namespace EBrief.UnitTests.Models;
 public class CourtListModelTests

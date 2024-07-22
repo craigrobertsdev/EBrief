@@ -61,4 +61,14 @@ public class LocalStorage(IServiceProvider serviceProvider) : IDataAccess
         var key = BuildKey(new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom));
         await _jsRuntime.InvokeVoidAsync("removeCourtList", key);
     }
+
+    public Task UpdateCaseFiles(IEnumerable<string> caseFileNumbers, string updateText)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateDocumentName(string fileName, string newFileName)
+    {
+        throw new NotImplementedException();
+    }
 }

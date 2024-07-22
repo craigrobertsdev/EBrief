@@ -8,15 +8,15 @@ using Microsoft.JSInterop;
 using EBrief.Shared.Data;
 
 namespace EBrief.WebClient.Pages;
-public partial class CourtListPage
+public partial class CourtListPage : ICourtListPage
 {
     [Inject]
     private IDataAccess LocalStorage { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
-    public CourtCode CourtCode { get; set; } = default!;
-    public DateTime CourtDate { get; set; } = default!;
-    public int CourtRoom { get; set; } = default!;
+    private CourtCode CourtCode { get; set; } = default!;
+    private DateTime CourtDate { get; set; } = default!;
+    private int CourtRoom { get; set; } = default!;
     private ElementReference? UnsavedChangesDialog { get; set; }
     private ElementReference? AddCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
@@ -174,11 +174,14 @@ public partial class CourtListPage
         await LocalStorage.UpdateCourtList(CourtList);
     }
 
-    private void ExportCourtList()
+    bool ICourtListPage.IsSelected(Defendant defendant)
     {
-        var courtList = CourtList.SerialiseToJson();
-        var fileName = $"Court {CourtRoom} {CourtCode} - {CourtList.CourtDate.Day} {CourtList.CourtDate:MMM} {CourtList.CourtDate.Year}.court";
-        File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName), courtList);
+        throw new NotImplementedException();
+    }
+
+    void ICourtListPage.ActivateDefendant(Defendant defendant)
+    {
+        throw new NotImplementedException();
     }
 
     //private bool UnsavedChanges()

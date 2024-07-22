@@ -44,4 +44,8 @@
 	<ItemGroup>
 	  <Folder Include="wwwroot\images\" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\EBrief.Shared\EBrief.Shared.csproj" />
+	</ItemGroup>
 </Project>

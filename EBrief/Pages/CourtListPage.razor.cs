@@ -1,22 +1,22 @@
-﻿using EBrief.Data;
-using EBrief.Models;
-using EBrief.Models.Data;
-using EBrief.Models.UI;
-using EBrief.Services;
+﻿using EBrief.Shared.Data;
+using EBrief.Shared.Models.Data;
+using EBrief.Shared.Services;
+using EBrief.Shared.Models;
+using EBrief.Shared.Models.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
 
 namespace EBrief.Pages;
-public partial class CourtListPage
+public partial class CourtListPage : ICourtListPage
 {
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
     [Inject] public IFileService FileService { get; set; } = default!;
     [Inject] public AppState AppState { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
     private CourtList CourtList { get; set; } = default!;
-    private List<CourtSitting> CourtSittings { get; set; } = [];
+    public List<CourtSitting> CourtSittings { get; set; } = [];
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
@@ -182,7 +182,7 @@ public partial class CourtListPage
         await JSRuntime.InvokeVoidAsync("closeDialog", _unsavedChangesDialog);
     }
 
-    internal void ActivateDefendant(Defendant defendant)
+    public void ActivateDefendant(Defendant defendant)
     {
         ActiveDefendant = defendant;
         if (ActiveDefendant.ActiveCaseFile is null)
@@ -203,7 +203,7 @@ public partial class CourtListPage
         ActivateDefendant(ActiveDefendant!);
     }
 
-    internal string IsSelected(Defendant defendant)
+    public string IsSelected(Defendant defendant)
     {
         if (ActiveDefendant?.Id == defendant.Id)
         {

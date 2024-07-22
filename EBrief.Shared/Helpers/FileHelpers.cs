@@ -2,6 +2,7 @@
 public static class FileHelpers
 {
     public static string AppDataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief");
+    public static string DocumentPath => Path.Combine(AppDataPath, "documents");
     public static string GetMimeType(string fileExtension)
     {
         return fileExtension switch

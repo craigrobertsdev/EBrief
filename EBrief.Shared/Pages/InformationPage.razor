@@ -1,3 +1,5 @@
+@using EBrief.Shared.Models
+
 <div>
     @if (Parent.ActiveDefendant?.ActiveCaseFile?.Information is not null) {
         foreach (var entry in Parent.ActiveDefendant.ActiveCaseFile.Information.Charges) {
@@ -18,5 +20,5 @@
 </div>
 
 @code {
-    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
+    [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
 }

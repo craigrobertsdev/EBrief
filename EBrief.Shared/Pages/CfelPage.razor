@@ -1,10 +1,12 @@
+@using EBrief.Shared.Models
 @using EBrief.Shared.Models.UI
+
 <div class="flex-grow">
-    @if (Parent?.ActiveDefendant?.ActiveCaseFile?.CfelEntries is null) {
+    @if (Parent?.ActiveDefendant?.ActiveCaseFile?.Cfel is null) {
         <p>No CFEL entries to display</p>
     }
     else {
-        @foreach (var entry in Parent.ActiveDefendant.ActiveCaseFile.CfelEntries!) {
+        @foreach (var entry in Parent.ActiveDefendant.ActiveCaseFile.Cfel!) {
             <div class="border-b border-b-black pb-4 mb-4">
                 <p class="py-1 text-sm text-gray-700">Entered on @entry.EntryDate by @entry.EnteredBy</p>
                 <p>
@@ -18,12 +20,12 @@
 </div>
 
 @code {
-    [CascadingParameter] public CourtListPage Parent { get; set; } = default!;
-    public List<CaseFileEnquiryLog> CfelEntries = [];
+    [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
+    private List<CaseFileEnquiryLogEntry> _cfelEntries = [];
 
     protected override void OnInitialized() {
-        if (Parent?.ActiveDefendant?.ActiveCaseFile?.CfelEntries is var entries && entries is not null) {
-            CfelEntries = entries;
+        if (Parent?.ActiveDefendant?.ActiveCaseFile?.Cfel is var entries && entries is not null) {
+            _cfelEntries = entries;
         }
     }
 }

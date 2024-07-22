@@ -46,38 +46,25 @@ public static class DummyData
             .RuleFor(c => c.CaseFileNumber, f => caseFileNumber)
             .RuleFor(c => c.Defendant, f => _defendants[f.Random.Number(0, _defendants.Count - 1)])
             .RuleFor(c => c.CourtFileNumber, f => $"MCCRM-24-{f.Random.Number(1, 100)}")
-            .RuleFor(c => c.PreviousHearings, f => Enumerable.Range(0, f.Random.Number(1, 5)).Select(i =>
+            .RuleFor(c => c.Schedule, f => Enumerable.Range(0, f.Random.Number(1, 5)).Select(i =>
                 new HearingEntryModel
                 {
                     AppearanceType = f.PickRandom(new string[] { "First Appearance", "Mention", "Pretrial conference", "Trial" }),
                     HearingDate = f.Date.Past(),
                     Notes = _hearingNotes[f.Random.Number(0, _hearingNotes.Count - 1)]
                 }).ToList())
-            .RuleFor(c => c.CfelEntries, f => Enumerable.Range(0, f.Random.Number(1, 5)).Select(i =>
-                new CaseFileEnquiryLogModel
+            .RuleFor(c => c.CfelEntries, (f, c) => Enumerable.Range(0, f.Random.Number(1, 5)).Select(i =>
+                new CaseFileEnquiryLogEntryModel
                 {
-                    EnteredBy = $"PD{f.Random.Number(10000, 99999)}, {f.Name.FullName()}",
+                    EnteredBy = $"ID{f.Random.Number(10000, 99999)}, {f.Name.FullName()}",
                     EntryDate = f.Date.Past(),
                     EntryText = _cfelEntries[f.Random.Number(0, _cfelEntries.Count - 1)]
                 }).ToList())
             .RuleFor(c => c.FactsOfCharge, f => _factsOfCharge[f.Random.Number(0, _factsOfCharge.Count - 1)])
             .RuleFor(c => c.Charges, f => Enumerable.Range(0, f.Random.Number(1, 5)).Select(i =>
-                Charges[f.Random.Number(0, Charges.Count - 1)]).ToList())
-            .RuleFor(c => c.CaseFileDocuments, f => Enumerable.Range(0, _caseFileDocuments.Count).Select(i =>
-                new CaseFileDocumentModel
-                {
-                    FileName = _caseFileDocuments[i].FileName,
-                    Title = _caseFileDocuments[i].Title
-                }).ToList().RandomiseOrder())
-            .RuleFor(c => c.OccurrenceDocuments, f => Enumerable.Range(0, _occurrenceDocuments.Count).Select(i =>
-                new OccurrenceDocumentModel
-                {
-                    FileName = _occurrenceDocuments[i].FileName,
-                    Title = _occurrenceDocuments[i].Title
-                }).ToList().RandomiseOrder());
+                Charges[f.Random.Number(0, Charges.Count - 1)]).ToList());
 
         return caseFile;
-
     }
 
     static List<ChargeModel> Charges = [
@@ -143,67 +130,6 @@ public static class DummyData
         },
     ];
 
-    static readonly List<CaseFileDocumentModel> _caseFileDocuments = [
-        new CaseFileDocumentModel
-        {
-            FileName = "Letter from Prosecution.pdf",
-            Title = "Letter to Prosecution",
-        },
-        new CaseFileDocumentModel
-        {
-            FileName = "Bail Application.pdf",
-            Title = "Bail Application"
-        },
-        new CaseFileDocumentModel
-        {
-            FileName = "Letter to Defence.pdf",
-            Title = "Letter to Defence"
-        },
-        new CaseFileDocumentModel
-        {
-            FileName = "Typical Negotiations.pdf",
-            Title = "Typical Negotiations"
-        },
-        new CaseFileDocumentModel
-        {
-            FileName = "Application to Revoke Bail.pdf",
-            Title = "Application to Revoke Bail"
-        },
-    ];
-
-    static readonly List<OccurrenceDocumentModel> _occurrenceDocuments = [
-        new OccurrenceDocumentModel
-        {
-            FileName = "Police Notes.pdf",
-            Title = "Police Notes"
-        },
-        new OccurrenceDocumentModel
-        {
-            FileName = "Victim Statement.pdf",
-            Title = "Victim Statement"
-        },
-        new OccurrenceDocumentModel
-        {
-            FileName = "Witness Statement.pdf",
-            Title = "Witness Statement"
-        },
-        new OccurrenceDocumentModel
-        {
-            FileName = "PD731.pdf",
-            Title = "PD731"
-        },
-        new OccurrenceDocumentModel
-        {
-            FileName = "FSSA Statement of Analysis.pdf",
-            Title = "FSSA Statement of Analysis"
-        },
-        new OccurrenceDocumentModel
-        {
-            FileName = "Test Statement.pdf",
-            Title = "Test Statement"
-        },
-    ];
-
     static List<DefendantModel> RandomiseDefendants()
     {
         var defendants = Enumerable.Range(1, 60)
@@ -243,12 +169,6 @@ public static class DummyData
          }).ToList();
 
         return defendants;
-    }
-
-    static List<T> RandomiseOrder<T>(this List<T> list)
-    {
-        var random = new Random();
-        return [.. list.OrderBy(x => random.Next())];
     }
 
     private static readonly List<string> _factsOfCharge = [

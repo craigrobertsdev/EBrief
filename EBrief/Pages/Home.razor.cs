@@ -1,14 +1,14 @@
-﻿using EBrief.Data;
-using EBrief.Helpers;
-using EBrief.Models;
-using EBrief.Models.Data;
-using EBrief.Services;
+﻿using EBrief.Shared.Data;
+using EBrief.Shared.Helpers;
+using EBrief.Shared.Services;
+using EBrief.Shared.Models;
+using EBrief.Shared.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.IO;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.IO;
+using System.Net.Http;
 
 namespace EBrief.Pages;
 

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace EBrief.Shared.Models.UI;
 public class CourtList
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CourtDate { get; set; }
     public CourtCode CourtCode { get; set; }
     public int CourtRoom { get; set; }
@@ -39,6 +39,7 @@ public class CourtList
             }
 
             defendant.CaseFiles.Add(caseFile);
+            defendant.CaseFiles.Sort((cf1, cf2) => cf1.Charges.First().Date.CompareTo(cf2.Charges.First().Date));
         }
     }
 
@@ -51,14 +52,5 @@ public class CourtList
         }
 
         return caseFiles;
-    }
-
-    public string SerialiseToJson()
-    {
-        return JsonSerializer.Serialize(this, new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles
-        });
     }
 }

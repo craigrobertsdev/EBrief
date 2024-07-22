@@ -1,7 +1,8 @@
-﻿using EBrief.Helpers;
-using EBrief.Models;
-using EBrief.Models.Data;
-using EBrief.Models.UI;
+﻿using EBrief.Shared.Data;
+using EBrief.Shared.Helpers;
+using EBrief.Shared.Models;
+using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.UI;
 using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
@@ -11,18 +12,18 @@ namespace EBrief.Data;
 public class FileService : IFileService
 {
     private readonly IDataAccess _dataAccess;
-    private static readonly string _correspondenceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief", "correspondence");
-    private static readonly string _evidenceDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EBrief", "evidence");
     public FileService(IDataAccess dataAccess)
     {
         _dataAccess = dataAccess;
     }
     public async Task SaveFile(CourtList courtList)
     {
-        var dialog = new SaveFileDialog();
-        dialog.FileName = $"Court {courtList.CourtRoom} {courtList.CourtCode} - {courtList.CourtDate.Day} {courtList.CourtDate:MMM} {courtList.CourtDate.Year}.court";
-        dialog.DefaultExt = ".court";
-        dialog.Filter = "Court files|*.court";
+        var dialog = new SaveFileDialog
+        {
+            FileName = $"Court {courtList.CourtRoom} {courtList.CourtCode} - {courtList.CourtDate.Day} {courtList.CourtDate:MMM} {courtList.CourtDate.Year}.court",
+            DefaultExt = ".court",
+            Filter = "Court files|*.court"
+        };
 
         bool? result = dialog.ShowDialog();
         if (result == true)
