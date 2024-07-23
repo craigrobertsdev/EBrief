@@ -226,7 +226,7 @@ public partial class CourtListPage : ICourtListPage
 
     private void ReturnHome()
     {
-        NavManager.NavigateTo("/");
+            NavManager.NavigateTo("/EBrief");
     }
 
     private bool UnsavedChanges()
