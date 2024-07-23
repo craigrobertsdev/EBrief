@@ -132,7 +132,7 @@ public partial class CourtListPage : ICourtListPage
 
     private async Task HandleReturnHome()
     {
-        if (await UnsavedChanges())
+        if (UnsavedChanges())
         {
             await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
         }
@@ -224,7 +224,12 @@ public partial class CourtListPage : ICourtListPage
         NavManager.NavigateTo("/");
     }
 
-    private async Task<bool> UnsavedChanges()
+    private void ReturnHome()
+    {
+        NavManager.NavigateTo("/");
+    }
+
+    private bool UnsavedChanges()
     {
         // Handles the case where something has gone wrong and the user wants to go back to the start
         if (_error is not null)

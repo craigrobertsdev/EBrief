@@ -63,7 +63,6 @@ else
                     <div class="max-w-2xl">
                         <RadzenMenu Style="margin: 5px 5px 0 0">
                             <RadzenMenuItem Style="padding: 3px 6px; " Text="Menu">
-                                <RadzenMenuItem Text="Add Case Files" Click="OpenAddCaseFilesDialog" />
                                 <RadzenMenuItem Text="Save" Click="SaveCourtList" />
                                 <RadzenMenuItem Text="Return Home" Click="HandleReturnHome" />
                             </RadzenMenuItem>
@@ -118,9 +117,10 @@ else
 }
 
 <dialog @ref="UnsavedChangesDialog" class="p-5">
-    <h3 class="text-lg">You have unsaved changes. Do you wish to continue?</h3>
+    <h3 class="text-lg">Do you want to save your changes?</h3>
     <div class="flex w-full justify-end gap-3">
-        <RadzenButton Text="Confirm" Click="SaveChanges" />
+        <RadzenButton Text="Yes" Click="SaveChanges" />
+        <RadzenButton Text="No" Click="ReturnHome" />
         <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog" />
     </div>
 </dialog>
