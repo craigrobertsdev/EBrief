@@ -19,7 +19,7 @@ FUNCTIONALITY:
 	- Add auth tokens and use them to send requests and populate user data for CFEL updates:
 		* CaseFileEnquiryLogEntry constructor needs to accept a user rather than a string
 		* Follow ups page needs to be updated to use the user
-	- When closing the application after saving changes to the current court list, I am prompted again to save my changes (which shouldn't occur)
+	- When closing the application after saving changes to the current court list, I am prompted again to save my changes (this shouldn't occur)
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
@@ -42,5 +42,3 @@ DECISION LOG:
 	3. Multiple court lists both stored in a local database and able to be exported to a file to enable sharing
 
 	Chose option 3.
-
-
