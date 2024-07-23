@@ -127,9 +127,10 @@ else
 }
 
 <dialog @ref="_unsavedChangesDialog" class="p-5">
-    <h3 class="text-lg">You have unsaved changes. Do you wish to continue?</h3>
-    <div class="flex w-full justify-end gap-3">
-        <RadzenButton Text="Confirm" Click="SaveChanges" />
+    <h3 class="text-lg pb-2">You have unsaved changes. Do you want to save them before returning home?</h3>
+    <div class="flex w-full justify-center gap-3">
+        <RadzenButton Text="Yes" Click="SaveChanges" />
+        <RadzenButton Text="No" Click="ReturnHome" />
         <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog" />
     </div>
 </dialog>

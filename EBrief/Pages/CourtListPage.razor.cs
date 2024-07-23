@@ -177,6 +177,11 @@ public partial class CourtListPage : ICourtListPage
         NavManager.NavigateTo("/");
     }
 
+    private void ReturnHome()
+    {
+        NavManager.NavigateTo("/");
+    }
+
     private async Task CloseUnsavedChangesDialog()
     {
         await JSRuntime.InvokeVoidAsync("closeDialog", _unsavedChangesDialog);
