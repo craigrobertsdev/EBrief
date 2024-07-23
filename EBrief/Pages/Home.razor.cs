@@ -281,6 +281,7 @@ public partial class Home
         await JSRuntime.InvokeVoidAsync("closeDialog", PreviousCourtListDialog);
 
     private async Task CloseConfirmDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", ConfirmDialog);
+
     private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
     {
         if (SelectedCourtList == courtListEntry)

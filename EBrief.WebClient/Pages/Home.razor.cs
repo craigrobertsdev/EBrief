@@ -13,13 +13,43 @@ public partial class Home
     public IDataAccess DataAccess { get; set; } = default!;
     public ElementReference? NewCourtListDialog { get; set; }
     public ElementReference? PreviousCourtListDialog { get; set; }
+    private ElementReference? ConfirmDialog { get; set; }
     public string CaseFileNumbers { get; set; } = string.Empty;
+    private Court? SelectedCourt { get; set; }
+    private List<Court> Courts = [];
     public DateTime? CourtDate { get; set; }
-    public CourtCode? CourtCode { get; set; }
     public int? CourtRoom { get; set; }
     public string? _error;
+    private bool _loadingCourtList;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.AMC,
+            CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24]
+        });
+
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.EMC,
+            CourtRooms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        });
+
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.CBMC,
+            CourtRooms = [1, 2, 3, 4, 5]
+        });
+
+        Courts.Add(new Court
+        {
+            CourtCode = CourtCode.PAMC,
+            CourtRooms = [1, 2, 3, 4, 5]
+        });
+    }
 
     private async Task OpenNewCourtListDialog()
     {
@@ -29,11 +59,21 @@ public partial class Home
             await JSRuntime.InvokeVoidAsync("openDialog", NewCourtListDialog);
         }
     }
+
+    private async Task OpenConfirmDialog()
+    {
+        if (ConfirmDialog is not null)
+        {
+            _error = null;
+            await JSRuntime.InvokeVoidAsync("openDialog", ConfirmDialog);
+        }
+    }
+
     private async Task OpenPreviousCourtListDialog()
     {
-        PreviousCourtLists = (await DataAccess.GetSavedCourtLists())
-            .Select(e => new CourtListEntry(e.CourtCode, e.CourtDate, e.CourtRoom))
-            .ToList();
+        PreviousCourtLists = await DataAccess.GetSavedCourtLists();
+        SelectedCourtList = PreviousCourtLists.FirstOrDefault();
+
         if (PreviousCourtListDialog is not null)
         {
             _error = null;
@@ -52,8 +92,13 @@ public partial class Home
         NavManager.NavigateTo($"/EBrief/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
     }
 
-    private async Task DeletePreviousCourtList()
+    private async Task DeletePreviousCourtList(bool confirmDeletion)
     {
+        await CloseConfirmDialog();
+        if (!confirmDeletion)
+        {
+            return;
+        }
         if (SelectedCourtList is null || PreviousCourtLists is null)
         {
             return;
@@ -61,7 +106,7 @@ public partial class Home
 
         try
         {
-            await DataAccess.DeleteCourtList(SelectedCourtList);
+            await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom));
         }
         catch (Exception e)
         {
@@ -70,7 +115,9 @@ public partial class Home
         }
 
         PreviousCourtLists.Remove(SelectedCourtList);
+        SelectedCourtList = PreviousCourtLists.FirstOrDefault();
     }
+
 
     private async Task FetchCourtList()
     {
@@ -81,7 +128,7 @@ public partial class Home
             return;
         }
 
-        if (CourtCode is null)
+        if (SelectedCourt is null)
         {
             _error = "Please select a court code.";
             return;
@@ -96,7 +143,7 @@ public partial class Home
         // this should only check whether the previous court list exists, not retrieve the whole list
         // the next call should save the court list to localStorage then the following call should 
         // navigate to the court list page
-        var courtListExists = await DataAccess.CheckCourtListExists(new CourtListEntry(CourtCode.Value, CourtDate.Value, CourtRoom!.Value));
+        var courtListExists = await DataAccess.CheckCourtListExists(new CourtListEntry(SelectedCourt.CourtCode, CourtDate.Value, CourtRoom!.Value));
         if (courtListExists)
         {
            _error = "Court list already exists.";
@@ -106,7 +153,7 @@ public partial class Home
         var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         try
         {
-            var caseFiles = DummyData.GenerateCaseFiles(caseFileNumbers);
+            var caseFiles = DummyData.GenerateCaseFiles(caseFileNumbers, CourtDate.Value);
             if (caseFiles is null)
             {
                 _error = "Failed to fetch court list.";
@@ -116,7 +163,7 @@ public partial class Home
             var courtList = new CourtListModel
             {
                 CaseFiles = caseFiles,
-                CourtCode = CourtCode.Value,
+                CourtCode = SelectedCourt.CourtCode,
                 CourtDate = CourtDate.Value,
                 CourtRoom = CourtRoom!.Value
             };
@@ -133,7 +180,7 @@ public partial class Home
                 return;
             }
 
-            NavManager.NavigateTo($"/EBrief/court-list/?newList=true&courtCode={CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
+            NavManager.NavigateTo($"/EBrief/court-list/?newList=true&courtCode={SelectedCourt.CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}");
         }
         catch (Exception e)
         {
@@ -158,6 +205,8 @@ public partial class Home
         }
     }
 
+    private async Task CloseConfirmDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", ConfirmDialog);
+
     private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
     {
         if (SelectedCourtList == courtListEntry)
@@ -169,5 +218,48 @@ public partial class Home
         SelectedCourtList = courtListEntry;
     }
 
+    private void HandleSelectCourtDate(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        try
+        {
+            CourtDate = DateTime.Parse(e.Value.ToString()!);
+        }
+        catch (Exception)
+        {
+            CourtDate = null;
+        }
+    }
+
+    private void HandleSelectCourt(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        _error = null;
+        var courtCode = Enum.Parse<CourtCode>(e.Value.ToString()!);
+        SelectedCourt = Courts.FirstOrDefault(e => e.CourtCode == courtCode);
+    }
+
+    private void HandleSelectCourtRoom(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        _error = null;
+        CourtRoom = int.Parse(e.Value.ToString()!);
+    }
+
     private List<int> CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24];
+
+    class Court
+    {
+        public CourtCode CourtCode { get; set; }
+        public List<int> CourtRooms { get; set; } = [];
+    }
 }

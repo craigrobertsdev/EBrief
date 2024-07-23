@@ -1,3 +1,17 @@
+function openDialog(element) {
+    element.addEventListener('close', closeEvent)
+    element.showModal();
+}
+
+function closeDialog(element) {
+    element.removeEventListener("close", closeEvent);
+    element.close();
+}
+
+function closeEvent() {
+    document.activeElement.blur();
+}
+
 function setTooltipPosition(id) {
     const caseFileCard = document.getElementById(id);
     const container = document.getElementById("casefile-container");
@@ -11,5 +25,4 @@ function setTooltipPosition(id) {
     } else {
         return caseFileCard.offsetLeft - container.scrollLeft;
     }
-
 }

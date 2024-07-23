@@ -1,7 +1,12 @@
 ﻿function saveCourtList(key, courtList) {
+    try {
+        localStorage.removeItem(key);
+    } catch (e) { }
+
     localStorage.setItem(key, courtList);
     let courtLists = JSON.parse(localStorage.getItem("courtLists"));
     if (courtLists) {
+        courtLists = courtLists.filter(k => k != key);
         courtLists.push(key);
     } else {
         courtLists = [key];
@@ -40,12 +45,12 @@ function checkPreviousListExists(key) {
 }
 
 function getCourtList(key) {
-    const courtList = JSON.parse(localStorage.getItem(key));
+    const courtList = localStorage.getItem(key);
     if (!courtList) {
         return null;
     }
 
-    return JSON.stringify(courtList);
+    return courtList;
 }
 
 function removeCourtList(key) {

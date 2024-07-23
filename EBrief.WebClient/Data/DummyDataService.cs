@@ -13,12 +13,22 @@ public static class DummyData
         _defendants = RandomiseDefendants();
     }
 
-    public static List<CaseFileModel> GenerateCaseFiles(IEnumerable<string> caseFileNumbers)
+    public static List<CaseFileModel> GenerateCaseFiles(IEnumerable<string> caseFileNumbers, DateTime courtDate)
     {
         List<CaseFileModel> caseFiles = [];
+        var rand = new Random();
         foreach (var caseFileNumber in caseFileNumbers)
         {
-            caseFiles.Add(GenerateCaseFile(caseFileNumber));
+            var caseFile = GenerateCaseFile(caseFileNumber);
+            var hearingTime = _sittingTimes[rand.Next(_sittingTimes.Length)];
+            caseFile.Schedule.Add(new()
+            {
+                AppearanceType = _appearanceTypes[rand.Next(_appearanceTypes.Length)],
+                HearingDate = new(courtDate.Year, courtDate.Month, courtDate.Day, hearingTime.Hour, hearingTime.Minute, 0),
+                Notes = _hearingNotes[rand.Next(_hearingNotes.Count)]
+            });
+            caseFiles.Add(caseFile);
+
         }
 
         for (int i = 0; i < caseFiles.Count; i++)
@@ -138,6 +148,10 @@ public static class DummyData
              Id = i,
              FirstName = _faker.Name.FirstName(),
              LastName = _faker.Name.LastName(),
+             DateOfBirth = _faker.Person.DateOfBirth,
+             Address = _faker.Address.FullAddress(),
+             Phone = i % 3 == 0 ? "" : _faker.Phone.PhoneNumber(),
+             Email = i % 3 == 0 ? "" : _faker.Person.Email,
              BailAgreements = Enumerable.Range(0, new Random().Next(0, 5))
                  .Select(i => new BailAgreementModel
                  {
@@ -156,7 +170,7 @@ public static class DummyData
                      {
                          FirstName = _faker.Name.FirstName(),
                          LastName = _faker.Name.LastName(),
-                         DateOfBirth = _faker.Date.Past()
+                         DateOfBirth = _faker.Person.DateOfBirth,
                      },
                      DateIssued = _faker.Date.Past(),
                      Conditions = Enumerable.Range(0, new Random().Next(1, _bailConditions.Count - 1))
@@ -215,4 +229,8 @@ public static class DummyData
         "Conducted case review with investigating officer to assess evidence and identify potential gaps in the prosecution's case. Discussed strategies for strengthening the case and addressing weaknesses in the evidence.\n\nReviewed legal submissions from defense counsel and prepared responses to counter arguments raised in the defense letter.",
         "File adjudicated, sufficient to lay."
     ];
+
+    private static readonly TimeOnly[] _sittingTimes = [new(9, 30), new(10, 0), new(11, 30), new(14, 15)];
+
+    private static readonly string[] _appearanceTypes = ["First Appearance", "Mention", "Pretrial Conference", "Trial"];
 }

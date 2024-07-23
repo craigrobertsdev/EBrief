@@ -10,13 +10,13 @@ using EBrief.Shared.Data;
 namespace EBrief.WebClient.Pages;
 public partial class CourtListPage : ICourtListPage
 {
-    [Inject]
-    private IDataAccess LocalStorage { get; set; } = default!;
+    [Inject] private IDataAccess LocalStorage { get; set; } = default!;
     public bool NewList { get; set; }
     private CourtList CourtList { get; set; } = default!;
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
+    public List<CourtSitting> CourtSittings { get; set; } = [];
     private ElementReference? UnsavedChangesDialog { get; set; }
     private ElementReference? AddCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
@@ -47,7 +47,8 @@ public partial class CourtListPage : ICourtListPage
 
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
-        ActivateDefendant(CourtList.Defendants.First());
+        CourtSittings = GenerateCourtSittings();
+        ActivateDefendant(CourtSittings.First().Defendants.First());
         _loading = false;
     }
 
@@ -61,9 +62,27 @@ public partial class CourtListPage : ICourtListPage
         }
 
         CourtList = courtList.ToUIModel();
-        CourtList.CourtCode = courtCode;
-        CourtList.CourtDate = courtDate;
-        CourtList.CourtRoom = courtRoom;
+        //CourtList.CourtCode = courtCode;
+        //CourtList.CourtDate = courtDate;
+        //CourtList.CourtRoom = courtRoom;
+    }
+
+    private List<CourtSitting> GenerateCourtSittings()
+    {
+        // iterate over the list of defendants and group them by the appearance time of their first case file in the list
+        var courtSittings = CourtList.Defendants.SelectMany(d => d.CaseFiles)
+            .GroupBy(cf => cf.Schedule.Last().HearingDate)
+            .OrderBy(g => g.Key)
+            .Select((g, i) => new CourtSitting(i, g.Key))
+            .ToList();
+
+        foreach (var defendant in CourtList.Defendants)
+        {
+            var hearingTime = defendant.CaseFiles.First().Schedule.Last().HearingDate;
+            courtSittings.First(cs => cs.SittingTime.TimeOfDay == hearingTime.TimeOfDay).Defendants.Add(defendant);
+        }
+
+        return courtSittings;
     }
 
     private async Task OpenAddCaseFilesDialog()
@@ -96,10 +115,11 @@ public partial class CourtListPage : ICourtListPage
         try
         {
             _addCaseFilesError = null;
-            var newCaseFiles = DummyData.GenerateCaseFiles(newCaseFileNumbers);
+            var newCaseFiles = DummyData.GenerateCaseFiles(newCaseFileNumbers, CourtDate);
             CourtList.AddCaseFiles(newCaseFiles.ToUIModels());
             await LocalStorage.UpdateCourtList(CourtList);
             await JSRuntime.InvokeVoidAsync("closeDialog", AddCaseFilesDialog);
+            //UpdateCourtSittings(newCaseFiles.Select(cf => cf.Defendant).ToList());
             _loadingNewCaseFiles = false;
         }
         catch (Exception e)
@@ -112,19 +132,21 @@ public partial class CourtListPage : ICourtListPage
 
     private async Task HandleReturnHome()
     {
-        //if (UnsavedChanges())
-        //{
-        //    await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
-        //}
-
-        NavManager.NavigateTo("/EBrief");
+        if (await UnsavedChanges())
+        {
+            await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
+        }
+        else
+        {
+            NavManager.NavigateTo("/EBrief");
+        }
     }
 
     private async Task CloseUnsavedChangesDialog()
     {
         await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
     }
-    private void ActivateDefendant(Defendant defendant)
+    public void ActivateDefendant(Defendant defendant)
     {
         ActiveDefendant = defendant;
         if (ActiveDefendant.ActiveCaseFile is null)
@@ -133,6 +155,7 @@ public partial class CourtListPage : ICourtListPage
         }
 
         OnDefendantChange?.Invoke();
+        StateHasChanged();
     }
 
     private void CaseFileChanged()
@@ -149,7 +172,7 @@ public partial class CourtListPage : ICourtListPage
         ActivateDefendant(ActiveDefendant!);
     }
 
-    private string IsSelected(Defendant defendant)
+    public string IsSelected(Defendant defendant)
     {
         if (ActiveDefendant?.Id == defendant.Id)
         {
@@ -169,40 +192,55 @@ public partial class CourtListPage : ICourtListPage
         return "hover:bg-gray-500";
     }
 
-    private async Task UpdateCourtList()
+    private void UpdateCourtSittings(List<Defendant> defendants)
+    {
+        foreach (var defendant in defendants)
+        {
+            var courtSitting = CourtSittings.FirstOrDefault(cs => cs.SittingTime == defendant.CaseFiles.First().Schedule.Last().HearingDate);
+            if (courtSitting is null)
+            {
+                courtSitting = new(CourtSittings.Count, defendant.CaseFiles.First().Schedule.Last().HearingDate);
+            }
+
+            courtSitting.Defendants.Add(defendant);
+        }
+
+        OnDefendantChange?.Invoke();
+    }
+
+    private void SaveCourtList()
+    {
+        LocalStorage.UpdateCourtList(CourtList);
+
+        foreach (var caseFile in CourtList.GetCaseFiles())
+        {
+            caseFile.Notes.HasChanged = false;
+        }
+    }
+
+    private async Task SaveChanges()
     {
         await LocalStorage.UpdateCourtList(CourtList);
+        NavManager.NavigateTo("/");
     }
 
-    bool ICourtListPage.IsSelected(Defendant defendant)
+    private async Task<bool> UnsavedChanges()
     {
-        throw new NotImplementedException();
+        // Handles the case where something has gone wrong and the user wants to go back to the start
+        if (_error is not null)
+        {
+            return false;
+        }
+
+        foreach (var caseFile in CourtList.GetCaseFiles())
+        {
+            if (caseFile.Notes.HasChanged)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
-
-    void ICourtListPage.ActivateDefendant(Defendant defendant)
-    {
-        throw new NotImplementedException();
-    }
-
-    //private bool UnsavedChanges()
-    //{
-    //    // Handles the case where something has gone wrong and the user wants to go back to the start
-    //    if (_error is not null)
-    //    {
-    //        return false;
-    //    }
-    //    var courtList = DataAccess.GetCourtList(DataAccess.BuildKey(CourtCode, CourtDate, CourtRoom))!;
-
-    //    foreach (var caseFile in CourtList.GetCaseFiles())
-    //    {
-    //        var caseFileModel = courtList.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber);
-    //        if (caseFileModel.Notes != caseFile.Notes)
-    //        {
-    //            return true;
-    //        }
-    //    }
-
-    //    return false;
-    //}
 
 }

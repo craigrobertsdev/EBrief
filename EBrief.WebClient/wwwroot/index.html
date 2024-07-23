@@ -5,9 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EBrief</title>
+    <link rel="icon" href="images/ebrief.ico" />
     <base href="/" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="css/output.css" rel="stylesheet" />
+    <link href="_content/EBrief.Shared/css/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
     <!-- Start Single Page Apps for GitHub Pages -->
     <script type="text/javascript">
@@ -52,6 +54,9 @@
 
 <body class="h-full">
     <div id="app" class="h-full">
+        <div class="flex h-full justify-center items-center">
+            Loading...
+        </div>
     </div>
 
     <div id="blazor-error-ui">
@@ -60,10 +65,9 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <script src="scripts/decode.js"></script>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
-    <script src="scripts/Dialog.js"></script>
+    <script src="scripts/Script.js"></script>
     <script src="scripts/LocalStorage.js"></script>
     <script>
         Blazor.start({
