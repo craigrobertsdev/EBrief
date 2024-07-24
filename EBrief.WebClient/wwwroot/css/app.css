@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('/_content/EBrief.Shared/css/output.css');
 
 html, body {
     font-family: Arial, sans-serif;
