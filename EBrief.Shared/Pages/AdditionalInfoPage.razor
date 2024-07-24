@@ -4,7 +4,7 @@
 <div class="h-full" @onclick="MinimiseImage">
     <div class="grid grid-cols-[auto,_1fr] grid-rows-[auto,_1fr] gap-x-2 gap-y-8 w-full">
         @* defendant's photo *@
-        <div class="grid-col-1 grid-row-1 w-40 h-52">
+        <div class="grid-col-1 grid-row-1 w-40 h-52 cursor-pointer">
             <img class="@(_imageExpanded ? "hidden" : "") w-40" src="images/mugshot.jpg" @onclick:stopPropagation @onclick="ExpandImage" />
             <img class="@(_imageExpanded ? "" : "hidden") absolute w-64" src="images/mugshot.jpg" />
         </div>

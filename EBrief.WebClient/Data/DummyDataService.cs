@@ -71,6 +71,7 @@ public static class DummyData
                     EntryText = _cfelEntries[f.Random.Number(0, _cfelEntries.Count - 1)]
                 }).ToList())
             .RuleFor(c => c.FactsOfCharge, f => _factsOfCharge[f.Random.Number(0, _factsOfCharge.Count - 1)])
+            .RuleFor(c => c.TimeInCustody, f => new TimeSpan(f.Random.Number(0, 30), f.Random.Number(0, 59), 0))
             .RuleFor(c => c.Charges, f => Enumerable.Range(0, f.Random.Number(1, 5)).Select(i =>
                 Charges[f.Random.Number(0, Charges.Count - 1)]).ToList());
 
