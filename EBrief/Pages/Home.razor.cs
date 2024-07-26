@@ -28,6 +28,7 @@ public partial class Home
     private bool IncludeDocuments { get; set; }
     private bool _loadingCourtList;
     private string? _error;
+    private string? _loadCourtListError;
     private List<CourtListEntry>? PreviousCourtLists { get; set; }
     private CourtListEntry? SelectedCourtList { get; set; }
 
@@ -186,22 +187,28 @@ public partial class Home
 
     private async Task FetchCourtList()
     {
-        _error = null;
+        _loadCourtListError = null;
         if (CourtDate is null)
         {
-            _error = "Please select a court date.";
+            _loadCourtListError = "Please select a court date.";
             return;
         }
 
         if (SelectedCourt is null)
         {
-            _error = "Please select a court.";
+            _loadCourtListError = "Please select a court.";
             return;
         }
 
         if (CourtRoom is null)
         {
-            _error = "Please select a court room.";
+            _loadCourtListError = "Please select a court room.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(CaseFileNumbers))
+        {
+            _loadCourtListError = "Please enter case file numbers";
             return;
         }
 
@@ -301,7 +308,7 @@ public partial class Home
         }
         try
         {
-            CourtDate = DateTime.Parse(e.Value.ToString()!);
+            CourtDate = DateTime.Parse((string)e.Value);
         }
         catch (Exception)
         {
@@ -316,7 +323,7 @@ public partial class Home
             return;
         }
         _error = null;
-        var courtCode = Enum.Parse<CourtCode>(e.Value.ToString()!);
+        var courtCode = Enum.Parse<CourtCode>((string)e.Value);
         SelectedCourt = Courts.FirstOrDefault(e => e.CourtCode == courtCode);
     }
 
@@ -327,7 +334,17 @@ public partial class Home
             return;
         }
         _error = null;
-        CourtRoom = int.Parse(e.Value.ToString()!);
+        CourtRoom = int.Parse((string)e.Value);
+    }
+
+    private void HandleIncludeDocuments(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+
+        IncludeDocuments = bool.Parse((string)e.Value);
     }
 
     private async Task DownloadDocuments(CourtListModel courtList)

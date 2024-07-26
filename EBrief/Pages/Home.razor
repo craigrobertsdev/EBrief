@@ -1,4 +1,5 @@
 @page "/"
+@using EBrief.Shared.Components
 @using EBrief.Shared.Models
 
 @inject IJSRuntime JSRuntime
@@ -28,14 +29,12 @@
 </div>
 
 <dialog @ref="NewCourtListDialog" class="p-5">
-    <h3 class="text-lg pb-2">Copy the column of case file numbers from your court list into the box below</h3>
-    <div class="flex gap-4">
-        <div class="flex items-center pb-2 gap-6">
-            <label>Court date: </label>
+    <h3 class="text-lg text-center pb-2">Enter details of court list</h3>
+    <div class="grid grid-cols-2 gap-4">
+        <div class="col-start-1 grid grid-cols-2 items-center gap-x-4">
+            <label class="ml-auto">Court date: </label>
             <input type="date" @onchange="HandleSelectCourtDate" class="border border-black rounded-md p-1">
-        </div>
-        <div>
-            <label>Court code: </label>
+            <label class="ml-auto">Court code: </label>
             <select @onchange="HandleSelectCourt" class="border border-black p-2 rounded-md">
                 <option selected hidden disabled></option>
                 @foreach (var courtCode in Courts.Select(c => c.CourtCode))
@@ -43,9 +42,7 @@
                     <option value="@courtCode">@courtCode</option>
                 }
             </select>
-        </div>
-        <div>
-            <label>Court room: </label>
+            <label class="ml-auto">Court room: </label>
             <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md" disabled="@(SelectedCourt == null)">
                 @if (SelectedCourt is not null)
                 {
@@ -56,31 +53,36 @@
                     }
                 }
             </select>
+            <label class="ml-auto">Include documents:</label>
+            <select @onchange="HandleIncludeDocuments" class="border border-black p-2 rounded-md">
+                <option selected hidden disabled></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            @* <RadzenCheckBox @bind-Value="IncludeDocuments" /> *@
         </div>
-    </div>
-    <div class="py-2">
-        <label class="pr-2">Include documents</label>
-        <RadzenCheckBox @bind-Value="IncludeDocuments" />
-    </div>
-    <div class="w-full">
-        <textarea @bind="@CaseFileNumbers" rows="15" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
-    </div>
-
-    @if (_error is not null)
-    {
-        <div class="w-full h-full flex justify-center items-center py-2">
-            <p class="text-red-500">@_error</p>
+        <div class="w-full col-start-2 row-start-1">
+            <textarea @bind="@CaseFileNumbers" rows="10" placeholder="Enter case file numbers here" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
         </div>
-    }
 
-    <div class="flex w-full justify-end gap-3">
-        <RadzenButton Text="Confirm" Click="FetchCourtList" Disabled="_loadingCourtList" />
-        <RadzenButton Text="Cancel" Click="CloseLoadNewCourtListDialog" />
+        @if (_loadCourtListError is not null)
+        {
+            <p class="col-span-2 text-center text-lg text-red-500">@_loadCourtListError</p>
+        }
+
+        <div class="flex w-full col-span-2 justify-center gap-6">
+            <Button OnClick="FetchCourtList" Disabled="_loadingCourtList">
+                Confirm
+            </Button>
+            <Button Variant="ButtonTypes.Cancel" OnClick="CloseLoadNewCourtListDialog">
+                Cancel
+            </Button>
+        </div>
     </div>
 </dialog>
 
 <dialog @ref="PreviousCourtListDialog" class="p-5">
-    <h3 class="text-lg pb-2">Choose from a previous court list</h3>
+    <h3 class="text-lg text-center pb-2">Choose from a previous court list</h3>
     @if (PreviousCourtLists is null)
     {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
@@ -88,7 +90,7 @@
 
     else
     {
-        <div class="border border-black mb-2 w-[500px] h-[400px]">
+        <div class="border border-black mb-2 w-[300px] h-[400px]">
             @if (PreviousCourtLists!.Count == 0)
             {
                 <div class="h-full w-full flex items-center justify-center">
