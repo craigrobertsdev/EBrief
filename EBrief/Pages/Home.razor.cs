@@ -216,7 +216,7 @@ public partial class Home
         var listAlreadyExists = await DataAccess.CheckCourtListExists(new CourtListEntry(SelectedCourt.CourtCode, CourtDate.Value, CourtRoom.Value));
         if (listAlreadyExists)
         {
-            _error = "A court list for this date and location already exists";
+            _loadCourtListError = "A court list for this date and location already exists";
             _loadingCourtList = false;
             return;
         }
@@ -229,14 +229,14 @@ public partial class Home
             var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body);
             if (!response.IsSuccessStatusCode)
             {
-                _error = "Failed to connect to the server";
+                _loadCourtListError = "Failed to connect to the server";
                 return;
             }
 
             var caseFiles = await response.Content.ReadFromJsonAsync<List<CaseFileModel>>();
             if (caseFiles is null)
             {
-                _error = "Failed to fetch court list.";
+                _loadCourtListError = "Failed to fetch court list.";
                 return;
             }
 
@@ -259,7 +259,7 @@ public partial class Home
             }
             catch (Exception e)
             {
-                _error = e.InnerException?.Message ?? e.Message;
+                _loadCourtListError = e.InnerException?.Message ?? e.Message;
                 _loadingCourtList = false;
                 return;
             }
@@ -268,12 +268,12 @@ public partial class Home
         }
         catch (HttpRequestException)
         {
-            _error = "Failed to connect to the server";
+            _loadCourtListError = "Failed to connect to the server";
             _loadingCourtList = false;
         }
         catch (Exception e)
         {
-            _error = e.InnerException?.Message ?? e.Message;
+            _loadCourtListError = e.InnerException?.Message ?? e.Message;
             _loadingCourtList = false;
         }
 
