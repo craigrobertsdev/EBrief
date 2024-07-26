@@ -4,7 +4,6 @@ using EBrief.Shared.Helpers;
 using EBrief.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Radzen;
 using Serilog;
 using System.ComponentModel;
 using System.IO;
@@ -46,7 +45,6 @@ public partial class MainWindow : Window
                 options.EnableSensitiveDataLogging();
             });
             serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
-            serviceCollection.AddScoped<TooltipService>();
             serviceCollection.AddScoped<IFileService, FileService>();
             serviceCollection.AddSingleton(new AppState());
 

@@ -212,20 +212,20 @@ public partial class CourtListPage : ICourtListPage
     {
         if (ActiveDefendant?.Id == defendant.Id)
         {
-            return "!bg-sky-700";
+            return "!bg-blue !text-primary font-semibold";
         }
 
-        return "hover:bg-gray-500";
+        return "hover:bg-slate-300";
     }
 
     private string IsSelected(CaseFile caseFile)
     {
         if (ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber)
         {
-            return "!bg-sky-700";
+            return "!bg-blue !text-primary";
         }
 
-        return "hover:bg-gray-500";
+        return "hover:bg-slate-300";
     }
 
     private void SaveCourtList()

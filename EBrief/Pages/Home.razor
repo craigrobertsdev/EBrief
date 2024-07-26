@@ -99,7 +99,7 @@
             {
                 @foreach (var courtList in PreviousCourtLists!)
                 {
-                    <p class="text-lg text-center p-1 @(courtList == SelectedCourtList ? "!bg-blue-800 !text-white hover:bg-blue-800 hover:text-white" : "") hover:bg-slate-200 hover:text-black cursor-default border-b border-black"
+                    <p class="text-lg text-center p-1 @(courtList == SelectedCourtList ? "!bg-blue !text-primary hover:bg-blue hover:text-primary" : "") hover:bg-slate-300 hover:text-black cursor-default border-b border-black"
                        @onclick=@(() => HandleSelectCourtListEntry(courtList))>
                         @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
                     </p>
