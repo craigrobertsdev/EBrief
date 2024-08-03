@@ -13,6 +13,8 @@
 */Uploads
 .idea/
 **/*.crt
+LandscapeLists/
+*.docx
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -107,6 +107,12 @@ public partial class Home
         }
     }
 
+    private void ParseFile()
+    {
+        var parser = new CourtListParser();
+        parser.Parse(2);
+    }
+
     private async Task LoadFromCommandLine()
     {
         var args = Environment.GetCommandLineArgs();

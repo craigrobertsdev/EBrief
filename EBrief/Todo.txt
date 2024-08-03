@@ -25,6 +25,8 @@ STYLING:
 	- Add colour coding for whether notes have been added to the case file
 	- Go through every date and time and format them consistently
 	- When expanding a court session, make scroll snap to the botton of the newly opened session, or as far down as possible if the session is too long
+	- OpenPreviousCourtList - create grid for each element of CourtListEntry (date, court code, court room)
+	- CancelButton - work out why the button is always purple
 	
 TESTING:
 	- Add tests for models and data access where it makes sense

@@ -11,9 +11,18 @@
             <h1>Choose an option to get started</h1>
         </div>
         <div class="grid grid-cols-3 gap-3">
-            <RadzenButton Text="Load New Court List" Click="OpenNewCourtListDialog" />
-            <RadzenButton Text="Load Previous Court List" Click="OpenPreviousCourtListDialog" />
-            <RadzenButton Text="Open Court List From File" Click="LoadCourtListFromFile" />
+            <Button Variant="ButtonTypes.Add" OnClick="OpenNewCourtListDialog">
+                Add New Court List
+            </Button>
+            <Button OnClick="OpenPreviousCourtListDialog">
+                Load Previous Court List
+            </Button>
+            <Button Variant="ButtonTypes.Open" OnClick="LoadCourtListFromFile">
+                Open Court List From File
+            </Button>
+            <Button Variant="ButtonTypes.Open" OnClick="ParseFile">
+                Parse
+            </Button>
         </div>
 
         @if (_error is not null)
@@ -101,22 +110,31 @@
             {
                 @foreach (var courtList in PreviousCourtLists!)
                 {
-                    <p class="text-lg text-center p-1 @(courtList == SelectedCourtList ? "!bg-blue !text-primary hover:bg-blue hover:text-primary" : "") hover:bg-slate-300 hover:text-black cursor-default border-b border-black"
-                       @onclick=@(() => HandleSelectCourtListEntry(courtList))>
-                        @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
-                    </p>
+                    <div class="flex justify-between border-b border-black @(courtList == SelectedCourtList ? "!bg-blue !text-primary hover:bg-blue hover:text-primary" : "")">
+                        <p class="text-lg text-center p-1 hover:bg-slate-300 hover:text-black cursor-default"
+                           @onclick=@(() => HandleSelectCourtListEntry(courtList))>
+                            @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
+                            <CancelButton OnClick="OpenConfirmDialog" />
+                        </p>
+                    </div>
                 }
             }
         </div>
 
     }
-    <div class="flex w-full justify-end gap-3">
+    <div class="flex w-full justify-center gap-3">
         @if (PreviousCourtLists?.Count != 0)
         {
-            <RadzenButton Text="Confirm" Click="LoadPreviousCourtList" />
-            <RadzenButton Text="Delete" Click="OpenConfirmDialog" Disabled=@(SelectedCourtList == null) />
+            <Button OnClick="LoadPreviousCourtList">
+                Confirm
+            </Button>
+            <Button Variant="ButtonTypes.Close" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtList == null)>
+                Delete
+            </Button>
         }
-        <RadzenButton Text="Cancel" Click="ClosePreviousCourtListDialog" />
+        <Button Variant="ButtonTypes.Cancel" OnClick="ClosePreviousCourtListDialog">
+            Cancel
+        </Button>
     </div>
 </dialog>
 
