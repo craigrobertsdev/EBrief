@@ -16,7 +16,7 @@ public partial class CourtListPage : ICourtListPage
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
-    public List<CourtSitting> CourtSittings { get; set; } = [];
+    public List<CourtSession> CourtSittings { get; set; } = [];
     private ElementReference? UnsavedChangesDialog { get; set; }
     private ElementReference? AddCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
@@ -67,13 +67,13 @@ public partial class CourtListPage : ICourtListPage
         //CourtList.CourtRoom = courtRoom;
     }
 
-    private List<CourtSitting> GenerateCourtSittings()
+    private List<CourtSession> GenerateCourtSittings()
     {
         // iterate over the list of defendants and group them by the appearance time of their first case file in the list
         var courtSittings = CourtList.Defendants.SelectMany(d => d.CaseFiles)
             .GroupBy(cf => cf.Schedule.Last().HearingDate)
             .OrderBy(g => g.Key)
-            .Select((g, i) => new CourtSitting(i, g.Key))
+            .Select((g, i) => new CourtSession(i, g.Key))
             .ToList();
 
         foreach (var defendant in CourtList.Defendants)
