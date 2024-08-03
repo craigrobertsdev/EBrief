@@ -1,0 +1,57 @@
+<button type="@Type" class="@style @ClassList px-4 py-1 rounded-md text-lg @(loading || Disabled ? "!bg-disabled hover:!bg-disabled" : "")"
+        @onclick=@HandleClick
+        disabled="@(Disabled || loading)">
+    @if (loading)
+    {
+        <div class="text-gray-400 h-[30px] w-[30px]">
+            <img src="images/loading_spinner.svg" class="h-full w-full object-contain" />
+        </div>
+    }
+    else
+    {
+        @ChildContent
+    }
+</button>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public ButtonTypes Variant { get; set; } = ButtonTypes.Submit;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ClassList { get; set; } = string.Empty;
+
+    private bool loading = false;
+
+    private string style => Variant switch
+    {
+        ButtonTypes.Submit => "bg-blue text-primary hover:bg-blue-hover",
+        ButtonTypes.Cancel => "bg-red-500 text-white hover:bg-red-700",
+        ButtonTypes.Add => "bg-jade text-primary hover:bg-jade-hover",
+        ButtonTypes.Open => "bg-turquoise text-primary hover:bg-turquoise-hover",
+        ButtonTypes.Close => "bg-ceramic text-primary hover:bg-peach-hover",
+        ButtonTypes.Tab => "bg-gray-200 text-black hover:bg-gray-300",
+        ButtonTypes.TabActive => "bg-blue text-primary hover:bg-blue-hover",
+        _ => "bg-blue text-primary hover:bg-blue-hover"
+    };
+
+    private async Task HandleClick()
+    {
+        loading = true;
+        await OnClick.InvokeAsync();
+        loading = false;
+    }
+
+}
+

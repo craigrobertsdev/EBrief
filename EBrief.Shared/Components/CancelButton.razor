@@ -1,0 +1,13 @@
+<div class="@Class">
+    <button style="color: red !important" class="float-right text-2xl" @onclick=OnClick>
+        &#10006;
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+}
