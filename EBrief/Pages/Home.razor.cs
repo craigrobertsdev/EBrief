@@ -20,8 +20,11 @@ public partial class Home
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
+    private ElementReference? SelectCourtRoomDialog { get; set; }
     private string CaseFileNumbers { get; set; } = string.Empty;
     private List<Court> Courts = [];
+    private string? SelectedFile { get; set; }
+    private List<CourtListModel>? LandscapeList { get; set; }
     private Court? SelectedCourt { get; set; }
     public DateTime? CourtDate { get; set; }
     private int? CourtRoom { get; set; }
@@ -107,12 +110,6 @@ public partial class Home
         }
     }
 
-    private void ParseFile()
-    {
-        var parser = new CourtListParser();
-        parser.Parse(2);
-    }
-
     private async Task LoadFromCommandLine()
     {
         var args = Environment.GetCommandLineArgs();
@@ -189,6 +186,36 @@ public partial class Home
 
         PreviousCourtLists.Remove(SelectedCourtList);
         SelectedCourtList = PreviousCourtLists.FirstOrDefault();
+    }
+
+    private void SelectFile()
+    {
+        SelectedFile = FileService.SelectLandscapeList();
+    }
+
+    private async Task LoadCourtList()
+    {
+        if (SelectedFile is not null)
+        {
+            var (landscapeList, error) = FileService.LoadLandscapeList(SelectedFile);
+            if (error is not null)
+            {
+                _error = error;
+                return;
+            }
+
+            await JSRuntime.InvokeVoidAsync("openDialog", SelectCourtRoomDialog);
+        }
+        else
+        {
+            await FetchCourtList();
+        }
+    }
+
+    private async Task FetchCourtListFromLandscape()
+    {
+        Console.WriteLine("Got here");
+        await Task.CompletedTask;
     }
 
     private async Task FetchCourtList()
@@ -285,15 +312,31 @@ public partial class Home
 
     }
 
-    private async Task CloseLoadNewCourtListDialog()
+    [JSInvokable]
+    public async Task CloseLoadNewCourtListDialog()
     {
         await JSRuntime.InvokeVoidAsync("closeDialog", NewCourtListDialog);
+        SelectedFile = null;
+        SelectedCourt = null;
+        CourtRoom = null;
+        CourtDate = null;
     }
 
     private async Task ClosePreviousCourtListDialog() =>
         await JSRuntime.InvokeVoidAsync("closeDialog", PreviousCourtListDialog);
 
     private async Task CloseConfirmDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", ConfirmDialog);
+    private async Task CloseSelectCourtRoomDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", SelectCourtRoomDialog);
+
+    private void HandleSelectFile(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+
+        SelectedFile = (string)e.Value;
+    }
 
     private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
     {

@@ -7,8 +7,9 @@ public interface IFileService
 {
     Task SaveFile(CourtList courtList);
     Task<(CourtListEntry?, string?)> LoadCourtFile();
-    (List<CourtListModel>? courtLists, string?) LoadLandscapeList();
-    (CourtListModel? courtList, string?) LoadIndividualCourtList(int courtRoom);
+    (List<CourtListModel>? courtLists, string?) LoadLandscapeList(string filePath);
+    string? SelectLandscapeList();
+    //(CourtListModel? courtList, string?) LoadIndividualCourtList(string filePath);
     void CreateDocumentDirectory();
     Task SaveDocument(Stream stream, string fileName);
 }

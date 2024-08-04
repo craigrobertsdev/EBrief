@@ -82,7 +82,43 @@ public class FileService : IFileService
         }
     }
 
-    public (CourtListModel?, string?) LoadIndividualCourtList(int courtRoom)
+    //public (CourtListModel?, string?) LoadIndividualCourtList(int courtRoom)
+    //{
+    //    var dialog = new OpenFileDialog
+    //    {
+    //        DefaultExt = ".docx",
+    //        Filter = "Word Document|*.docx"
+    //    };
+    //    var result = dialog.ShowDialog();
+
+    //    if (result is null || result == false)
+    //    {
+    //        return (null, null);
+    //    }
+
+    //    if (!File.Exists(dialog.FileName))
+    //    {
+    //        throw new FileNotFoundException("File does not exist");
+    //    }
+
+    //    var parser = new CourtListParser();
+    //    try
+    //    {
+    //        var courtList = parser.ParseIndividual(dialog.FileName, courtRoom);
+    //        return (courtList, null);
+    //    }
+    //    catch (IOException)
+    //    {
+    //        return (null, "The landscape list in already open. Please close it and try again.");
+    //    }
+    //    catch (Exception)
+    //    {
+    //        return (null, "The file in not in a valid format. Please ensure you have an unmodified landscape list. Alternatively, try loading the court list from the hearing list from ECMS.");
+    //    }
+
+    //}
+
+    public string? SelectLandscapeList()
     {
         var dialog = new OpenFileDialog
         {
@@ -93,46 +129,15 @@ public class FileService : IFileService
 
         if (result is null || result == false)
         {
-            return (null, null);
+            return null;
         }
 
-        if (!File.Exists(dialog.FileName))
-        {
-            throw new FileNotFoundException("File does not exist");
-        }
-
-        var parser = new CourtListParser();
-        try
-        {
-            var courtList = parser.ParseIndividual(dialog.FileName, courtRoom);
-            return (courtList, null);
-        }
-        catch (IOException)
-        {
-            return (null, "The landscape list in already open. Please close it and try again.");
-        }
-        catch (Exception)
-        {
-            return (null, "The file in not in a valid format. Please ensure you have an unmodified landscape list. Alternatively, try loading the court list from the hearing list from ECMS.");
-        }
-
+        return dialog.FileName;
     }
 
-    public (List<CourtListModel>?, string?) LoadLandscapeList()
+    public (List<CourtListModel>?, string?) LoadLandscapeList(string filePath)
     {
-        var dialog = new OpenFileDialog
-        {
-            DefaultExt = ".docx",
-            Filter = "Word Document|*.docx"
-        };
-        var result = dialog.ShowDialog();
-
-        if (result is null || result == false)
-        {
-            return (null, null);
-        }
-
-        if (!File.Exists(dialog.FileName))
+        if (!File.Exists(filePath))
         {
             throw new FileNotFoundException("File does not exist");
         }
@@ -140,7 +145,7 @@ public class FileService : IFileService
         var parser = new CourtListParser();
         try
         {
-            var courtLists = parser.ParseLandscapeList(dialog.FileName);
+            var courtLists = parser.ParseLandscapeList(filePath);
             return (courtLists, null);
         }
         catch (IOException)
