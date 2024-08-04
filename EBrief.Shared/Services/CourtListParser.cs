@@ -1,6 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
 using EBrief.Shared.Models;
 using EBrief.Shared.Models.Data;
 
@@ -8,11 +7,14 @@ namespace EBrief.Shared.Services;
 public class CourtListParser
 {
     bool _endOfCourtRoom = false;
-    public CourtListModel Parse(int courtRoom)
+    bool _endOfLandscapeList = false;
+    int pos = 0;
+
+    public CourtListModel ParseIndividual(string filePath, int courtRoom)
     {
         try
         {
-            using var document = WordprocessingDocument.Open(@"C:\Users\craig\source\repos\EBrief\EBrief.Shared\LandscapeLists\Landscape List 20240801.docx", false);
+            using var document = WordprocessingDocument.Open(filePath, false);
             var body = document.MainDocumentPart?.Document.Body;
 
             var headerText = document.MainDocumentPart.HeaderParts.First().Header.InnerText;
@@ -20,18 +22,7 @@ public class CourtListParser
             var date = DateTime.Parse(string.Join(" ", headerText.Split(" ")[^3..]));
             var court = body.ChildElements[0].ChildElements[3].InnerText.Split(',')[0];
 
-            var courtList = new CourtListModel
-            {
-                CourtDate = date,
-                CourtCode = CourtCodeMappings[court],
-                CourtRoom = courtRoom
-            };
-
-            int pos = 4;
-            while (!_endOfCourtRoom)
-            {
-                ParseNext(courtList, hearingEntries.ChildElements, ref pos);
-            }
+            CourtListModel courtList = ParseCourtListIndividual(courtRoom, hearingEntries, date, court);
 
             return courtList;
         }
@@ -42,7 +33,81 @@ public class CourtListParser
         }
     }
 
-    private void ParseNext(CourtListModel courtList, OpenXmlElementList childElements, ref int pos)
+    public List<CourtListModel> ParseLandscapeList(string filePath)
+    {
+        try
+        {
+            using var document = WordprocessingDocument.Open(filePath, false);
+            var body = document.MainDocumentPart!.Document.Body;
+
+            var headerText = document.MainDocumentPart!.HeaderParts.First().Header.InnerText;
+            var hearingEntries = body!.ChildElements[0].ChildElements[5].ChildElements[1].ChildElements[1];
+            var date = DateTime.Parse(string.Join(" ", headerText.Split(" ")[^3..]));
+            var court = body.ChildElements[0].ChildElements[3].InnerText.Split(',')[0];
+
+            List<CourtListModel> lists = [];
+            pos = 2;
+            while (!_endOfLandscapeList)
+            {
+                _endOfCourtRoom = false;
+                CourtListModel courtList = ParseCourtListLandscape(hearingEntries, date, court);
+                lists.Add(courtList);
+                _endOfLandscapeList = IsEndOfLandscapeList(hearingEntries);
+            }
+
+            return lists;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+    }
+
+    private bool IsEndOfLandscapeList(OpenXmlElement hearingEntries)
+    {
+        return pos >= hearingEntries.ChildElements.Count;
+    }
+
+    private CourtListModel ParseCourtListIndividual(int courtRoom, OpenXmlElement hearingEntries, DateTime date, string court)
+    {
+        var courtList = new CourtListModel
+        {
+            CourtDate = date,
+            CourtCode = CourtCodeMappings[court],
+            CourtRoom = courtRoom
+        };
+
+        pos = 4;
+        while (!_endOfCourtRoom)
+        {
+            ParseNext(courtList, hearingEntries.ChildElements);
+        }
+
+        return courtList;
+    }
+
+    private CourtListModel ParseCourtListLandscape(OpenXmlElement hearingEntries, DateTime date, string court)
+    {
+        var courtRoom = Int32.Parse(hearingEntries.ChildElements[pos].ChildElements[1].InnerText.Split(' ')[1]);
+        pos += 2;
+
+        var courtList = new CourtListModel
+        {
+            CourtDate = date,
+            CourtCode = CourtCodeMappings[court],
+            CourtRoom = courtRoom
+        };
+
+        while (!_endOfCourtRoom && pos < hearingEntries.ChildElements.Count)
+        {
+            ParseNext(courtList, hearingEntries.ChildElements);
+        }
+
+        return courtList;
+    }
+
+    private void ParseNext(CourtListModel courtList, OpenXmlElementList childElements)
     {
         var row = childElements[pos];
 
@@ -54,45 +119,70 @@ public class CourtListParser
         else if (row.InnerText.StartsWith("COURT"))
         {
             _endOfCourtRoom = IsNewCourtRoom(row, courtList.CourtRoom);
-            pos += 2; // skips the column header line immediately following the court session header
+            if (!_endOfCourtRoom)
+            {
+                pos += 2; // skips the column header line immediately following the court session header
+            }
             return;
         }
 
         var elements = row.ChildElements;
         var caseFile = new CaseFileModel();
 
-        //hearingElements[3] = "3. MCCRM-24-016760(H3617790B)First Appearances"
-        var ids = SplitCourtIdentifiers(elements[3].InnerText);
-        caseFile.CaseFileNumber = ids.PoliceFileNumber;
-        caseFile.CourtFileNumber = ids.CourtFileNumber;
-        caseFile.ListNumber = ids.ListNo;
-        caseFile.ListingType = ids.ListingType;
-
-
-        //hearingElements[4] = "HARDING, Christopher"
-        var defendantName = elements[4].InnerText.Split(", ");
-        var defendant = new DefendantModel
+        //elements[3] = "3. MCCRM-XX-XXXXXX(H1234567B)First Appearances"
+        if (elements[3].InnerText == string.Empty) // this happens for co-accused
         {
-            FirstName = defendantName[1],
-            LastName = defendantName[0]
+            var lastCaseFile = courtList.CaseFiles.Last();
+            caseFile.CourtFileNumber = lastCaseFile.CourtFileNumber;
+            caseFile.CaseFileNumber = lastCaseFile.CaseFileNumber;
+            caseFile.ListNumber = lastCaseFile.ListNumber;
+            caseFile.ListingType = lastCaseFile.ListingType;
+        }
+        else
+        {
+            var ids = SplitCourtIdentifiers(elements[3].InnerText);
+            caseFile.CaseFileNumber = ids.PoliceFileNumber;
+            caseFile.CourtFileNumber = ids.CourtFileNumber;
+            caseFile.ListNumber = ids.ListNo;
+            caseFile.ListingType = ids.ListingType;
+        }
+
+        //elements[4] = "SURNAME, FirstName"
+        var defendantName = elements[4].InnerText.Split(", ");
+        caseFile.Defendant = new DefendantModel
+        {
+            FirstName = defendantName[1].Trim(),
+            LastName = defendantName[0].Trim()
         };
 
-        //hearingElements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
-        var offenceDetails = elements[5];
+        // elements[6] && elements[7]
+        if (elements[6].InnerText != string.Empty)
+        {
+            var counsel = new DefenceCounsel
+            {
+                Name = elements[6].InnerText,
+                Number = elements[7].InnerText
+            };
+            caseFile.Counsel = counsel;
+        }
 
-        //hearingElements[6] = "Jessica Kurtzer"
-        var counsel = elements[6];
+        //elements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
+        caseFile.OffenceDetails = elements[5].InnerText.Split("/ ").Select(o => o.Trim()).ToArray();
 
-        //hearingElements[7] = "(0488 345 065)"
-        var counselPhoneNumber = elements[7];
-        //hearingElements[8] = "Hearing"
-        var hearingType = elements[8];
+        //elements[8] = "Hearing"
+        caseFile.HearingType = elements[8].InnerText;
 
-        //hearingElements[9] = "Gaol/Bail"
-        var defendantRestraint = elements[9];
+        //elements[9] = "Gaol/Bail"
+        caseFile.DefendantAppearanceMethod = elements[9].InnerText;
 
         courtList.CaseFiles.Add(caseFile);
         pos++;
+    }
+
+    private string[] SplitOffenceDetails(string offenceText)
+    {
+        var offences = offenceText.Split("/ ");
+        return offences;
     }
 
     private CourtIdentifiers SplitCourtIdentifiers(string text)
@@ -103,42 +193,42 @@ public class CourtListParser
 
         // "3. MCCRM-24-016760(H3617790B)First Appearances"
         // "3. MCCRM-24-016760First Appearances"
-        int pos = text.IndexOf('.');
-        int listNo = Int32.Parse(text[0..pos]);
-        pos++; // skip the '.' after the list number
-        while (text[pos] == ' ')
+        int idTextPos = text.IndexOf('.');
+        int listNo = Int32.Parse(text[0..idTextPos]);
+        idTextPos++; // skip the '.' after the list number
+        while (text[idTextPos] == ' ')
         {
-            pos++;
+            idTextPos++;
         }
 
         var polFilePos = text.IndexOf('(');
         if (polFilePos > 0) // MCCRM-24-016760(H3617790B)First Appearances"
         {
-            courtFileNumber = text[pos..polFilePos];
-            pos = polFilePos + 1;
+            courtFileNumber = text[idTextPos..polFilePos];
+            idTextPos = polFilePos + 1;
 
             var rightParenPos = text.IndexOf(')');
-            policeFileNumber = text[pos..rightParenPos];
-            pos = rightParenPos + 1;
+            policeFileNumber = text[idTextPos..rightParenPos];
+            idTextPos = rightParenPos + 1;
         }
         else // MCCRM-24-016760First Appearances"
         {
-            for (int i = pos + 10; i < text.Length; i++)
+            for (int i = idTextPos + 10; i < text.Length; i++)
             {
-                if (!char.IsDigit(text[i]))
+                if (char.IsDigit(text[i]))
                 {
                     continue;
                 }
                 else
                 {
-                    courtFileNumber = text[pos..(i - 1)];
-                    pos = i;
+                    courtFileNumber = text[idTextPos..(i - 1)];
+                    idTextPos = i;
                     break;
                 }
             }
         }
 
-        listingType = text[pos..];
+        listingType = text[idTextPos..];
 
         return new CourtIdentifiers(listNo, courtFileNumber, policeFileNumber, listingType);
     }
