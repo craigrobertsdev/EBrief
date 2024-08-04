@@ -45,6 +45,11 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CaseFileModel>()
+            .HasOne(cf => cf.Counsel)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CaseFileModel>()
             .HasMany(cf => cf.Documents)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
