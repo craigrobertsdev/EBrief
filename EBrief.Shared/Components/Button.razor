@@ -1,4 +1,4 @@
-<button type="@Type" class="@style @ClassList px-4 py-1 rounded-md text-lg @(loading || Disabled ? "!bg-disabled hover:!bg-disabled" : "")"
+<button type="@Type" class="@style @ClassList px-4 py-1 rounded-md text-lg select-none @(loading || Disabled ? "!bg-disabled hover:!bg-disabled" : "")"
         @onclick=@HandleClick
         disabled="@(Disabled || loading)">
     @if (loading)
