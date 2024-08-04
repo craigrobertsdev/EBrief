@@ -81,7 +81,6 @@
                 <option value="true">Yes</option>
                 <option value="false">No</option>
             </select>
-            @* <RadzenCheckBox @bind-Value="IncludeDocuments" /> *@
         </div>
         <div class="w-full col-start-2 row-start-1">
             <textarea @bind="@CaseFileNumbers" rows="10" placeholder="Enter case file numbers here" class="w-full p-2 border border-slate-500 rounded-md resize-none disabled:bg-gray-200" disabled="@(SelectedFile != null)" />
@@ -90,7 +89,10 @@
 
         @if (_loadCourtListError is not null)
         {
-            <p class="col-span-2 text-center text-lg text-red-500">@_loadCourtListError</p>
+            foreach (var line in _loadCourtListError.Split('\n'))
+            {
+                <p class="col-span-2 pb-2 text-center text-lg text-red-500">@line</p>
+            }
         }
 
         <div class="flex w-full col-span-2 justify-center gap-6">

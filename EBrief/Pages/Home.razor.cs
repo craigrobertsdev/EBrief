@@ -76,7 +76,7 @@ public partial class Home
     {
         if (NewCourtListDialog is not null)
         {
-            _error = null;
+            _loadCourtListError = null;
             var obj = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("openDialog", NewCourtListDialog, obj);
         }
@@ -188,9 +188,10 @@ public partial class Home
         SelectedCourtList = PreviousCourtLists.FirstOrDefault();
     }
 
-    private void SelectFile()
+    private async Task SelectFile()
     {
-        SelectedFile = FileService.SelectLandscapeList();
+        _loadCourtListError = null;
+        SelectedFile = await FileService.SelectLandscapeList();
     }
 
     private async Task LoadCourtList()
@@ -200,7 +201,7 @@ public partial class Home
             var (landscapeList, error) = FileService.LoadLandscapeList(SelectedFile);
             if (error is not null)
             {
-                _error = error;
+                _loadCourtListError = error;
                 return;
             }
 

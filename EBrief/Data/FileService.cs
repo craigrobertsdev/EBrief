@@ -118,8 +118,9 @@ public class FileService : IFileService
 
     //}
 
-    public string? SelectLandscapeList()
+    public async Task<string?> SelectLandscapeList()
     {
+        await Task.CompletedTask;
         var dialog = new OpenFileDialog
         {
             DefaultExt = ".docx",
@@ -154,7 +155,7 @@ public class FileService : IFileService
         }
         catch (Exception)
         {
-            return (null, "The file in not in a valid format. Please ensure you have an unmodified landscape list. Alternatively, try loading the court list from the hearing list from ECMS.");
+            return (null, "The file in not in a valid format. Please ensure you have an unmodified landscape list.\nAlternatively, try loading the court list from the hearing list from ECMS.");
         }
     }
     public void CreateDocumentDirectory()
