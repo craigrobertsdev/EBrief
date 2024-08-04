@@ -1,11 +1,33 @@
-function openDialog(element) {
+let currentDialog = null;
+let dialogReference = null;
+
+function openDialog(element, objRef) {
+    currentDialog = element;
+    dialogReference = objRef;
     element.addEventListener('close', closeEvent)
+    document.addEventListener('keydown', onEscapePressed);
     element.showModal();
 }
 
 function closeDialog(element) {
     element.removeEventListener("close", closeEvent);
     element.close();
+}
+
+const onEscapePressed = (e, element) => {
+    if (e.key !== "Escape") {
+        return;
+    }
+
+    if (currentDialog.id === "new-court-list") { 
+        if (dialogReference !== null) {
+            dialogReference.invokeMethodAsync("CloseLoadNewCourtListDialog");
+        }
+    }
+
+    dialogReference = null;
+    document.removeEventListener('keydown', onEscapePressed);
+    currentDialog.close();
 }
 
 function closeEvent() {
