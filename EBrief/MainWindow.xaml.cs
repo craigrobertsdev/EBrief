@@ -1,6 +1,5 @@
 ﻿using EBrief.Data;
 using EBrief.Shared.Data;
-using EBrief.Shared.Exceptions;
 using EBrief.Shared.Helpers;
 using EBrief.Shared.Services;
 using Microsoft.EntityFrameworkCore;
