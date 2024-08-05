@@ -1,4 +1,4 @@
-﻿using EBrief.Shared.Models;
+﻿using EBrief.Shared.Models.Shared;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

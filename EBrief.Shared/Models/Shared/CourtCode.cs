@@ -1,4 +1,4 @@
-﻿namespace EBrief.Shared.Models;
+﻿namespace EBrief.Shared.Models.Shared;
 
 public enum CourtCode
 {

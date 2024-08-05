@@ -1,4 +1,4 @@
-﻿using EBrief.Shared.Models;
+﻿using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Models.UI;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -41,8 +41,12 @@ public class CourtListModel
             CourtCode = CourtCode,
             CourtDate = CourtDate,
             CourtRoom = CourtRoom
-
         };
+    }
+
+    public void CombineCaseFiles(List<CaseFileModel> caseFiles)
+    {
+
     }
 
     // To handle the situation where a defendant has multiple case files

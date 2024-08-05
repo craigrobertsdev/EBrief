@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using EBrief.Shared.Models;
 using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.Shared;
 
 namespace EBrief.Shared.Services;
 public class CourtListParser
@@ -9,29 +9,6 @@ public class CourtListParser
     bool _endOfCourtRoom = false;
     bool _endOfLandscapeList = false;
     int pos = 0;
-
-    public CourtListModel ParseIndividual(string filePath, int courtRoom)
-    {
-        try
-        {
-            using var document = WordprocessingDocument.Open(filePath, false);
-            var body = document.MainDocumentPart?.Document.Body;
-
-            var headerText = document.MainDocumentPart.HeaderParts.First().Header.InnerText;
-            var hearingEntries = body.ChildElements[0].ChildElements[5].ChildElements[1].ChildElements[1];
-            var date = DateTime.Parse(string.Join(" ", headerText.Split(" ")[^3..]));
-            var court = body.ChildElements[0].ChildElements[3].InnerText.Split(',')[0];
-
-            CourtListModel courtList = ParseCourtListIndividual(courtRoom, hearingEntries, date, court);
-
-            return courtList;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            throw;
-        }
-    }
 
     public List<CourtListModel> ParseLandscapeList(string filePath)
     {
@@ -50,7 +27,7 @@ public class CourtListParser
             while (!_endOfLandscapeList)
             {
                 _endOfCourtRoom = false;
-                CourtListModel courtList = ParseCourtListLandscape(hearingEntries, date, court);
+                CourtListModel courtList = ParseCourtList(hearingEntries, date, court);
                 lists.Add(courtList);
                 _endOfLandscapeList = IsEndOfLandscapeList(hearingEntries);
             }
@@ -69,25 +46,7 @@ public class CourtListParser
         return pos >= hearingEntries.ChildElements.Count;
     }
 
-    private CourtListModel ParseCourtListIndividual(int courtRoom, OpenXmlElement hearingEntries, DateTime date, string court)
-    {
-        var courtList = new CourtListModel
-        {
-            CourtDate = date,
-            CourtCode = CourtCodeMappings[court],
-            CourtRoom = courtRoom
-        };
-
-        pos = 4;
-        while (!_endOfCourtRoom)
-        {
-            ParseNext(courtList, hearingEntries.ChildElements);
-        }
-
-        return courtList;
-    }
-
-    private CourtListModel ParseCourtListLandscape(OpenXmlElement hearingEntries, DateTime date, string court)
+    private CourtListModel ParseCourtList(OpenXmlElement hearingEntries, DateTime date, string court)
     {
         var courtRoom = Int32.Parse(hearingEntries.ChildElements[pos].ChildElements[1].InnerText.Split(' ')[1]);
         pos += 2;
@@ -250,96 +209,3 @@ public class CourtListParser
 
     record CourtIdentifiers(int ListNo, string CourtFileNumber, string PoliceFileNumber, string ListingType);
 }
-
-/* 
-* Court session header: these are found as one of the row types in the list
-* hearingEntries.ChildElements[2].ChildElements[1] = "COURT 2"
-* hearingEntries.ChildElements[2].ChildElements[2] = "Before MAGISTRATE MCLEOD"
-* 
-* Observations about hearing entries:
-* A hearing with a solicitor but without a gaol/bail type:
-*      10:00 AM3.   MCCRM-24-016760(H3617790B)First AppearancesHARDING, Christopher Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)Jessica Kurtzer(0488 345 065)Hearing 
-* hearingElements = hearingEntries.ChildElements[2].ChildElements[10].ChildElements
-* hearingElements[1] = "10:00AM"
-* hearingElements[2] = ""
-* hearingElements[3] = "3. MCCRM-24-016760(H3617790B)First Appearances"
-* hearingElements[4] = "HARDING, Christopher"
-* hearingElements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
-* hearingElements[6] = "Jessica Kurtzer"
-* hearingElements[7] = "(0488 345 065)"
-* hearingElements[8] = "Hearing"
-* hearingElements[9] = ""
-* hearingElements[10] = ""
-* 
-* 
-* A hearing with a solicitor and a gaol/bail type:
-*      11:30 AM26.   MCCRM-24-027522(CO2400027635)First AppearancesTAVINO, Costanzo Dino Basic Offence: Dishonestly Take Property Without Consent Evangelos Dimou(8111 5555)HearingBail
-* hearingElements = hearingEntries.ChildElements[2].ChildElements[58].ChildElements
-* hearingElements[1] = "11:30AM"
-* hearingElements[2] = ""
-* hearingElements[3] = "26. MCCRM-24-027522(CO2400027635)First Appearances"
-* hearingElements[4] = "TAVINO, Costanzo Dino "
-* hearingElements[5] = "Basic Offence: Dishonestly Take Property Without Consent "
-* hearingElements[6] = "Evangelos Dimou"
-* hearingElements[7] = "(8111 5555)"
-* hearingElements[8] = "Hearing"
-* hearingElements[9] = "Bail"
-* hearingElements[10] = ""
-* 
-* Hearing entries can exist without case file numbers if they are breaches of bond or similar. The format is:
-* hearingElements[3] = "50. MCCRM-24-028483General List"
-* will need to find the last number and split it there.
-* 
-* Multiple offences are created like:
-* hearingElements[5] = "Unlawfully On Premises(3)/ Basic Offence: Dishonestly Take property Without consent/ Damage Building Or Motor Vehicle (Not Graffiti Or Unkown)"
-* these will be able to be split by the "/ ". Will be useful informatino to have in the tooltip or perhaps in a listing information tab?
-* 
-* Multiple defendants:
-* The usual hearing details exist for the first accused
-* The next accused's entries look like:
-* hearingElements[1] = ""
-* hearingElements[2] = ""
-* hearingElements[3] = ""
-* hearingElements[4] = "COOKE, Mitchell "
-* hearingElements[5] = " Commit Theft Using Force (Aggravated Offence) (2)/ Drive Or Use Motor Vehicle Without Consent (2)"
-* hearingElements[6] = "Stacey Carter"
-* hearingElements[7] = "(1300 707 054)"
-* hearingElements[8] = "Committal Hearing - Answer Charge"
-* hearingElements[9] = "Bail"
-* hearingElements[10] = ""
-*/
-
-//public string[] HearingTypes = [
-//    "First Appearances",
-//    "General List",
-//    "Committal",
-//    "Part Heard",
-//    "Trial",
-//    "Callover",
-//    "Pre Trial Conference",
-//    "PTC Following Files",
-//    "Family Violence",
-//    "Police Interim Intervention Orders",
-//    "Aboriginal Community Court",
-//    "DCS",
-//    "Tax"
-//];
-
-/* Header contains text like: Magistrates Court - Criminal JurisdictionThursday 01 August 2023
- * 
- * CourtHearings can be divided into:
- *  List number: 1
- *  CourtFileNumber: MCCRM-24-123456
- *  CaseFileNumber: CO2300012345
- *  Defendant: SURNAME, First, (Middle Names?)
- *  Offences: Basic Offence: Dishonestly Take Property Without Consent (probably don't care about this unless we have no case file number?)
- *  Counsel: FirstName, LastName (may be null)
- *  Hearing Type: Hearing/Committal Hearing - Answer Charge/Bail Hearing/Charge Determination Hearing/For Mention Only/Trial/Callover etc
- *  Gaol/Bail: null/Bail/Gaol
- *  
- *  
- *  Will need regex for:
- *  1. /Adelaide Magistrates Court, 260-280 Victoria Square,Adelaide 5000COURT/ - to get word COURT from end of first part of court list
- *  2. /ChargeGaolCOURT 14Before MAGISTRATE / - to extract COURT 14
- *  3. 
- */

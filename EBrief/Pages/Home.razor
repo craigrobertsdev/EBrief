@@ -30,28 +30,38 @@
             </div>
         }
     </div>
-
-
     <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
 </div>
 
 <dialog id="new-court-list" @ref="NewCourtListDialog" class="p-5">
-    <h3 class="text-lg text-center pb-2 underline">Select a file to load</h3>
-    <div class="grid grid-cols-[0.4fr_1fr] gap-4 pt-2 w-lg max-w-lg m-auto items-center">
-        <Button Variant="ButtonTypes.Submit" OnClick="SelectFile">Choose a file</Button>
+    <h3 class="text-lg font-semibold text-center pb-2 underline">Select a file to load</h3>
+    <div class="grid grid-cols-[0.6fr_1fr] gap-4 pt-2 w-lg max-w-lg m-auto items-center">
+        <Button Variant="ButtonTypes.Submit" OnClick="async () => await SelectFile()" Disabled="@_loadingCourtList">Choose a file</Button>
         <div class="border border-black rounded-md p-1 overflow-hidden h-9">
-        @if (SelectedFile is null)
-        {
-            <span class="font-semibold">No file selected</span>
-        }
-        else
-        {
-            <span class="font-semibold max-w- whitespace-nowrap text-clip">@Path.GetFileName(SelectedFile)</span>
-        }
+            @if (SelectedFile is null)
+            {
+                <span class="font-semibold">No file selected</span>
+            }
+            else
+            {
+                <span class="font-semibold whitespace-nowrap text-clip">@Path.GetFileName(SelectedFile)</span>
+            }
         </div>
+
+        <p class="text-lg text-center pb-2">Select a court room</p>
+        <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(LandscapeList == null)">
+            <option selected hidden disabled></option>
+            @if (LandscapeList is not null)
+            {
+                foreach (var courtRoom in LandscapeList.Select(cl => cl.CourtRoom))
+                {
+                    <option value="@courtRoom">@courtRoom</option>
+                }
+            }
+        </select>
     </div>
     <h3 class="text-lg text-center py-4 font-bold">OR</h3>
-    <h3 class="text-lg text-center pb-2 underline">Enter details of court list</h3>
+    <h3 class="text-lg font-semibold text-center pb-2 underline">Enter details of court list</h3>
     <div class="grid grid-cols-2 gap-4">
         <div class="col-start-1 grid grid-cols-2 items-center gap-x-4">
             <label class="ml-auto">Court date: </label>
@@ -65,21 +75,11 @@
                 }
             </select>
             <label class="ml-auto">Court room: </label>
-            <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(SelectedCourt == null)">
-                @if (SelectedCourt is not null)
-                {
-                    <option selected hidden disabled></option>
-                    foreach (var courtRoom in SelectedCourt!.CourtRooms)
-                    {
-                        <option value="@courtRoom">@courtRoom</option>
-                    }
-                }
-            </select>
+            <input @oninput=HandleEnterCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(SelectedFile != null)" />
             <label class="ml-auto">Include documents:</label>
             <select @onchange="HandleIncludeDocuments" class="border border-black p-2 rounded-md">
-                <option selected hidden disabled></option>
                 <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option selected value="false">No</option>
             </select>
         </div>
         <div class="w-full col-start-2 row-start-1">
@@ -87,27 +87,27 @@
         </div>
     </div>
 
-        @if (_loadCourtListError is not null)
+    @if (_loadNewCourtListError is not null)
+    {
+        foreach (var line in _loadNewCourtListError.Split('\n'))
         {
-            foreach (var line in _loadCourtListError.Split('\n'))
-            {
-                <p class="col-span-2 pb-2 text-center text-lg text-red-500">@line</p>
-            }
+            <p class="col-span-2 pb-2 text-center text-lg text-red-500">@line</p>
         }
+    }
 
-        <div class="flex w-full col-span-2 justify-center gap-6">
-            <Button OnClick="LoadCourtList" Disabled="_loadingCourtList">
-                Confirm
-            </Button>
-            <Button Variant="ButtonTypes.Cancel" OnClick="CloseLoadNewCourtListDialog">
-                Cancel
-            </Button>
-        </div>
+    <div class="flex w-full col-span-2 justify-center gap-6">
+        <Button OnClick="SubmitNewCourtListForm" Disabled="@(_loadingCourtList || !CourtListBuilder.IsValid)">
+            Confirm
+        </Button>
+        <Button Variant="ButtonTypes.Cancel" OnClick="CloseLoadNewCourtListDialog">
+            Cancel
+        </Button>
+    </div>
 </dialog>
 
 <dialog @ref="PreviousCourtListDialog" class="p-5">
     <h3 class="text-lg text-center pb-2">Choose from a previous court list</h3>
-    @if (PreviousCourtLists is null)
+    @if (PreviousCourtListEntries is null)
     {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     }
@@ -115,7 +115,7 @@
     else
     {
         <div class="border border-black mb-2 w-[300px] h-[300px]">
-            @if (PreviousCourtLists!.Count == 0)
+            @if (PreviousCourtListEntries!.Count == 0)
             {
                 <div class="h-full w-full flex items-center justify-center">
                     <h3 class="text-center text-lg pb-2">No court previous court lists found</h3>
@@ -123,9 +123,9 @@
             }
             else
             {
-                @foreach (var courtList in PreviousCourtLists!)
+                @foreach (var courtList in PreviousCourtListEntries!)
                 {
-                    <div class="flex justify-between border-b border-black @(courtList == SelectedCourtList ? "!bg-blue !text-primary hover:bg-blue hover:text-primary" : "")">
+                    <div class="flex justify-between border-b border-black @(courtList == SelectedCourtListEntry ? "!bg-blue !text-primary hover:bg-blue hover:text-primary" : "")">
                         <p class="text-lg text-center p-1 hover:bg-slate-300 hover:text-black cursor-default"
                            @onclick=@(() => HandleSelectCourtListEntry(courtList))>
                             @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
@@ -138,15 +138,15 @@
 
     }
     <div class="flex w-full justify-center gap-3">
-        @if (PreviousCourtLists?.Count != 0)
+        @if (PreviousCourtListEntries?.Count != 0)
         {
             <Button OnClick="LoadPreviousCourtList">
                 Confirm
             </Button>
-            <Button Variant="ButtonTypes.Close" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtList == null)>
+            <Button Variant="ButtonTypes.Close" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtListEntry == null)>
                 Delete
             </Button>
-         }
+        }
         <Button Variant="ButtonTypes.Cancel" OnClick="ClosePreviousCourtListDialog">
             Cancel
         </Button>
@@ -161,30 +161,6 @@
         </Button>
         <Button Variant="ButtonTypes.Cancel" OnClick="async () => await DeletePreviousCourtList(false)">
             No
-        </Button>
-    </div>
-</dialog>
-
-<dialog @ref=SelectCourtRoomDialog class="p-5">
-    <p class="text-lg text-center pb-2">Select a court room</p>
-    <label class="ml-auto">Court room: </label>
-    <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md">
-            <option selected hidden disabled></option>
-        @if (LandscapeList is not null)
-        {
-            foreach (var courtRoom in LandscapeList.Select(cl => cl.CourtRoom))
-            {
-                <option value="@courtRoom">@courtRoom</option>
-            }
-        }
-    </select>
-
-    <div class="flex justify-center gap-3">
-        <Button OnClick="FetchCourtListFromLandscape">
-            Confirm
-        </Button>
-        <Button Variant="ButtonTypes.Cancel" OnClick="CloseSelectCourtRoomDialog">
-            Cancel
         </Button>
     </div>
 </dialog>

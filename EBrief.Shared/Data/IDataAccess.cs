@@ -1,5 +1,5 @@
-﻿using EBrief.Shared.Models;
-using EBrief.Shared.Models.Data;
+﻿using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Models.UI;
 
 namespace EBrief.Shared.Data;

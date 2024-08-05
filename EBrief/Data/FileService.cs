@@ -1,7 +1,7 @@
 ﻿using EBrief.Shared.Data;
 using EBrief.Shared.Helpers;
-using EBrief.Shared.Models;
 using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Models.UI;
 using EBrief.Shared.Services;
 using Microsoft.Win32;
@@ -81,42 +81,6 @@ public class FileService : IFileService
             return (null, e.Message);
         }
     }
-
-    //public (CourtListModel?, string?) LoadIndividualCourtList(int courtRoom)
-    //{
-    //    var dialog = new OpenFileDialog
-    //    {
-    //        DefaultExt = ".docx",
-    //        Filter = "Word Document|*.docx"
-    //    };
-    //    var result = dialog.ShowDialog();
-
-    //    if (result is null || result == false)
-    //    {
-    //        return (null, null);
-    //    }
-
-    //    if (!File.Exists(dialog.FileName))
-    //    {
-    //        throw new FileNotFoundException("File does not exist");
-    //    }
-
-    //    var parser = new CourtListParser();
-    //    try
-    //    {
-    //        var courtList = parser.ParseIndividual(dialog.FileName, courtRoom);
-    //        return (courtList, null);
-    //    }
-    //    catch (IOException)
-    //    {
-    //        return (null, "The landscape list in already open. Please close it and try again.");
-    //    }
-    //    catch (Exception)
-    //    {
-    //        return (null, "The file in not in a valid format. Please ensure you have an unmodified landscape list. Alternatively, try loading the court list from the hearing list from ECMS.");
-    //    }
-
-    //}
 
     public async Task<string?> SelectLandscapeList()
     {

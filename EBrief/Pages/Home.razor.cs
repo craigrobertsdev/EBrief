@@ -1,7 +1,6 @@
 ﻿using EBrief.Shared.Data;
 using EBrief.Shared.Helpers;
 using EBrief.Shared.Services;
-using EBrief.Shared.Models;
 using EBrief.Shared.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -9,6 +8,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.IO;
 using System.Net.Http;
+using EBrief.Shared.Models.Shared;
+using EBrief.Shared.Models.Validation;
 
 namespace EBrief.Pages;
 
@@ -20,23 +21,21 @@ public partial class Home
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
-    private ElementReference? SelectCourtRoomDialog { get; set; }
     private string CaseFileNumbers { get; set; } = string.Empty;
     private List<Court> Courts = [];
     private string? SelectedFile { get; set; }
     private List<CourtListModel>? LandscapeList { get; set; }
-    private Court? SelectedCourt { get; set; }
-    public DateTime? CourtDate { get; set; }
-    private int? CourtRoom { get; set; }
+    private CourtListBuilder CourtListBuilder { get; set; } = default!;
     private bool IncludeDocuments { get; set; }
     private bool _loadingCourtList;
     private string? _error;
-    private string? _loadCourtListError;
-    private List<CourtListEntry>? PreviousCourtLists { get; set; }
-    private CourtListEntry? SelectedCourtList { get; set; }
+    private string? _loadNewCourtListError;
+    private List<CourtListEntry>? PreviousCourtListEntries { get; set; }
+    private CourtListEntry? SelectedCourtListEntry { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        CourtListBuilder = new CourtListBuilder();
         // This will be replaced when the application is in prod. Need to work out the actual court rooms
         // or create a generic list of court rooms up to 25 to cover everything. Need to add all the courts too
         Courts.Add(new Court
@@ -76,7 +75,7 @@ public partial class Home
     {
         if (NewCourtListDialog is not null)
         {
-            _loadCourtListError = null;
+            _loadNewCourtListError = null;
             var obj = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("openDialog", NewCourtListDialog, obj);
         }
@@ -141,8 +140,8 @@ public partial class Home
 
     private async Task OpenPreviousCourtListDialog()
     {
-        PreviousCourtLists = await DataAccess.GetSavedCourtLists();
-        SelectedCourtList = PreviousCourtLists.FirstOrDefault();
+        PreviousCourtListEntries = await DataAccess.GetSavedCourtLists();
+        SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
 
         if (PreviousCourtListDialog is not null)
         {
@@ -153,13 +152,13 @@ public partial class Home
 
     private void LoadPreviousCourtList()
     {
-        if (SelectedCourtList is null)
+        if (SelectedCourtListEntry is null)
         {
             _error = "Please select a court list.";
             return;
         }
 
-        NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtList.CourtCode}&courtDate={SelectedCourtList.CourtDate}&courtRoom={SelectedCourtList.CourtRoom}");
+        NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtListEntry.CourtCode}&courtDate={SelectedCourtListEntry.CourtDate}&courtRoom={SelectedCourtListEntry.CourtRoom}");
     }
 
     private async Task DeletePreviousCourtList(bool confirmDeletion)
@@ -169,14 +168,14 @@ public partial class Home
         {
             return;
         }
-        if (SelectedCourtList is null || PreviousCourtLists is null)
+        if (SelectedCourtListEntry is null || PreviousCourtListEntries is null)
         {
             return;
         }
 
         try
         {
-            await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtList.CourtCode, SelectedCourtList.CourtDate, SelectedCourtList.CourtRoom));
+            await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtListEntry.CourtCode, SelectedCourtListEntry.CourtDate, SelectedCourtListEntry.CourtRoom));
         }
         catch (Exception e)
         {
@@ -184,73 +183,56 @@ public partial class Home
             return;
         }
 
-        PreviousCourtLists.Remove(SelectedCourtList);
-        SelectedCourtList = PreviousCourtLists.FirstOrDefault();
+        PreviousCourtListEntries.Remove(SelectedCourtListEntry);
+        SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
     }
 
     private async Task SelectFile()
     {
-        _loadCourtListError = null;
+        _loadNewCourtListError = null;
+        _loadingCourtList = true;
         SelectedFile = await FileService.SelectLandscapeList();
+        if (SelectedFile is null)
+        {
+            LandscapeList = null;
+            return;
+        }
+
+        var (landscapeList, error) = FileService.LoadLandscapeList(SelectedFile);
+        if (error is not null)
+        {
+            _loadNewCourtListError = error;
+            return;
+        }
+
+        LandscapeList = landscapeList;
+        CourtListBuilder.SetCourtDate(landscapeList![0].CourtDate);
+        CourtListBuilder.SetCourtCode(landscapeList![0].CourtCode);
+        _loadingCourtList = false;
     }
 
-    private async Task LoadCourtList()
+    private async Task SubmitNewCourtListForm()
     {
-        if (SelectedFile is not null)
+        _loadNewCourtListError = null;
+        if (!CourtListBuilder.IsValid)
         {
-            var (landscapeList, error) = FileService.LoadLandscapeList(SelectedFile);
-            if (error is not null)
-            {
-                _loadCourtListError = error;
-                return;
-            }
+            _loadNewCourtListError = "An error occurred. Please reload and try again.";
+            return;
+        }
 
-            await JSRuntime.InvokeVoidAsync("openDialog", SelectCourtRoomDialog);
-        }
-        else
-        {
-            await FetchCourtList();
-        }
+        var courtList = CourtListBuilder.Build();
+        await FetchCourtList(courtList);
     }
 
-    private async Task FetchCourtListFromLandscape()
+    private async Task FetchCourtList(CourtListModel courtList)
     {
-        Console.WriteLine("Got here");
-        await Task.CompletedTask;
-    }
-
-    private async Task FetchCourtList()
-    {
-        _loadCourtListError = null;
-        if (CourtDate is null)
-        {
-            _loadCourtListError = "Please select a court date.";
-            return;
-        }
-
-        if (SelectedCourt is null)
-        {
-            _loadCourtListError = "Please select a court.";
-            return;
-        }
-
-        if (CourtRoom is null)
-        {
-            _loadCourtListError = "Please select a court room.";
-            return;
-        }
-
-        if (string.IsNullOrEmpty(CaseFileNumbers))
-        {
-            _loadCourtListError = "Please enter case file numbers";
-            return;
-        }
 
         _loadingCourtList = true;
-        var listAlreadyExists = await DataAccess.CheckCourtListExists(new CourtListEntry(SelectedCourt.CourtCode, CourtDate.Value, CourtRoom.Value));
+        var entry = new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
+        var listAlreadyExists = await DataAccess.CheckCourtListExists(entry);
         if (listAlreadyExists)
         {
-            _loadCourtListError = "A court list for this date and location already exists";
+            _loadNewCourtListError = "A court list for this date and location already exists";
             _loadingCourtList = false;
             return;
         }
@@ -259,28 +241,29 @@ public partial class Home
         var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         try
         {
-            var body = new CourtListDto(caseFileNumbers, CourtDate.Value);
+            var body = new CourtListDto(caseFileNumbers, CourtListBuilder.CourtDate.Value);
             var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body);
             if (!response.IsSuccessStatusCode)
             {
-                _loadCourtListError = "Failed to connect to the server";
+                _loadNewCourtListError = "Failed to connect to the server";
                 return;
             }
 
             var caseFiles = await response.Content.ReadFromJsonAsync<List<CaseFileModel>>();
             if (caseFiles is null)
             {
-                _loadCourtListError = "Failed to fetch court list.";
+                _loadNewCourtListError = "Failed to fetch court list.";
                 return;
             }
 
-            var courtList = new CourtListModel
+            if (courtList.CaseFiles is not null)
             {
-                CaseFiles = caseFiles,
-                CourtCode = SelectedCourt.CourtCode,
-                CourtDate = CourtDate.Value,
-                CourtRoom = CourtRoom.Value
-            };
+                courtList.CombineCaseFiles(caseFiles);
+            }
+            else
+            {
+                courtList.CaseFiles = caseFiles;
+            }
 
             try
             {
@@ -293,24 +276,72 @@ public partial class Home
             }
             catch (Exception e)
             {
-                _loadCourtListError = e.InnerException?.Message ?? e.Message;
+                _loadNewCourtListError = e.InnerException?.Message ?? e.Message;
                 _loadingCourtList = false;
                 return;
             }
 
-            NavManager.NavigateTo($"/court-list/?newList=&courtCode={SelectedCourt.CourtCode}&courtRoom={CourtRoom}&courtDate={CourtDate}&includeDocuments={IncludeDocuments}");
+            NavManager.NavigateTo($"/court-list/?newList=&courtCode={CourtListBuilder.CourtCode}&courtRoom={CourtListBuilder.CourtRoom}&courtDate={CourtListBuilder.CourtDate}&includeDocuments={IncludeDocuments}");
         }
         catch (HttpRequestException)
         {
-            _loadCourtListError = "Failed to connect to the server";
+            _loadNewCourtListError = "Failed to connect to the server";
             _loadingCourtList = false;
         }
         catch (Exception e)
         {
-            _loadCourtListError = e.InnerException?.Message ?? e.Message;
+            _loadNewCourtListError = e.InnerException?.Message ?? e.Message;
             _loadingCourtList = false;
         }
 
+    }
+
+    private void CheckNewCourtListErrors()
+    {
+        if (CourtListBuilder is null)
+        {
+            return;
+        }
+
+        if (CourtListBuilder.CourtDate is null)
+        {
+            _loadNewCourtListError = "Please select a court date.";
+            return;
+        }
+
+        if (CourtListBuilder.CourtRoom is null)
+        {
+            _loadNewCourtListError = "Please select a court room.";
+            return;
+        }
+
+        if (LandscapeList is null && string.IsNullOrEmpty(CaseFileNumbers))
+        {
+            _loadNewCourtListError = "Please enter case file numbers";
+            return;
+        }
+
+        if (CourtListBuilder.CourtCode is null)
+        {
+            _loadNewCourtListError = "Please select a court.";
+            return;
+        }
+    }
+
+    private bool NewCourtListParametersAreValid()
+    {
+
+        if (CourtListBuilder is null || CourtListBuilder.CourtDate is null || CourtListBuilder.CourtCode is null || CourtListBuilder.CourtRoom is null)
+        {
+            return false;
+        }
+
+        if (LandscapeList is null && !string.IsNullOrEmpty(CaseFileNumbers))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     [JSInvokable]
@@ -318,73 +349,89 @@ public partial class Home
     {
         await JSRuntime.InvokeVoidAsync("closeDialog", NewCourtListDialog);
         SelectedFile = null;
-        SelectedCourt = null;
-        CourtRoom = null;
-        CourtDate = null;
+        LandscapeList = null;
+        CourtListBuilder.SetCourtCode(null);
+        CourtListBuilder.SetCourtRoom(null);
+        CourtListBuilder.SetCourtDate(null);
+        _loadingCourtList = false;
     }
 
     private async Task ClosePreviousCourtListDialog() =>
         await JSRuntime.InvokeVoidAsync("closeDialog", PreviousCourtListDialog);
 
     private async Task CloseConfirmDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", ConfirmDialog);
-    private async Task CloseSelectCourtRoomDialog() => await JSRuntime.InvokeVoidAsync("closeDialog", SelectCourtRoomDialog);
 
-    private void HandleSelectFile(ChangeEventArgs e)
+    private void HandleSelectCourtRoom(ChangeEventArgs e)
     {
+        if (LandscapeList is null)
+        {
+            return;
+        }
+
         if (e.Value is null)
         {
             return;
         }
-
-        SelectedFile = (string)e.Value;
-    }
-
-    private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
-    {
-        if (SelectedCourtList == courtListEntry)
-        {
-            SelectedCourtList = null;
-            return;
-        }
-
-        SelectedCourtList = courtListEntry;
+        _loadNewCourtListError = null;
+        var courtRoom = int.Parse((string)e.Value);
+        CourtListBuilder.SetCourtRoom(courtRoom);
+        //SelectedCourtListEntry = LandscapeList.First(cl => cl.CourtRoom == CourtListBuilder!.CourtRoom);
     }
 
     private void HandleSelectCourtDate(ChangeEventArgs e)
     {
         if (e.Value is null)
         {
+            CourtListBuilder.SetCourtDate(null);
             return;
         }
         try
         {
-            CourtDate = DateTime.Parse((string)e.Value);
+            var date = DateTime.Parse((string)e.Value);
+            CourtListBuilder.SetCourtDate(date);
         }
-        catch (Exception)
-        {
-            CourtDate = null;
-        }
+        catch (Exception) { }
     }
 
     private void HandleSelectCourt(ChangeEventArgs e)
     {
         if (e.Value is null)
         {
+            CourtListBuilder.SetCourtCode(null);
             return;
         }
-        _error = null;
-        var courtCode = Enum.Parse<CourtCode>((string)e.Value);
-        SelectedCourt = Courts.FirstOrDefault(e => e.CourtCode == courtCode);
+        _loadNewCourtListError = null;
+
+        try
+        {
+            var courtCode = Enum.Parse<CourtCode>((string)e.Value);
+            CourtListBuilder.SetCourtCode(courtCode);
+        }
+        catch (Exception) { }
     }
 
-    private void HandleSelectCourtRoom(ChangeEventArgs e)
+    private void HandleEnterCourtRoom(ChangeEventArgs e)
     {
-        if (e.Value is null)
+        _loadNewCourtListError = null;
+        if (e.Value is null || (string)e.Value == string.Empty)
         {
+            CourtListBuilder.SetCourtRoom(null);
             return;
         }
-        _error = null;
-        CourtRoom = int.Parse((string)e.Value);
+        _loadNewCourtListError = null;
+        try
+        {
+            var courtRoom = int.Parse((string)e.Value);
+            if (courtRoom < 1)
+            {
+                courtRoom = 1;
+            }
+            CourtListBuilder.SetCourtRoom(courtRoom);
+        }
+        catch (Exception) {
+            CourtListBuilder.SetCourtRoom(null);
+            _loadNewCourtListError = "A number must be entered in the court room field.";
+        }
     }
 
     private void HandleIncludeDocuments(ChangeEventArgs e)
@@ -395,6 +442,17 @@ public partial class Home
         }
 
         IncludeDocuments = bool.Parse((string)e.Value);
+    }
+
+    private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
+    {
+        if (SelectedCourtListEntry == courtListEntry)
+        {
+            SelectedCourtListEntry = null;
+            return;
+        }
+
+        SelectedCourtListEntry = courtListEntry;
     }
 
     private async Task DownloadDocuments(CourtListModel courtList)

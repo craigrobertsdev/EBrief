@@ -1,12 +1,12 @@
 ﻿using EBrief.Shared.Data;
 using EBrief.Shared.Models.Data;
 using EBrief.Shared.Services;
-using EBrief.Shared.Models;
 using EBrief.Shared.Models.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
+using EBrief.Shared.Models.Shared;
 
 namespace EBrief.Pages;
 public partial class CourtListPage : ICourtListPage

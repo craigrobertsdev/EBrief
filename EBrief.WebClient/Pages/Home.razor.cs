@@ -1,9 +1,9 @@
 ﻿using EBrief.WebClient.Data;
-using EBrief.Shared.Models;
 using EBrief.Shared.Models.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using EBrief.Shared.Data;
+using EBrief.Shared.Models.Shared;
 
 namespace EBrief.WebClient.Pages;
 

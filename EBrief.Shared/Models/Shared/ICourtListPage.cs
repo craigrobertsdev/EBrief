@@ -1,6 +1,6 @@
 ﻿using EBrief.Shared.Models.UI;
 
-namespace EBrief.Shared.Models;
+namespace EBrief.Shared.Models.Shared;
 public interface ICourtListPage
 {
     Defendant? ActiveDefendant { get; set; }
