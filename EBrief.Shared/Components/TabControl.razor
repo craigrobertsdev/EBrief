@@ -1,9 +1,11 @@
+@using EBrief.Shared.Models.Shared
 <div class="flex flex-col h-full">
-    <div class="pb-4">
-        @foreach (var tabPage in _tabPages) {
+    <div class="flex pb-4 @(GetTabPosition())">
+        @foreach (var tabPage in _tabPages)
+        {
             <button type="button"
-                    class="p-2 first:border-l border-r border-t border-b border-slate-500 cursor-pointer @GetButtonClass(tabPage) 
-                    text-sm md:text-base"
+                    class="p-2 first:border-l border-r border-t border-b border-slate-500 cursor-pointer @GetButtonClass(tabPage)
+                    text-sm md:text-base select-none"
                     @onclick="() => ActivateTab(tabPage)">
                 @tabPage.Title
             </button>
@@ -19,27 +21,46 @@
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public TabPosition TabPosition { get; set; } = TabPosition.Left;
 
     public TabPage ActiveTab = default!;
     private List<TabPage> _tabPages = [];
 
-    internal void AddPage(TabPage tabPage) {
+    internal void AddPage(TabPage tabPage)
+    {
         _tabPages.Add(tabPage);
-        if (_tabPages.Count == 1) {
+        if (_tabPages.Count == 1)
+        {
             ActiveTab = tabPage;
         }
         StateHasChanged();
     }
 
-    private void ActivateTab(TabPage tabPage) {
+    private async Task ActivateTab(TabPage tabPage)
+    {
         ActiveTab = tabPage;
+
+        await ActiveTab.OnClick.InvokeAsync();
     }
 
-    private string GetButtonClass(TabPage tabPage) {
-        if (ActiveTab == tabPage) {
+    private string GetButtonClass(TabPage tabPage)
+    {
+        if (ActiveTab == tabPage)
+        {
             return "!bg-sky-700 text-white";
         }
 
         return "bg-gray-200 text-black hover:bg-gray-300";
     }
+
+    private string GetTabPosition()
+    {
+        return TabPosition switch
+        {
+            TabPosition.Left => "justify-left",
+            TabPosition.Center => "justify-center",
+            _ => ""
+        };
+    }
 }
+
