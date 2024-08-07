@@ -36,9 +36,14 @@ public class FileService : IFileService
 
     public async Task<(CourtListEntry?, string?)> LoadCourtFile()
     {
-        var dialog = new OpenFileDialog();
+        var dialog = new OpenFileDialog
+        {
+            DefaultExt = ".court",
+            Filter = "Court files|*.court"
+        };
         var result = dialog.ShowDialog();
         if (result is null || result == false) return (null, null);
+        if (!dialog.FileName.EndsWith(".court")) return (null, null);
 
         if (!File.Exists(dialog.FileName))
         {
