@@ -1,7 +1,6 @@
 npx tailwindcss -i .\wwwroot\css\app.css -o .\wwwroot\css\output.css --watch
 
 FUNCTIONALITY:
-	- Changing the case file doesn't cause the document to reload in the occurrence documents.
 	- Work out logging
 		* Add logging to all catch blocks
 		* Add logging to data access 
@@ -15,11 +14,10 @@ FUNCTIONALITY:
 	- Use cancellation tokens to cancel requesting both court lists and documents
 	- Add all courts to the list of courts
 	- Think of a way to represent regional courts where they only have 1 court room
-	- What kind of auth do we use? OAuth2 with Azure Entra Id
+	- Implement OAuth2
 	- Add auth tokens and use them to send requests and populate user data for CFEL updates:
 		* CaseFileEnquiryLogEntry constructor needs to accept a user rather than a string
 		* Follow ups page needs to be updated to use the user
-	- When closing the application after saving changes to the current court list, I am prompted again to save my changes (this shouldn't occur)
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 

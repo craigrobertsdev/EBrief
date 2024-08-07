@@ -188,6 +188,13 @@ public partial class Home
         SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
     }
 
+    private void ToggleManualCourtListEntry()
+    {
+        CourtListBuilder.CourtRoom = null;
+        EnterManually = !EnterManually;
+        StateHasChanged();
+    }
+
     private async Task SelectFile()
     {
         _loadNewCourtListError = null;
@@ -246,9 +253,9 @@ public partial class Home
             var client = new HttpClient();
 
             IEnumerable<string> caseFileNumbers;
-            if (CaseFileNumbers is not null)
+            if (EnterManually)
             {
-                caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
+                caseFileNumbers = CaseFileNumbers!.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
             }
             else
             {
@@ -320,7 +327,7 @@ public partial class Home
             return false;
         }
 
-        if (LandscapeList is null && string.IsNullOrEmpty(CaseFileNumbers))
+        if (EnterManually && string.IsNullOrEmpty(CaseFileNumbers))
         {
             return false;
         }
@@ -351,11 +358,6 @@ public partial class Home
 
     private void HandleSelectCourtRoom(ChangeEventArgs e)
     {
-        if (LandscapeList is null)
-        {
-            return;
-        }
-
         if (e.Value is null)
         {
             return;
@@ -363,7 +365,6 @@ public partial class Home
         _loadNewCourtListError = null;
         var courtRoom = int.Parse((string)e.Value);
         CourtListBuilder.SetCourtRoom(courtRoom);
-        //SelectedCourtListEntry = LandscapeList.First(cl => cl.CourtRoom == CourtListBuilder!.CourtRoom);
     }
 
     private void HandleSelectCourt(ChangeEventArgs e)
