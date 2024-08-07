@@ -10,6 +10,12 @@ public class CourtListParser
     bool _endOfLandscapeList = false;
     int pos = 0;
 
+    /*********DELETE THIS IN PROD*********/
+    record ParsedDefendant(string First, string Last, int Id);
+    List<ParsedDefendant> defendantNames = [];
+    int currentId = 0;
+    /*************************************/
+
     public List<CourtListModel> ParseLandscapeList(string filePath)
     {
         try
@@ -113,6 +119,20 @@ public class CourtListParser
             FirstName = defendantName[1].Trim(),
             LastName = defendantName[0].Trim()
         };
+
+        /*********DELETE THIS IN PROD*********/
+        var defendant = defendantNames.LastOrDefault();
+        if (defendant is not null && defendant.First == caseFile.Defendant.FirstName && defendant.Last == caseFile.Defendant.LastName)
+        {
+            caseFile.Defendant.Id = defendant.Id;
+        }
+        else
+        {
+            caseFile.Defendant.Id = currentId;
+            defendantNames.Add(new(caseFile.Defendant.FirstName, caseFile.Defendant.LastName, currentId));
+            currentId++;
+        }
+        /*************************************/
 
         // elements[6] && elements[7]
         if (elements[6].InnerText != string.Empty)

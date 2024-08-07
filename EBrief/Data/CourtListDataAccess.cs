@@ -28,7 +28,7 @@ public class CourtListDataAccess : IDataAccess
             return;
         }
 
-        courtList.CombineDefendantCaseFiles();
+        courtList.CombineAndSortDefendantCaseFiles();
 
         _context.CourtLists.Add(courtList);
         _context.SaveChanges();

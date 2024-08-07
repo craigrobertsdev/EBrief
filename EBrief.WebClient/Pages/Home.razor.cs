@@ -168,7 +168,7 @@ public partial class Home
                 CourtRoom = CourtRoom!.Value
             };
 
-            courtList.CombineDefendantCaseFiles();
+            courtList.CombineAndSortDefendantCaseFiles();
 
             try
             {

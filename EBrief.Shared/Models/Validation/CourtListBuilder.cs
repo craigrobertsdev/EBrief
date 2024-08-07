@@ -5,9 +5,9 @@ namespace EBrief.Shared.Models.Validation;
 public sealed class CourtListBuilder
 {
     private ICourtListValidationState _state;
-    public DateTime? CourtDate { get; private set; }
-    public CourtCode? CourtCode { get; private set; }
-    public int? CourtRoom { get; private set; }
+    public DateTime? CourtDate { get; set; }
+    public CourtCode? CourtCode { get; set; }
+    public int? CourtRoom { get; set; }
 
 
     public CourtListBuilder()
@@ -48,5 +48,12 @@ public sealed class CourtListBuilder
             CourtCode = CourtCode!.Value,
             CourtRoom = CourtRoom!.Value
         };
+    }
+
+    public void Reset()
+    {
+        CourtCode = null;
+        CourtDate = null;
+        CourtRoom = null;
     }
 }

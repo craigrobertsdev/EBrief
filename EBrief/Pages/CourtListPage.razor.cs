@@ -30,6 +30,8 @@ public partial class CourtListPage : ICourtListPage
     private string? _addCaseFilesError;
     private bool _loading;
     private bool _loadingNewCaseFiles;
+    private string CaseFileSelected = "bg-blue text-primary hover:bg-blue";
+    private string CaseFileNotSelected = "hover:bg-slate-300";
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,6 +91,8 @@ public partial class CourtListPage : ICourtListPage
             var hearingTime = defendant.CaseFiles.First().Schedule.Last().HearingDate;
             courtSessions.First(cs => cs.SittingTime.TimeOfDay == hearingTime.TimeOfDay).Defendants.Add(defendant);
         }
+
+        courtSessions.ForEach(cs => cs.Defendants.Sort((d1, d2) => d1.ListStart.CompareTo(d2.ListStart)));
 
         return courtSessions;
     }
@@ -208,25 +212,9 @@ public partial class CourtListPage : ICourtListPage
         ActivateDefendant(ActiveDefendant!);
     }
 
-    public string IsSelected(Defendant defendant)
-    {
-        if (ActiveDefendant?.Id == defendant.Id)
-        {
-            return "!bg-blue !text-primary font-semibold";
-        }
+    public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;
 
-        return "hover:bg-slate-300";
-    }
-
-    private string IsSelected(CaseFile caseFile)
-    {
-        if (ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber)
-        {
-            return "!bg-blue !text-primary";
-        }
-
-        return "hover:bg-slate-300";
-    }
+    private bool IsSelected(CaseFile caseFile) => ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber;
 
     private void SaveCourtList()
     {

@@ -5,6 +5,7 @@
 @using EBrief.Shared.Models.UI
 @using EBrief.Shared.Pages
 @using Microsoft.JSInterop
+@using Radzen
 @using Radzen.Blazor
 @using System.Text
 @inject IJSRuntime JSRuntime
@@ -46,7 +47,7 @@ else
                             @foreach (var caseFile in ActiveDefendant.CaseFiles)
                             {
                                 <Tooltip Text="@GenerateCaseFileTooltipText(caseFile)" Id="@caseFile.CaseFileNumber">
-                                    <div class="border font-semibold min-w-[18ch] text-center @IsSelected(caseFile)" @onclick="() => CaseFileChanged(caseFile)">
+                                    <div class="border font-semibold min-w-[18ch] text-center @(IsSelected(caseFile) ? CaseFileSelected : CaseFileNotSelected)" @onclick="() => CaseFileChanged(caseFile)">
                                         <p class="select-none">
                                             @caseFile.CaseFileNumber
                                         </p>

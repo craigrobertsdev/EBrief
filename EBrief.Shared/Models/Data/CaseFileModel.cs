@@ -50,6 +50,18 @@ public class CaseFileModel
             Notes = new() { Text = Notes, HasChanged = false }
         };
     }
+    public void CombineWith(CaseFileModel model)
+    {
+        Schedule = model.Schedule;
+        CfelEntries = model.CfelEntries;
+        FactsOfCharge = model.FactsOfCharge;
+        Information = model.Information;
+        TimeInCustody = model.TimeInCustody;
+        Charges = model.Charges;
+        Documents = model.Documents;
+        DocumentsLoaded = model.DocumentsLoaded;
+        Notes = model.Notes;
+    }
 }
 
 public static class CaseFileModelExtensions

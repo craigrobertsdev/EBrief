@@ -2,7 +2,8 @@
 public class Defendant
 {
     public int Id { get; set; }
-    public int ListNumber { get; set; }
+    public int ListStart { get; set; }
+    public int ListEnd { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }

@@ -21,13 +21,14 @@ public partial class Home
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
-    private string CaseFileNumbers { get; set; } = string.Empty;
+    private string? CaseFileNumbers { get; set; }
     private List<Court> Courts = [];
     private string? SelectedFile { get; set; }
     private List<CourtListModel>? LandscapeList { get; set; }
     private CourtListBuilder CourtListBuilder { get; set; } = default!;
     private bool IncludeDocuments { get; set; }
     private bool _loadingCourtList;
+    private bool EnterManually { get; set; }
     private string? _error;
     private string? _loadNewCourtListError;
     private List<CourtListEntry>? PreviousCourtListEntries { get; set; }
@@ -195,6 +196,8 @@ public partial class Home
         if (SelectedFile is null)
         {
             LandscapeList = null;
+            CourtListBuilder.Reset();
+            _loadingCourtList = false;
             return;
         }
 
@@ -202,6 +205,7 @@ public partial class Home
         if (error is not null)
         {
             _loadNewCourtListError = error;
+            _loadingCourtList = false;
             return;
         }
 
@@ -237,11 +241,22 @@ public partial class Home
             return;
         }
 
-        var client = new HttpClient();
-        var caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
         try
         {
-            var body = new CourtListDto(caseFileNumbers, CourtListBuilder.CourtDate.Value);
+            var client = new HttpClient();
+
+            IEnumerable<string> caseFileNumbers;
+            if (CaseFileNumbers is not null)
+            {
+                caseFileNumbers = CaseFileNumbers.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
+            }
+            else
+            {
+                courtList.CaseFiles = LandscapeList!.First(cl => cl.CourtRoom == courtList.CourtRoom).CaseFiles;
+                caseFileNumbers = courtList.CaseFiles.Select(cf => cf.CaseFileNumber);
+            }
+
+            var body = new CourtListDto(caseFileNumbers, courtList.CourtDate);
             var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body);
             if (!response.IsSuccessStatusCode)
             {
@@ -259,6 +274,7 @@ public partial class Home
             if (courtList.CaseFiles is not null)
             {
                 courtList.CombineCaseFiles(caseFiles);
+                courtList.CombineDefendantsWithServerResponse(caseFiles);
             }
             else
             {
@@ -296,47 +312,15 @@ public partial class Home
 
     }
 
-    private void CheckNewCourtListErrors()
-    {
-        if (CourtListBuilder is null)
-        {
-            return;
-        }
-
-        if (CourtListBuilder.CourtDate is null)
-        {
-            _loadNewCourtListError = "Please select a court date.";
-            return;
-        }
-
-        if (CourtListBuilder.CourtRoom is null)
-        {
-            _loadNewCourtListError = "Please select a court room.";
-            return;
-        }
-
-        if (LandscapeList is null && string.IsNullOrEmpty(CaseFileNumbers))
-        {
-            _loadNewCourtListError = "Please enter case file numbers";
-            return;
-        }
-
-        if (CourtListBuilder.CourtCode is null)
-        {
-            _loadNewCourtListError = "Please select a court.";
-            return;
-        }
-    }
-
     private bool NewCourtListParametersAreValid()
     {
 
-        if (CourtListBuilder is null || CourtListBuilder.CourtDate is null || CourtListBuilder.CourtCode is null || CourtListBuilder.CourtRoom is null)
+        if (!CourtListBuilder.IsValid)
         {
             return false;
         }
 
-        if (LandscapeList is null && !string.IsNullOrEmpty(CaseFileNumbers))
+        if (LandscapeList is null && string.IsNullOrEmpty(CaseFileNumbers))
         {
             return false;
         }
@@ -347,13 +331,17 @@ public partial class Home
     [JSInvokable]
     public async Task CloseLoadNewCourtListDialog()
     {
+        ResetNewCourtListForm();
         await JSRuntime.InvokeVoidAsync("closeDialog", NewCourtListDialog);
+        _loadingCourtList = false;
+    }
+
+    private void ResetNewCourtListForm()
+    {
         SelectedFile = null;
         LandscapeList = null;
-        CourtListBuilder.SetCourtCode(null);
-        CourtListBuilder.SetCourtRoom(null);
-        CourtListBuilder.SetCourtDate(null);
-        _loadingCourtList = false;
+        CourtListBuilder.Reset();
+        CaseFileNumbers = null;
     }
 
     private async Task ClosePreviousCourtListDialog() =>
@@ -376,21 +364,6 @@ public partial class Home
         var courtRoom = int.Parse((string)e.Value);
         CourtListBuilder.SetCourtRoom(courtRoom);
         //SelectedCourtListEntry = LandscapeList.First(cl => cl.CourtRoom == CourtListBuilder!.CourtRoom);
-    }
-
-    private void HandleSelectCourtDate(ChangeEventArgs e)
-    {
-        if (e.Value is null)
-        {
-            CourtListBuilder.SetCourtDate(null);
-            return;
-        }
-        try
-        {
-            var date = DateTime.Parse((string)e.Value);
-            CourtListBuilder.SetCourtDate(date);
-        }
-        catch (Exception) { }
     }
 
     private void HandleSelectCourt(ChangeEventArgs e)
@@ -428,7 +401,8 @@ public partial class Home
             }
             CourtListBuilder.SetCourtRoom(courtRoom);
         }
-        catch (Exception) {
+        catch (Exception)
+        {
             CourtListBuilder.SetCourtRoom(null);
             _loadNewCourtListError = "A number must be entered in the court room field.";
         }
@@ -442,6 +416,11 @@ public partial class Home
         }
 
         IncludeDocuments = bool.Parse((string)e.Value);
+    }
+
+    private void HandleEnterCaseFileNumbers(ChangeEventArgs e)
+    {
+        CaseFileNumbers = (string?)e.Value;
     }
 
     private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)

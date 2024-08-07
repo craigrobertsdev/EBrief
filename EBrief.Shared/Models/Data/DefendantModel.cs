@@ -17,6 +17,8 @@ public class DefendantModel
     public string? Address { get; set; }
     public string? Phone { get; set; }
     public string? Email { get; set; }
+    public int ListStart { get; set; }
+    public int ListEnd { get; set; }
     public List<BailAgreementModel> BailAgreements { get; set; } = [];
     public List<InterventionOrderModel> InterventionOrders { get; set; } = [];
     public string? OffenderHistory { get; set; }
@@ -32,6 +34,8 @@ public class DefendantModel
             Phone = Phone,
             Email = Email,
             CaseFiles = [],
+            ListStart = ListStart,
+            ListEnd = ListEnd,
             BailAgreements = BailAgreements.Select(ba => ba.ToUIModel()).ToList(),
             InterventionOrders = InterventionOrders.Select(io => io.ToUIModel()).ToList()
         };

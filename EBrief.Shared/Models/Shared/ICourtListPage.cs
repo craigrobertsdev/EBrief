@@ -5,6 +5,6 @@ public interface ICourtListPage
 {
     Defendant? ActiveDefendant { get; set; }
     event Func<Task> OnDefendantChange;
-    string IsSelected(Defendant defendant);
+    bool IsSelected(Defendant defendant);
     void ActivateDefendant(Defendant defendant);
 }

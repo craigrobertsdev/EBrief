@@ -2,6 +2,7 @@
 @using EBrief.Shared.Components
 @using EBrief.Shared.Models
 @using System.IO
+@using EBrief.Shared.Models.Shared
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavManager
@@ -33,14 +34,14 @@
     <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
 </div>
 
-<dialog id="new-court-list" @ref="NewCourtListDialog" class="p-5">
+<dialog id="new-court-list" @ref="NewCourtListDialog" class="p-5 w-[650px] h-[600px]">
     <h3 class="text-lg font-semibold text-center pb-2 underline">Select a file to load</h3>
-    <div class="grid grid-cols-[0.6fr_1fr] gap-4 pt-2 w-lg max-w-lg m-auto items-center">
-        <Button Variant="ButtonTypes.Submit" OnClick="async () => await SelectFile()" Disabled="@_loadingCourtList">Choose a file</Button>
-        <div class="border border-black rounded-md p-1 overflow-hidden h-9">
+    <div class="grid grid-cols-[0.6fr_1fr] gap-4 pt-2 pb-4 w-lg max-w-lg m-auto items-center">
+        <Button Variant="ButtonTypes.Submit" OnClick="async () => await SelectFile()" Disabled="@(_loadingCourtList || EnterManually)">Choose a file</Button>
+        <div class="border border-black rounded-md p-1 overflow-hidden h-9 @(EnterManually ? "bg-gray-200 text-gray-200" : "")">
             @if (SelectedFile is null)
             {
-                <span class="font-semibold">No file selected</span>
+                <span class="font-semibold ">No file selected</span>
             }
             else
             {
@@ -49,7 +50,7 @@
         </div>
 
         <p class="text-lg text-center pb-2">Select a court room</p>
-        <select @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(LandscapeList == null)">
+        <select value="@CourtListBuilder.CourtRoom" @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(LandscapeList == null)">
             <option selected hidden disabled></option>
             @if (LandscapeList is not null)
             {
@@ -60,32 +61,6 @@
             }
         </select>
     </div>
-    <h3 class="text-lg text-center py-4 font-bold">OR</h3>
-    <h3 class="text-lg font-semibold text-center pb-2 underline">Enter details of court list</h3>
-    <div class="grid grid-cols-2 gap-4">
-        <div class="col-start-1 grid grid-cols-2 items-center gap-x-4">
-            <label class="ml-auto">Court date: </label>
-            <input type="date" @onchange="HandleSelectCourtDate" class="border border-black rounded-md p-1 disabled:bg-gray-200" disabled=@(SelectedFile != null)>
-            <label class="ml-auto">Court code: </label>
-            <select @onchange="HandleSelectCourt" class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled=@(SelectedFile != null)>
-                <option selected hidden disabled></option>
-                @foreach (var courtCode in Courts.Select(c => c.CourtCode))
-                {
-                    <option value="@courtCode">@courtCode</option>
-                }
-            </select>
-            <label class="ml-auto">Court room: </label>
-            <input @oninput=HandleEnterCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(SelectedFile != null)" />
-            <label class="ml-auto">Include documents:</label>
-            <select @onchange="HandleIncludeDocuments" class="border border-black p-2 rounded-md">
-                <option value="true">Yes</option>
-                <option selected value="false">No</option>
-            </select>
-        </div>
-        <div class="w-full col-start-2 row-start-1">
-            <textarea @bind="@CaseFileNumbers" rows="10" placeholder="Enter case file numbers here" class="w-full p-2 border border-slate-500 rounded-md resize-none disabled:bg-gray-200" disabled="@(SelectedFile != null)" />
-        </div>
-    </div>
 
     @if (_loadNewCourtListError is not null)
     {
@@ -94,14 +69,47 @@
             <p class="col-span-2 pb-2 text-center text-lg text-red-500">@line</p>
         }
     }
-
-    <div class="flex w-full col-span-2 justify-center gap-6">
-        <Button OnClick="SubmitNewCourtListForm" Disabled="@(_loadingCourtList || !CourtListBuilder.IsValid)">
+    <div class="flex w-full col-span-2 justify-center gap-6 pb-4">
+        <Button OnClick="SubmitNewCourtListForm" Disabled="@(_loadingCourtList || !NewCourtListParametersAreValid())">
             Confirm
         </Button>
         <Button Variant="ButtonTypes.Cancel" OnClick="CloseLoadNewCourtListDialog">
             Cancel
         </Button>
+    </div>
+
+    
+    <div class="text-center pb-4">
+        <Button Variant="ButtonTypes.Add" OnClick="@(() => EnterManually = !EnterManually)">
+            Enter court list details manually instead?
+        </Button>
+    </div>
+    <div class="@(EnterManually ? "" : "hidden")">
+        <h3 class="text-lg font-semibold text-center pb-2 underline">Enter details of court list</h3>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="col-start-1 grid grid-cols-2 items-center gap-x-4">
+                <label class="ml-auto">Court date: </label>
+                <input type="date" @bind-value="@CourtListBuilder.CourtDate" class="border border-black rounded-md p-1 disabled:bg-gray-200" disabled=@(SelectedFile != null) />
+                <label class="ml-auto">Court code: </label>
+                <select value="@CourtListBuilder.CourtCode" @oninput="HandleSelectCourt" class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled=@(SelectedFile != null)>
+                    <option selected hidden disabled></option>
+                    @foreach (var courtCode in Courts.Select(c => c.CourtCode))
+                    {
+                        <option value="@courtCode">@courtCode</option>
+                    }
+                </select>
+                <label class="ml-auto">Court room: </label>
+                <input value="@CourtListBuilder.CourtRoom" @oninput=HandleEnterCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(SelectedFile != null)" />
+                <label class="ml-auto">Include documents:</label>
+                <select @onchange="HandleIncludeDocuments" class="border border-black p-2 rounded-md">
+                    <option value="true">Yes</option>
+                    <option selected value="false">No</option>
+                </select>
+            </div>
+            <div class="w-full col-start-2 row-start-1">
+                <textarea value="@CaseFileNumbers" @oninput="HandleEnterCaseFileNumbers" rows="10" placeholder="Enter case file numbers here" class="w-full p-2 border border-slate-500 rounded-md resize-none disabled:bg-gray-200" disabled="@(SelectedFile != null)" />
+            </div>
+        </div>
     </div>
 </dialog>
 
@@ -109,7 +117,7 @@
     <h3 class="text-lg text-center pb-2">Choose from a previous court list</h3>
     @if (PreviousCourtListEntries is null)
     {
-        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+        <Radzen.Blazor.RadzenProgressBarCircular Mode="Radzen.ProgressBarMode.Indeterminate" ShowValue=false />
     }
 
     else
@@ -125,11 +133,10 @@
             {
                 @foreach (var courtList in PreviousCourtListEntries!)
                 {
-                    <div class="flex justify-between border-b border-black @(courtList == SelectedCourtListEntry ? "!bg-blue !text-primary hover:bg-blue hover:text-primary" : "")">
-                        <p class="text-lg text-center p-1 hover:bg-slate-300 hover:text-black cursor-default"
+                    <div class="flex justify-between border-b border-black select-none @(courtList == SelectedCourtListEntry ? "bg-blue text-primary hover:bg-blue hover:text-primary" : "hover:bg-slate-300 hover:text-black ")">
+                        <p class="text-lg text-center p-1 flex-grow cursor-default"
                            @onclick=@(() => HandleSelectCourtListEntry(courtList))>
                             @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
-                            <CancelButton OnClick="OpenConfirmDialog" />
                         </p>
                     </div>
                 }
