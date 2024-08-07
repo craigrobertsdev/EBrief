@@ -30,8 +30,8 @@ public partial class CourtListPage : ICourtListPage
     private string? _addCaseFilesError;
     private bool _loading;
     private bool _loadingNewCaseFiles;
-    private string CaseFileSelected = "bg-blue text-primary hover:bg-blue";
-    private string CaseFileNotSelected = "hover:bg-slate-300";
+    private readonly string CaseFileSelected = "bg-blue text-text hover:bg-blue";
+    private readonly string CaseFileNotSelected = "hover:bg-slate-300";
 
     protected override async Task OnInitializedAsync()
     {

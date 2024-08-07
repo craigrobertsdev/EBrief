@@ -6,6 +6,7 @@ public enum ButtonTypes
     Add,
     Open,
     Close,
+    Delete,
     Tab,
     TabActive
 }

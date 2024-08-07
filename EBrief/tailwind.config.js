@@ -9,8 +9,8 @@ module.exports = {
                 primary: "#F0F0F0",
                 blue: "#2360DA",
                 "blue-hover": "#184cb5",
-                jade: "#016e44",
-                "jade-hover": "#005736",
+                jade: "#04b33b",
+                "jade-hover": "#02a134",
                 turquoise: "#028299",
                 "turquoise-hover": "#017185",
                 ceramic: "#3d0101",
@@ -18,7 +18,8 @@ module.exports = {
                 peach: "#DD8E75",
                 "peach-hover": "#C97C5D",
                 gunmetal: "#272D2D",
-                disabled: "#F2EDE9"
+                disabled: "#F2EDE9",
+                text: "#DDD"
             },
             fontFamily: {
                 'sans': ['Monserrat', ...defaultTheme.fontFamily.sans]

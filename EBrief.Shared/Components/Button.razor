@@ -1,4 +1,4 @@
-<button type="@Type" class="@style @ClassList px-4 py-1 rounded-md text-lg select-none @(loading || Disabled ? "!bg-gray-300 hover:!bg-gray-300" : "")"
+<button type="@Type" class="@style @ClassList px-4 py-1 rounded-md text-lg select-none @(loading || Disabled ? disabled : "")"
         @onclick=@HandleClick
         disabled="@(Disabled || loading)">
     @if (loading)
@@ -37,13 +37,20 @@
     private string style => Variant switch
     {
         ButtonTypes.Submit => "bg-blue text-primary hover:bg-blue-hover",
-        ButtonTypes.Cancel => "bg-red-500 text-white hover:bg-red-700",
-        ButtonTypes.Add => "bg-jade text-primary hover:bg-jade-hover",
+        ButtonTypes.Cancel => "bg-gray-500 text-white hover:bg-gray-600",
+        ButtonTypes.Add => "bg-jade text-white hover:bg-jade-hover",
         ButtonTypes.Open => "bg-turquoise text-primary hover:bg-turquoise-hover",
         ButtonTypes.Close => "bg-ceramic text-primary hover:bg-peach-hover",
+        ButtonTypes.Delete => "bg-transparent text-red-500 border border-red-500 hover:bg-red-500 hover:text-text",
         ButtonTypes.Tab => "bg-gray-200 text-black hover:bg-gray-300",
         ButtonTypes.TabActive => "bg-blue text-primary hover:bg-blue-hover",
         _ => "bg-blue text-primary hover:bg-blue-hover"
+    };
+
+    private string disabled => Variant switch
+    {
+        ButtonTypes.Delete => "!text-gray-300 !border-gray-300 hover:!text-gray-300 hover:!bg-transparent",
+        _ => "!bg-gray-300 hover:!bg-gray-300"
     };
 
     private async Task HandleClick()

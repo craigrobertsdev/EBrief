@@ -12,24 +12,24 @@
         var courtSitting = CourtSittings[idx];
         <li class="tree">
             <div id="court-sitting-@idx" class="text-lg relative text-center font-bold">
-                <p class="mt-2 py-1 text-center border-gunmetal bg-emerald-400 hover:bg-slate-300 active:bg-slate-400"
+                <p class="mt-2 py-1 text-center border-gunmetal bg-blue text-text hover:bg-blue-hover active:bg-slate-400"
                    @onclick="() => ToggleCourtSitting(courtSitting, idx)">
                     @courtSitting.Name
                 </p>
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
                     {
-                        <li class="relative text-sm font-semibold text-left lg:text-lg p-1 first:border-t
-                            border-b border-slate-300 active:bg-slate-400
+                        <li class="relative text-sm text-left lg:text-base font-medium p-1 first:border-t
+                            border-b border-gunmetal active:bg-slate-400
                             @(Parent.IsSelected(defendant) ? IsSelected : NotSelected)"
                             @onclick="() => Parent.ActivateDefendant(defendant)">
                             @if (defendant.ListStart == defendant.ListEnd)
                             {
-                                <span class="float-left pr-1">@(defendant.ListStart).</span>
+                                <span class="float-left pr-1 font-medium">@(defendant.ListStart).</span>
                             }
                             else
                             {
-                                <span class="float-left pr-1">@(defendant.ListStart)-@(defendant.ListEnd).</span>
+                                <span class="float-left pr-1 font-medium">@(defendant.ListStart)-@(defendant.ListEnd).</span>
                             }
                             <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
                                title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">

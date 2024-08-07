@@ -13,13 +13,13 @@
             <h1>Choose an option to get started</h1>
         </div>
         <div class="grid grid-cols-3 gap-3">
-            <Button Variant="ButtonTypes.Add" OnClick="OpenNewCourtListDialog">
+            <Button Variant="ButtonTypes.Submit" OnClick="OpenNewCourtListDialog">
                 Add New Court List
             </Button>
-            <Button OnClick="OpenPreviousCourtListDialog">
+            <Button Variant="ButtonTypes.Submit" OnClick="OpenPreviousCourtListDialog">
                 Load Previous Court List
             </Button>
-            <Button Variant="ButtonTypes.Open" OnClick="LoadCourtListFromFile">
+            <Button Variant="ButtonTypes.Submit" OnClick="LoadCourtListFromFile">
                 Open Court List From File
             </Button>
         </div>
@@ -35,38 +35,38 @@
 </div>
 
 <dialog id="new-court-list" @ref="NewCourtListDialog" class="p-5 w-[750px] h-[430px]">
-@if (!EnterManually)
-{
-    <h3 class="text-lg font-semibold text-center pb-2 underline">Select a landscape list to load</h3>
-    <div class="grid grid-cols-[0.6fr_1fr] gap-4 pt-2 pb-4 w-lg max-w-lg m-auto items-center">
-        <Button Variant="ButtonTypes.Submit" OnClick="async () => await SelectFile()" Disabled="@(_loadingCourtList || EnterManually)">Choose a file</Button>
-        <div class="border border-black rounded-md p-1 overflow-hidden h-9 @(EnterManually ? "bg-gray-200 text-gray-200" : "")">
-            @if (SelectedFile is null)
-            {
-                <span class="font-semibold ">No file selected</span>
-            }
-            else
-            {
-                <span class="font-semibold whitespace-nowrap text-clip">@Path.GetFileName(SelectedFile)</span>
-            }
-        </div>
-
-        <p class="text-lg text-center pb-2">Select a court room</p>
-        <select value="@CourtListBuilder.CourtRoom" @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(LandscapeList == null || EnterManually)">
-            <option selected hidden disabled></option>
-            @if (LandscapeList is not null)
-            {
-                foreach (var courtRoom in LandscapeList.Select(cl => cl.CourtRoom))
+    @if (!EnterManually)
+    {
+        <h3 class="text-lg font-semibold text-center pb-2 underline">Select a landscape list to load</h3>
+        <div class="grid grid-cols-[0.6fr_1fr] gap-4 pt-2 pb-4 w-lg max-w-lg m-auto items-center">
+            <Button Variant="ButtonTypes.Submit" OnClick="async () => await SelectFile()" Disabled="@(_loadingCourtList || EnterManually)">Choose a file</Button>
+            <div class="border border-black rounded-md p-1 overflow-hidden h-9 @(EnterManually ? "bg-gray-200 text-gray-200" : "")">
+                @if (SelectedFile is null)
                 {
-                    <option value="@courtRoom">@courtRoom</option>
+                    <span class="font-semibold ">No file selected</span>
                 }
-            }
-        </select>
-        <p class="text-lg text-center pb-2">Include documents?</p>
-        <select @onchange="HandleIncludeDocuments" class="border border-black p-2 rounded-md">
-            <option value="true">Yes</option>
-            <option selected value="false">No</option>
-        </select>
+                else
+                {
+                    <span class="font-semibold whitespace-nowrap text-clip">@Path.GetFileName(SelectedFile)</span>
+                }
+            </div>
+
+            <p class="text-lg text-center pb-2">Select a court room</p>
+            <select value="@CourtListBuilder.CourtRoom" @onchange=HandleSelectCourtRoom class="border border-black p-2 rounded-md disabled:bg-gray-200" disabled="@(LandscapeList == null || EnterManually)">
+                <option selected hidden disabled></option>
+                @if (LandscapeList is not null)
+                {
+                    foreach (var courtRoom in LandscapeList.Select(cl => cl.CourtRoom))
+                    {
+                        <option value="@courtRoom">@courtRoom</option>
+                    }
+                }
+            </select>
+            <p class="text-lg text-center pb-2">Include documents?</p>
+            <select @onchange="HandleIncludeDocuments" class="border border-black p-2 rounded-md">
+                <option value="true">Yes</option>
+                <option selected value="false">No</option>
+            </select>
         </div>
     }
     else
@@ -107,13 +107,13 @@
     }
 
     <div class="flex w-full col-span-2 justify-center gap-6 pb-4">
-        <Button OnClick="SubmitNewCourtListForm" Disabled="@(_loadingCourtList || !NewCourtListParametersAreValid())">
+        <Button Variant="ButtonTypes.Add" OnClick="SubmitNewCourtListForm" Disabled="@(_loadingCourtList || !NewCourtListParametersAreValid())">
             Confirm
         </Button>
         <Button Variant="ButtonTypes.Cancel" OnClick="CloseLoadNewCourtListDialog">
             Cancel
         </Button>
-        <Button Variant="ButtonTypes.Add" OnClick="@(ToggleManualCourtListEntry)">
+        <Button Variant="ButtonTypes.Submit" OnClick="@(ToggleManualCourtListEntry)">
             @(EnterManually ? "Create with landscape list" : "Enter manually?")
         </Button>
     </div>
@@ -128,7 +128,6 @@
     {
         <Radzen.Blazor.RadzenProgressBarCircular Mode="Radzen.ProgressBarMode.Indeterminate" ShowValue=false />
     }
-
     else
     {
         <div class="border border-black mb-2 w-[300px] h-[300px]">
@@ -142,7 +141,7 @@
             {
                 @foreach (var courtList in PreviousCourtListEntries!)
                 {
-                    <div class="flex justify-between border-b border-black select-none @(courtList == SelectedCourtListEntry ? "bg-blue text-primary hover:bg-blue hover:text-primary" : "hover:bg-slate-300 hover:text-black ")">
+                    <div class="flex justify-between border-b border-black font-medium select-none @(courtList == SelectedCourtListEntry ? "bg-blue text-text hover:bg-blue hover:text-primary" : "hover:bg-slate-300 hover:text-black ")">
                         <p class="text-lg text-center p-1 flex-grow cursor-default"
                            @onclick=@(() => HandleSelectCourtListEntry(courtList))>
                             @courtList.CourtDate.ToShortDateString() - @courtList.CourtCode Court @courtList.CourtRoom
@@ -156,16 +155,19 @@
     <div class="flex w-full justify-center gap-3">
         @if (PreviousCourtListEntries?.Count != 0)
         {
-            <Button OnClick="LoadPreviousCourtList">
+            <Button Variant="ButtonTypes.Add" OnClick="LoadPreviousCourtList">
                 Confirm
-            </Button>
-            <Button Variant="ButtonTypes.Close" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtListEntry == null)>
-                Delete
             </Button>
         }
         <Button Variant="ButtonTypes.Cancel" OnClick="ClosePreviousCourtListDialog">
             Cancel
         </Button>
+        @if (PreviousCourtListEntries?.Count != 0)
+        {
+            <Button Variant="ButtonTypes.Delete" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtListEntry == null)>
+                Delete
+            </Button>
+        }
     </div>
 </dialog>
 
