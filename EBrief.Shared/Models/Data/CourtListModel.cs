@@ -73,11 +73,11 @@ public class CourtListModel
             var d1 = CaseFiles[i].Defendant;
             var d2 = caseFiles[i].Defendant;
 
-            d1.OffenderHistory = d2.OffenderHistory;
             d1.DateOfBirth = d2.DateOfBirth;
             d1.Phone = d2.Phone;
             d1.Email = d2.Email;
             d1.Address = d2.Address;
+            d1.OffenderHistory = d2.OffenderHistory;
             d1.BailAgreements = d2.BailAgreements;
             d1.InterventionOrders = d2.InterventionOrders;
         }
