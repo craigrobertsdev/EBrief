@@ -68,4 +68,4 @@ If you would like to discuss this project further, please contact me at craig.ro
 
 ## Licence
 
-This application is subject to the Creative Commons Licence v1.0 Universal.
+This application is subject to the GNU Public Licence v2.0.
