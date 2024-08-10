@@ -134,6 +134,10 @@ public class CourtListParser
         }
         /*************************************/
 
+
+        //elements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
+        caseFile.OffenceDetails = elements[5].InnerText.Split("/ ").Select(o => o.Trim()).ToArray();
+
         // elements[6] && elements[7]
         if (elements[6].InnerText != string.Empty)
         {
@@ -145,9 +149,6 @@ public class CourtListParser
             caseFile.Counsel = counsel;
         }
 
-        //elements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
-        caseFile.OffenceDetails = elements[5].InnerText.Split("/ ").Select(o => o.Trim()).ToArray();
-
         //elements[8] = "Hearing"
         caseFile.HearingType = elements[8].InnerText;
 
@@ -156,12 +157,6 @@ public class CourtListParser
 
         courtList.CaseFiles.Add(caseFile);
         pos++;
-    }
-
-    private string[] SplitOffenceDetails(string offenceText)
-    {
-        var offences = offenceText.Split("/ ");
-        return offences;
     }
 
     private CourtIdentifiers SplitCourtIdentifiers(string text)
@@ -173,7 +168,7 @@ public class CourtListParser
         // "3. MCCRM-24-016760(H3617790B)First Appearances"
         // "3. MCCRM-24-016760First Appearances"
         int idTextPos = text.IndexOf('.');
-        int listNo = Int32.Parse(text[0..idTextPos]);
+        int listNo = int.Parse(text[0..idTextPos]);
         idTextPos++; // skip the '.' after the list number
         while (text[idTextPos] == ' ')
         {
