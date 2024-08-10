@@ -278,7 +278,7 @@ public partial class Home
                 return;
             }
 
-            if (courtList.CaseFiles is not null)
+            if (courtList.CaseFiles.Count > 0)
             {
                 courtList.CombineCaseFiles(caseFiles);
                 courtList.CombineDefendantsWithServerResponse(caseFiles);
@@ -286,6 +286,7 @@ public partial class Home
             else
             {
                 courtList.CaseFiles = caseFiles;
+                courtList.OrderAndAssignListingNumbers();
             }
 
             try

@@ -2,7 +2,7 @@
 
 <div class="float-right relative">
     <Button Class="rounded-none dropdown-btn py-2" @onclick=@(ToggleDropdown)>
-        Click me
+        @Text
     </Button>
 
     <div id="dropdown" class="@(IsOpen ? "block" : "hidden") absolute right-0 z-10 bg-white w-max shadow-menu rounded-md py-2">

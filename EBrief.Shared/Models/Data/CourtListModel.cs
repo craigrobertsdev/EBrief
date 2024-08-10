@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using EBrief.Shared.Models.Shared;
+﻿using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Models.UI;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -109,6 +108,16 @@ public class CourtListModel
             }
         }
 
+    }
+
+    public void OrderAndAssignListingNumbers()
+    {
+        CaseFiles.Sort((a, b) => a.Schedule.Last().HearingDate.CompareTo(b.Schedule.Last().HearingDate));
+        int listNo = 1;
+        foreach (var caseFile in CaseFiles)
+        {
+            caseFile.ListNumber = listNo++;
+        }
     }
 
     public string SerialiseToJson()

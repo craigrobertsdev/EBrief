@@ -56,13 +56,11 @@ dotnet run
 
 <br>
 
-3. The first time you launch the application, you will need to generate a court list by clicking on the `Load New Court List` button. Fill in the information in the dropdowns (it is all test data so you can choose any option) and provide a list of unique numbers separated by spaces or line breaks. A sample list is stored [here](https://github.com/craigrobertsdev/EBrief/blob/main/sample-case-numbers.txt).
+3. The first time you launch the application, you will need to generate a court list by clicking on the `Add New Court List` button. As the landscape lists used by this application are not public documents, you will need to click the `Enter manually?` button. <br><br>Fill in the information in the dropdowns (it is all test data so you can choose any option) and provide a list of unique numbers separated by spaces or line breaks. A sample list is stored [here](https://github.com/craigrobertsdev/EBrief/blob/main/sample-case-numbers.txt).
 
 ![Home screen](https://github.com/craigrobertsdev/EBrief/blob/main/Images/Home%20Screen.png)
 
 ![Information screen](https://github.com/craigrobertsdev/EBrief/blob/main/Images/Information%20screen.png)
-
-![Correspondence screen](https://github.com/craigrobertsdev/EBrief/blob/main/Images/Correspondence%20screen.png)
 
 ## Questions
 
