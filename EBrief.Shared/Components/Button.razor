@@ -1,4 +1,4 @@
-<button type="@Type" class="@style @ClassList px-4 py-1 rounded-md text-lg select-none @(loading || Disabled ? disabled : "")"
+<button type="@Type" class="@style @Class px-4 py-1 rounded-md text-lg select-none @(loading || Disabled ? disabled : "")"
         @onclick=@HandleClick
         disabled="@(Disabled || loading)">
     @if (loading)
@@ -30,7 +30,7 @@
     public string Type { get; set; } = string.Empty;
 
     [Parameter]
-    public string ClassList { get; set; } = string.Empty;
+    public string Class { get; set; } = string.Empty;
 
     private bool loading = false;
 

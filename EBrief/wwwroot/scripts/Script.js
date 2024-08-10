@@ -1,6 +1,12 @@
 let currentDialog = null;
 let dialogReference = null;
 
+window.onclick = function (event) {
+    if (!event.target.matches('.dropdown-btn')) {
+        let dropdowns = document.getElementsByClassName("dropdown-content");
+    }
+}
+
 function openDialog(element, objRef) {
     currentDialog = element;
     dialogReference = objRef;
@@ -47,6 +53,11 @@ function setTooltipPosition(id) {
     } else {
         return caseFileCard.offsetLeft - container.scrollLeft;
     }
+}
+
+function dropdownIsOpen() {
+    const dropdown = document.getElementById("dropdown");
+    return dropdown.classList.contains("block");
 }
 
 function scrollToBottomOfCourtSitting(id) {

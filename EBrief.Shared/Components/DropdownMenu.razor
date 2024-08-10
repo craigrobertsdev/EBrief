@@ -1,0 +1,23 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="float-right relative">
+    <Button Class="rounded-none dropdown-btn py-2" @onclick=@(ToggleDropdown)>
+        Click me
+    </Button>
+
+    <div id="dropdown" class="@(IsOpen ? "block" : "hidden") absolute right-0 z-10 bg-white w-max shadow-menu rounded-md py-2">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public string Text { get; set; } = default!;
+    private bool IsOpen { get; set; }
+
+    private async Task ToggleDropdown()
+    {
+        var isOpen = await JSRuntime.InvokeAsync<bool>("dropdownIsOpen");
+        IsOpen = !isOpen;
+    }
+}

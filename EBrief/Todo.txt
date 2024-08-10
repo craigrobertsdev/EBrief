@@ -12,12 +12,15 @@ FUNCTIONALITY:
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back
 		* research the outbox pattern
 	- Use cancellation tokens to cancel requesting both court lists and documents
-	- Add all courts to the list of courts
+	- Add all courts to the list of court	
 	- Think of a way to represent regional courts where they only have 1 court room
 	- Implement OAuth2
 	- Add auth tokens and use them to send requests and populate user data for CFEL updates:
 		* CaseFileEnquiryLogEntry constructor needs to accept a user rather than a string
 		* Follow ups page needs to be updated to use the user
+	- Templates for court updates
+		* Add the judicial officer and some template text like "COURT UPDATE" in an editable text field so every entry can be quickly started for prosecutors to do an update.
+		* If admin are coming to court to assist with court lists, they should be provided with the same court list to so they can do updates to CFELs. Follow up tasks should be able to be created for the prosecutor they are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 

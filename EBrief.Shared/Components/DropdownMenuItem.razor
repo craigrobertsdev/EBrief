@@ -1,0 +1,8 @@
+﻿<div class="py-2 px-4 hover:bg-slate-200 active:bg-slate-300 cursor-pointer" @onclick=@OnClick>
+    @Text
+</div>
+
+@code {
+    [Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClick { get; set; }
+}

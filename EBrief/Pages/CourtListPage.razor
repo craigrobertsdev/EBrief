@@ -14,7 +14,9 @@
 @if (_error is not null)
 {
     <p>@_error</p>
-    <RadzenButton Text="Back to start" Click="HandleReturnHome" />
+    <Button OnClick="HandleReturnHome">
+        Back to start
+    </Button>
 }
 
 else if (_loading)
@@ -62,14 +64,12 @@ else
 
                     @* Court List Menu *@
                     <div class="max-w-2xl">
-                        <RadzenMenu Style="margin: 5px 5px 0 0">
-                            <RadzenMenuItem Style="padding: 3px 6px;" Text="Menu">
-                                <RadzenMenuItem Text="Add Case Files" Click="OpenAddCaseFilesDialog" />
-                                <RadzenMenuItem Text="Save" Click="SaveCourtList" />
-                                <RadzenMenuItem Text="Export Court List" Click="ExportCourtList" />
-                                <RadzenMenuItem Text="Return Home" Click="HandleReturnHome" />
-                            </RadzenMenuItem>
-                        </RadzenMenu>
+                        <DropdownMenu Text="Menu">
+                            <DropdownMenuItem Text="Save" OnClick="SaveCourtList" />
+                            <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCaseFilesDialog" />
+                            <DropdownMenuItem Text="Export Court List" OnClick="ExportCourtList" />
+                            <DropdownMenuItem Text="Return Home" OnClick="HandleReturnHome" />
+                        </DropdownMenu>
                     </div>
                 </div>
             }

@@ -12,14 +12,14 @@
         var courtSitting = CourtSittings[idx];
         <li class="tree">
             <div id="court-sitting-@idx" class="text-lg relative text-center font-bold">
-                <p class="mt-2 py-1 text-center border-gunmetal bg-blue text-text hover:bg-blue-hover active:bg-slate-400"
+                <p class="mt-2 py-1 text-center border-gunmetal bg-slate-300 text-black hover:bg-slate-400 active:bg-slate-500"
                    @onclick="() => ToggleCourtSitting(courtSitting, idx)">
                     @courtSitting.Name
                 </p>
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
                     {
-                        <li class="relative text-sm text-left lg:text-base font-medium p-1 first:border-t
+                        <li class="relative text-sm text-left lg:text-base font-medium p-1 first:mt-[1px] first:hover:mt-0 first:hover:border-t 
                             border-b border-gunmetal active:bg-slate-400
                             @(Parent.IsSelected(defendant) ? IsSelected : NotSelected)"
                             @onclick="() => Parent.ActivateDefendant(defendant)">

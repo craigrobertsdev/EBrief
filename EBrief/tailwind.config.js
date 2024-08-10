@@ -23,6 +23,9 @@ module.exports = {
             },
             fontFamily: {
                 'sans': ['Monserrat', ...defaultTheme.fontFamily.sans]
+            },
+            boxShadow: {
+                'menu': "0px 8px 16px 0px rgba(0,0,0,0.2)"
             }
         },
     },
