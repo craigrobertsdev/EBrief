@@ -35,6 +35,7 @@ public partial class CourtListPage : ICourtListPage
 
     protected override async Task OnInitializedAsync()
     {
+        await JSRuntime.InvokeVoidAsync("addSearchEventHandler");
         HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
@@ -171,7 +172,7 @@ public partial class CourtListPage : ICourtListPage
         }
         else
         {
-            NavManager.NavigateTo("/");
+            ReturnHome();
         }
     }
 
@@ -181,8 +182,9 @@ public partial class CourtListPage : ICourtListPage
         NavManager.NavigateTo("/");
     }
 
-    private void ReturnHome()
+    private async void ReturnHome()
     {
+        await JSRuntime.InvokeVoidAsync("removeSearchEventHandler");
         NavManager.NavigateTo("/");
     }
 

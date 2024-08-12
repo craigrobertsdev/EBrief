@@ -25,7 +25,7 @@ const onEscapePressed = (e, element) => {
         return;
     }
 
-    if (currentDialog.id === "new-court-list") { 
+    if (currentDialog.id === "new-court-list") {
         if (dialogReference !== null) {
             dialogReference.invokeMethodAsync("CloseLoadNewCourtListDialog");
         }
@@ -73,4 +73,22 @@ function scrollToBottomOfCourtSitting(id) {
     // set the scrolltop to the height of the offsetHeight - view port height
     let courtSittingOffset = courtSitting.offsetTop;
     let viewPortHeight = container.clientHeight;
+}
+
+const handleSearch = (event) => {
+    if (!(event.key === "f" && event.ctrlKey) || !event.key === "F3") {
+        return;
+    }
+
+    event.preventDefault();
+    const searchDialog = document.getElementById("search-dialog");
+    openDialog(searchDialog, null);
+}
+
+function addSearchEventHandler() {
+    window.addEventListener("keydown", handleSearch);
+}
+
+function removeSearchEventHandler() {
+    window.removeEventListener("keydown", handleSearch);
 }
