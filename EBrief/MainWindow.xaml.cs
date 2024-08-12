@@ -44,7 +44,7 @@ public partial class MainWindow : Window
                 options.UseSqlite($"Filename={dbPath}");
                 options.EnableSensitiveDataLogging();
             });
-            serviceCollection.AddScoped<IDataAccess, CourtListDataAccess>();
+            serviceCollection.AddScoped<IDataAccess, DataAccess>();
             serviceCollection.AddScoped<IFileService, FileService>();
             serviceCollection.AddSingleton(new AppState());
 
