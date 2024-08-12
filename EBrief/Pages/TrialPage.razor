@@ -1,0 +1,138 @@
+﻿@page "/trial"
+
+@using EBrief.Shared.Components
+@using EBrief.Shared.Models
+@using EBrief.Shared.Models.UI
+@using EBrief.Shared.Pages
+@using Microsoft.JSInterop
+@using Radzen
+@using Radzen.Blazor
+@using System.Text
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+@if (_error is not null)
+{
+    <p>@_error</p>
+    <Button OnClick="HandleReturnHome">
+        Back to start
+    </Button>
+}
+
+else if (_loading)
+{
+    <div class="w-full h-full flex justify-center items-center">
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+    </div>
+}
+else
+{
+    <CascadingValue Value="this">
+        <div class="h-full grid grid-cols-[225px_1fr] laptop:grid-cols-[300px_1fr] grid-rows-[auto_1fr] pt-2">
+            @* Defendant column *@
+            <div id="defendant-container" class="row-span-2 overflow-auto max-h-full pl-2">
+                <div class="flex flex-col mr-2 h-full">
+                    <TreeView CourtSittings="CourtSessions" />
+                </div>
+            </div>
+
+            @* Court List Menu *@
+            <div class="max-w-2xl flex items-center">
+                <DropdownMenu Text="Menu">
+                    <DropdownMenuItem Text="Save" OnClick="SaveCourtList" />
+                    <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCaseFilesDialog" />
+                    <DropdownMenuItem Text="Export Court List" OnClick="ExportCourtList" />
+                    <DropdownMenuItem Text="Return Home" OnClick="HandleReturnHome" />
+                </DropdownMenu>
+            </div>
+        </div>
+
+        <div class="h-full ml-2">
+            <TabControl>
+                <TabPage Title="CFEL">
+                    <CfelPage />
+                </TabPage>
+                <TabPage Title="Information">
+                    <InformationPage />
+                </TabPage>
+                <TabPage Title="Facts of Charge">
+                    <FactsOfChargePage />
+                </TabPage>
+                <TabPage Title="Offender History">
+                    <OffenderHistoryPage />
+                </TabPage>
+                <TabPage Title="Correspondence">
+                    <CorrespondencePage />
+                </TabPage>
+                <TabPage Title="Evidence">
+                    <EvidencePage />
+                </TabPage>
+                <TabPage Title="Orders">
+                    <OrdersPage />
+                </TabPage>
+                <TabPage Title="Additional Info">
+                    <AdditionalInfoPage />
+                </TabPage>
+                <TabPage Title="Schedule">
+                    <SchedulePage />
+                </TabPage>
+                <TabPage Title="Follow-Ups">
+                    <FollowUpsPage />
+                </TabPage>
+                <TabPage Title="Notes">
+                    <NotesPage />
+                </TabPage>
+            </TabControl>
+        </div>
+    </CascadingValue>
+}
+
+<dialog @ref="_unsavedChangesDialog" class="p-5">
+    <h3 class="text-lg pb-2">You have unsaved changes. Do you want to save them before returning home?</h3>
+    <div class="flex w-full justify-center gap-3">
+        <RadzenButton Text="Yes" Click="SaveChanges" />
+        <RadzenButton Text="No" Click="ReturnHome" />
+        <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog" />
+    </div>
+</dialog>
+
+<dialog @ref="_addCaseFilesDialog" class="p-5">
+    @if (_loadingNewCaseFiles)
+    {
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+    }
+    else
+    {
+        <h3 class="text-lg text-center pb-2">
+            Enter the case file numbers you want to add, separated by a space or new line
+        </h3>
+        <div class="w-full pb-4">
+            <textarea @bind="@CaseFilesToAdd" rows="10" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
+        </div>
+        <div class="flex w-full justify-end gap-3 pb-2">
+            <RadzenButton Text="Add" Click="AddCaseFiles" />
+            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCaseFilesDialog" />
+        </div>
+
+        @if (_addCaseFilesError is not null)
+        {
+            <p class="text-red-500 text-center text-lg">@_addCaseFilesError</p>
+        }
+    }
+</dialog>
+
+ @* <dialog id="search-dialog">
+     <h1>This is the search box</h1>
+     <input @oninput="SearchCaseFiles" />
+     <p>
+         @foreach (var result in SearchResults)
+         {
+         <p>@result.CaseFileNumber</p>
+         }
+     </p>
+ </dialog> *@
+
+@code {
+
+}
