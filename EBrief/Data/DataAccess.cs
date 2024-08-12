@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EBrief.Data;
-public class CourtListDataAccess : IDataAccess
+public class DataAccess : IDataAccess
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<CourtListDataAccess> _logger;
+    private readonly ILogger<DataAccess> _logger;
     private readonly AppState _appState;
 
-    public CourtListDataAccess(ApplicationDbContext context, ILogger<CourtListDataAccess> logger, AppState appState)
+    public DataAccess(ApplicationDbContext context, ILogger<DataAccess> logger, AppState appState)
     {
         _context = context;
         _logger = logger;
