@@ -75,6 +75,22 @@ function scrollToBottomOfCourtSitting(id) {
     let viewPortHeight = container.clientHeight;
 }
 
+const deleteCourtListEntry = async (event, objRef) => {
+    if (!(event.key === "Delete")) {
+        return;
+    }
+
+    await objRef.invokeMethodAsync("OpenConfirmDialog");
+}
+
+function addDeleteEventHandler(objRef) {
+    window.addEventListener("keydown", (e) => deleteCourtListEntry(e, objRef));
+}
+
+function removeDeleteEventHandler() {
+    window.removeEventListener("keydown", deleteCourtListEntry);
+}
+
 const handleSearch = (event) => {
     if (!(event.key === "f" && event.ctrlKey) || !event.key === "F3") {
         return;

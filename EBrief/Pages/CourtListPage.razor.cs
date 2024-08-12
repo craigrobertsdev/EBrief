@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Radzen;
 using EBrief.Shared.Models.Shared;
+using EBrief.Shared.Services.Search;
 
 namespace EBrief.Pages;
 public partial class CourtListPage : ICourtListPage
@@ -15,12 +16,14 @@ public partial class CourtListPage : ICourtListPage
     [Inject] public IFileService FileService { get; set; } = default!;
     [Inject] public AppState AppState { get; set; } = default!;
     public HttpService HttpService { get; set; } = default!;
+    public SearchService SearchService { get; set; } = default!;
     private CourtList CourtList { get; set; } = default!;
     public List<CourtSession> CourtSessions { get; set; } = [];
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
     private bool IncludeDocuments { get; set; }
+    private List<CaseFile> SearchResults { get; set; } = [];
     private ElementReference? _unsavedChangesDialog { get; set; }
     private ElementReference? _addCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
@@ -58,6 +61,7 @@ public partial class CourtListPage : ICourtListPage
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
         CourtSessions = GenerateCourtSessions();
         ActivateDefendant(CourtSessions[0].Defendants.First());
+        SearchService = new(CourtList);
 
         AppState.CurrentCourtList = CourtList;
         _loading = false;
@@ -212,6 +216,14 @@ public partial class CourtListPage : ICourtListPage
             ActiveDefendant.ActiveCaseFile = caseFile;
         }
         ActivateDefendant(ActiveDefendant!);
+    }
+
+    private void SearchCaseFiles(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            SearchResults = SearchService.Find((string)e.Value);
+        }
     }
 
     public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;

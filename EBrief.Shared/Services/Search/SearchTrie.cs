@@ -8,13 +8,13 @@ public class SearchTrie
     {
         public char Key;
         public Dictionary<char, TrieNode> Children = [];
-        public NodeValue? Value;
+        public CaseFile? Value;
         public bool HasValue => Value != null;
     }
 
     public SearchTrie() => Root = new();
 
-    public void Insert(string key, NodeValue value)
+    public void Insert(string key, CaseFile value)
     {
         TrieNode current = Root;
         for (int i = 0; i < key.Length; i++)
@@ -26,15 +26,16 @@ public class SearchTrie
             else
             {
                 current.Children.Add(key[i], new TrieNode());
+                // update current here to the new TrieNode()?
             }
         }
 
         current.Value = value;
     }
 
-    public List<NodeValue> GetSearchResults(string key)
+    public List<CaseFile> GetSearchResults(string key)
     {
-        List<NodeValue> results = [];
+        List<CaseFile> results = [];
 
         TrieNode? current = Search(key);
         if (current is null) // key not found, return empty set
@@ -80,7 +81,7 @@ public class SearchTrie
      * if so, return.
      * Does this need a bool flag atMax, or will it have the maxCheck at the right point of the function?
      */
-    private static List<NodeValue> FindWords(TrieNode node, string key, List<NodeValue> results, int maxResults)
+    private static List<CaseFile> FindWords(TrieNode node, string key, List<CaseFile> results, int maxResults)
     {
         if (node.HasValue)
         {
@@ -109,17 +110,9 @@ public class SearchTrie
 public class NodeValue
 {
     public CaseFile? CaseFile { get; private set; }
-    public Defendant? Defendant { get; private set; }
 
     public NodeValue(CaseFile caseFile)
     {
         CaseFile = caseFile;
-        Defendant = null;
-    }
-
-    public NodeValue(Defendant defendant)
-    {
-        CaseFile = null;
-        Defendant = defendant;
     }
 }

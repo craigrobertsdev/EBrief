@@ -163,6 +163,13 @@ else
 
 <dialog id="search-dialog">
     <h1>This is the search box</h1>
+    <input @oninput="SearchCaseFiles" />
+    <p>
+        @foreach (var result in SearchResults)
+        {
+            <p>@result.CaseFileNumber</p>
+        }
+    </p>
 </dialog>
 
 @code {

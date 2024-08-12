@@ -31,6 +31,7 @@ public partial class Home
     private bool EnterManually { get; set; }
     private string? _error;
     private string? _loadNewCourtListError;
+    private bool _previousCourtListDialogIsOpen;
     private List<CourtListEntry>? PreviousCourtListEntries { get; set; }
     private CourtListEntry? SelectedCourtListEntry { get; set; }
 
@@ -72,6 +73,15 @@ public partial class Home
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var obj = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("addDeleteEventHandler", obj);
+        }
+    }
+
     private async Task OpenNewCourtListDialog()
     {
         if (NewCourtListDialog is not null)
@@ -82,8 +92,16 @@ public partial class Home
         }
     }
 
-    private async Task OpenConfirmDialog()
+    [JSInvokable]
+    public async Task OpenConfirmDialog()
     {
+        // this is to manage situations where the user presses delete while the PreviousCourtListDialog is not open.
+        // it is controlled by a JS keydown event listener
+        if (!_previousCourtListDialogIsOpen || PreviousCourtListEntries?.Count == 0)
+        {
+            return;
+        }
+
         if (ConfirmDialog is not null)
         {
             _error = null;
@@ -102,7 +120,7 @@ public partial class Home
                 return;
             }
 
-            NavManager.NavigateTo($"/court-list?courtCode={courtEntry.CourtCode}&courtDate={courtEntry.CourtDate}&courtRoom={courtEntry.CourtRoom}");
+            await NavigateToCourtList(courtEntry.CourtCode, courtEntry.CourtDate, courtEntry.CourtRoom);
         }
         catch (Exception e)
         {
@@ -131,7 +149,7 @@ public partial class Home
             }
 
             AppState.ApplicationLoaded();
-            NavManager.NavigateTo($"/court-list?courtCode={courtEntry.CourtCode}&courtDate={courtEntry.CourtDate}&courtRoom={courtEntry.CourtRoom}");
+            await NavigateToCourtList(courtEntry.CourtCode, courtEntry.CourtDate, courtEntry.CourtRoom);
         }
         catch (Exception e)
         {
@@ -139,8 +157,16 @@ public partial class Home
         }
     }
 
+    private async Task NavigateToCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom, bool? includeDocuments = null)
+    {
+        await JSRuntime.InvokeVoidAsync("removeDeleteEventHandler");
+        var incDocs = includeDocuments is not null ? $"&includeDocuments={includeDocuments!}" : string.Empty;
+        NavManager.NavigateTo($"/court-list?courtCode={courtCode}&courtDate={courtDate}&courtRoom={courtRoom}{incDocs}");
+    }
+
     private async Task OpenPreviousCourtListDialog()
     {
+        _previousCourtListDialogIsOpen = true;
         PreviousCourtListEntries = await DataAccess.GetSavedCourtLists();
         SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
 
@@ -305,7 +331,7 @@ public partial class Home
                 return;
             }
 
-            NavManager.NavigateTo($"/court-list/?newList=&courtCode={CourtListBuilder.CourtCode}&courtRoom={CourtListBuilder.CourtRoom}&courtDate={CourtListBuilder.CourtDate}&includeDocuments={IncludeDocuments}");
+            await NavigateToCourtList(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom, IncludeDocuments);
         }
         catch (HttpRequestException)
         {
