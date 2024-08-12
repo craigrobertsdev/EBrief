@@ -1,12 +1,15 @@
 ﻿@inject IJSRuntime JSRuntime
+@implements IDisposable
 
-<div class="float-right relative">
-    <Button Class="rounded-none dropdown-btn py-2" @onclick=@(ToggleDropdown)>
+<div class="float-right relative text-sm laptop:text-base">
+    <Button Id="dropdown-btn" Class="rounded-none dropdown-btn py-2 text-sm laptop:text-base" @onclick=@(ToggleDropdown)>
         @Text
     </Button>
 
     <div id="dropdown" class="@(IsOpen ? "block" : "hidden") absolute right-0 z-10 bg-white w-max shadow-menu rounded-md py-2">
-        @ChildContent
+        <CascadingValue Value="this">
+            @ChildContent
+        </CascadingValue>
     </div>
 </div>
 
@@ -15,9 +18,27 @@
     [Parameter] public string Text { get; set; } = default!;
     private bool IsOpen { get; set; }
 
-    private async Task ToggleDropdown()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var objRef = DotNetObjectReference.Create(this);
+        await JSRuntime.InvokeVoidAsync("addDropdownClickHandler", objRef);
+    }
+
+    internal async Task ToggleDropdown()
     {
         var isOpen = await JSRuntime.InvokeAsync<bool>("dropdownIsOpen");
         IsOpen = !isOpen;
+    }
+
+    [JSInvokable]
+    public void Close()
+    {
+        IsOpen = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Task.Run(() => JSRuntime.InvokeVoidAsync("removeDropdownClickHandler"));
     }
 }

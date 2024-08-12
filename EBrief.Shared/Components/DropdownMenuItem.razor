@@ -1,8 +1,15 @@
-﻿<div class="py-2 px-4 hover:bg-slate-200 active:bg-slate-300 cursor-pointer" @onclick=@OnClick>
+﻿<div class="py-2 px-4 hover:bg-slate-200 active:bg-slate-300 cursor-pointer" @onclick=@Click>
     @Text
 </div>
 
 @code {
+    [CascadingParameter] public DropdownMenu Parent { get; set; } = default!;
     [Parameter] public string Text { get; set; } = string.Empty;
     [Parameter] public EventCallback OnClick { get; set; }
+
+    private async Task Click()
+    {
+        await OnClick.InvokeAsync();
+        Parent.Close();
+    }
 }
