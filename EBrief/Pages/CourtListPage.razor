@@ -28,10 +28,10 @@ else if (_loading)
 else
 {
     <CascadingValue Value="this">
-        <div class="h-full grid grid-cols-[300px_1fr] grid-rows-[auto_1fr] pt-2">
+        <div class="h-full grid grid-cols-[225px_1fr] laptop:grid-cols-[300px_1fr] grid-rows-[auto_1fr] pt-2">
             @* Defendant column *@
             <div id="defendant-container" class="row-span-2 overflow-auto max-h-full pl-2">
-                <div class="flex flex-col mr-2 h-full ">
+                <div class="flex flex-col mr-2 h-full">
                     <TreeView CourtSittings="CourtSessions" />
                 </div>
             </div>
@@ -49,7 +49,8 @@ else
                             @foreach (var caseFile in ActiveDefendant.CaseFiles)
                             {
                                 <Tooltip Text="@GenerateCaseFileTooltipText(caseFile)" Id="@caseFile.CaseFileNumber">
-                                    <div class="border-r border-t border-b border-slate-500 font-normal min-w-[18ch] text-center @(IsSelected(caseFile) ? CaseFileSelected : CaseFileNotSelected)" @onclick="() => CaseFileChanged(caseFile)">
+                                    <div class="border-r border-t border-b border-slate-500 font-normal min-w-[18ch] text-center text-sm laptop:text-base
+                                        @(IsSelected(caseFile) ? CaseFileSelected : CaseFileNotSelected)" @onclick="() => CaseFileChanged(caseFile)">
                                         <p class="select-none">
                                             @caseFile.CaseFileNumber
                                         </p>
@@ -63,7 +64,7 @@ else
                     </div>
 
                     @* Court List Menu *@
-                    <div class="max-w-2xl">
+                    <div class="max-w-2xl flex items-center">
                         <DropdownMenu Text="Menu">
                             <DropdownMenuItem Text="Save" OnClick="SaveCourtList" />
                             <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCaseFilesDialog" />
@@ -167,7 +168,7 @@ else
     <p>
         @foreach (var result in SearchResults)
         {
-            <p>@result.CaseFileNumber</p>
+        <p>@result.CaseFileNumber</p>
         }
     </p>
 </dialog>

@@ -572,6 +572,12 @@ video {
   }
 }
 
+@media (min-width: 1360px) {
+  .container {
+    max-width: 1360px;
+  }
+}
+
 @media (min-width: 1536px) {
   .container {
     max-width: 1536px;
@@ -787,6 +793,10 @@ video {
   width: max-content;
 }
 
+.w-56 {
+  width: 14rem;
+}
+
 .min-w-56 {
   min-width: 14rem;
 }
@@ -883,6 +893,10 @@ video {
 
 .grid-cols-\[auto\2c _1fr\] {
   grid-template-columns: auto 1fr;
+}
+
+.grid-cols-\[225px_1fr\] {
+  grid-template-columns: 225px 1fr;
 }
 
 .grid-rows-\[1fr\2c _25px\] {
@@ -1240,6 +1254,11 @@ video {
   line-height: 1.25rem;
 }
 
+.text-md {
+  font-size: 15px;
+  line-height: 22px;
+}
+
 .font-bold {
   font-weight: 700;
 }
@@ -1330,11 +1349,6 @@ video {
   outline-style: solid;
 }
 
-.blur {
-  --tw-blur: blur(8px);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1345,10 +1359,6 @@ video {
 
 .first\:border-l:first-child {
   border-left-width: 1px;
-}
-
-.first\:border-t:first-child {
-  border-top-width: 1px;
 }
 
 .first\:border-slate-500:first-child {
@@ -1448,14 +1458,6 @@ video {
   border-top-width: 1px;
 }
 
-.first\:hover\:outline:hover:first-child {
-  outline-style: solid;
-}
-
-.first\:hover\:outline-1:hover:first-child {
-  outline-width: 1px;
-}
-
 .active\:bg-slate-300:active {
   --tw-bg-opacity: 1;
   background-color: rgb(203 213 225 / var(--tw-bg-opacity));
@@ -1476,20 +1478,28 @@ video {
   background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
-@media (min-width: 768px) {
-  .md\:text-base {
-    font-size: 1rem;
-    line-height: 1.5rem;
+@media (min-width: 1024px) {
+  .lg\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 }
 
-@media (min-width: 1024px) {
-  .lg\:text-base {
+@media (min-width: 1360px) {
+  .laptop\:w-56 {
+    width: 14rem;
+  }
+
+  .laptop\:grid-cols-\[300px_1fr\] {
+    grid-template-columns: 300px 1fr;
+  }
+
+  .laptop\:text-base {
     font-size: 1rem;
     line-height: 1.5rem;
   }
 
-  .lg\:text-lg {
+  .laptop\:text-lg {
     font-size: 1.125rem;
     line-height: 1.75rem;
   }

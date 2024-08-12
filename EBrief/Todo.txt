@@ -21,6 +21,7 @@ FUNCTIONALITY:
 	- Templates for court updates
 		* Add the judicial officer and some template text like "COURT UPDATE" in an editable text field so every entry can be quickly started for prosecutors to do an update.
 		* If admin are coming to court to assist with court lists, they should be provided with the same court list to so they can do updates to CFELs. Follow up tasks should be able to be created for the prosecutor they are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
+	- Make dropdown menu close when clicking out of the menu area
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 
@@ -33,6 +34,7 @@ STYLING:
 	
 TESTING:
 	- Add tests for models and data access where it makes sense
+	- Check that DotNetObjectReferences are being disposed of correctly
 
 NICE TO HAVES:
 	- Keyboard shortcuts
