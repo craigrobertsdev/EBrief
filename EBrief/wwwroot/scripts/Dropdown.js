@@ -5,7 +5,8 @@ function dropdownIsOpen() {
 }
 
 const closeDropDownOnClickOut = (event) => {
-    if (!event.target.matches('.dropdown-btn')) {
+    const target = event.target;
+    if (!event.target.matches('[dropdown-btn]')) {
         dropdownRef.invokeMethodAsync("Close");
     }
 }

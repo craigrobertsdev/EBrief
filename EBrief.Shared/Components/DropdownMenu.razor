@@ -1,8 +1,8 @@
 ﻿@inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<div class="float-right relative text-sm laptop:text-base">
-    <Button Id="dropdown-btn" Class="rounded-none dropdown-btn py-2 text-sm laptop:text-base" @onclick=@(ToggleDropdown)>
+<div dropdown-btn class="float-right relative text-sm laptop:text-base">
+    <Button Class="rounded-none dropdown-btn py-2 text-sm laptop:text-base" @onclick=@(ToggleDropdown)>
         @Text
     </Button>
 
