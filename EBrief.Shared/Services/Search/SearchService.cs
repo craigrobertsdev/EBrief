@@ -15,7 +15,7 @@ public class SearchService
             cf.CaseFileNumber = cf.CaseFileNumber.ToLower();
             cf.CourtFileNumber = cf.CourtFileNumber?.ToLower();
         }
-        _caseFiles = caseFiles.ToArray();
+        _caseFiles = [.. caseFiles];
     }
 
     public List<SearchResult> Find(string key)
@@ -28,15 +28,10 @@ public class SearchService
                 break;
             }
 
-            if (caseFile.CaseFileNumber.Contains(key))
+            if (caseFile.CaseFileNumber.Contains(key) || 
+                (caseFile.CourtFileNumber is not null && caseFile.CourtFileNumber!.Contains(key)))
             {
-                results.Add(new(caseFile, key));
-                continue;
-            }
-
-            if (caseFile.CourtFileNumber is not null && caseFile.CourtFileNumber!.Contains(key))
-            {
-                results.Add(new(caseFile, key));
+                results.Add(new(SearchTrie.Find(caseFile.CaseFileNumber), key));
                 continue;
             }
         }

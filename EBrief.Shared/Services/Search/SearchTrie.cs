@@ -37,9 +37,19 @@ public class SearchTrie
         current.Value = value;
     }
 
-    public List<SearchResult> GetSearchResults(string key)
+    /// <summary>
+    /// Used in SearchService when the existence of the casefile is already known
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public CaseFile Find(string key)
     {
-        List<SearchResult> results = [];
+        return Search(key)!.Value!;
+    }
+
+    public List<CaseFile> GetSearchResults(string key)
+    {
+        List<CaseFile> results = [];
 
         TrieNode? current = Search(key);
         if (current is null) // key not found, return empty set
@@ -48,7 +58,7 @@ public class SearchTrie
         }
         else if (current.HasValue) // key exists so return only that key
         {
-            results.Add(new SearchResult(current.Value!, key));
+            results.Add(current.Value!);
         }
         else // build list of child nodes that branch off the endpoint of key and return them
         {
@@ -85,11 +95,11 @@ public class SearchTrie
      * if so, return.
      * Does this need a bool flag atMax, or will it have the maxCheck at the right point of the function?
      */
-    private static List<SearchResult> FindWords(TrieNode node, string key, List<SearchResult> results, int maxResults)
+    private static List<CaseFile> FindWords(TrieNode node, string key, List<CaseFile> results, int maxResults)
     {
         if (node.HasValue)
         {
-            results.Add(new SearchResult(node.Value!, key));
+            results.Add(node.Value!);
             if (results.Count == maxResults)
             {
                 return results;
@@ -108,15 +118,5 @@ public class SearchTrie
     {
         // this needs to be implemented when the ability to delete case files from the court list is implemented
         throw new NotImplementedException();
-    }
-}
-
-public class NodeValue
-{
-    public CaseFile? CaseFile { get; private set; }
-
-    public NodeValue(CaseFile caseFile)
-    {
-        CaseFile = caseFile;
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.JSInterop;
 using Radzen;
 using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Services.Search;
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
 
 namespace EBrief.Pages;
 public partial class CourtListPage : ICourtListPage
@@ -26,6 +27,7 @@ public partial class CourtListPage : ICourtListPage
     private List<SearchResult> SearchResults { get; set; } = [];
     private ElementReference? _unsavedChangesDialog { get; set; }
     private ElementReference? _addCaseFilesDialog { get; set; }
+    private ElementReference? _searchDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
@@ -38,7 +40,7 @@ public partial class CourtListPage : ICourtListPage
 
     protected override async Task OnInitializedAsync()
     {
-        await JSRuntime.InvokeVoidAsync("addSearchEventHandler");
+        await JSRuntime.InvokeVoidAsync("addSearchEventHandler", DotNetObjectReference.Create(this));
         HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
@@ -224,6 +226,21 @@ public partial class CourtListPage : ICourtListPage
         {
             SearchResults = SearchService.Find((string)e.Value);
         }
+    }
+
+    [JSInvokable]
+    public async void OpenSearchDialog()
+    {
+        var caseFiles = CourtList.GetCaseFiles(10);
+        SearchResults = caseFiles.Select(cf => new SearchResult(cf, "")).ToList();
+        await JSRuntime.InvokeVoidAsync("openDialog", _searchDialog);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void CloseSearchDialog()
+    {
+        SearchResults.Clear();
     }
 
     public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;

@@ -1,5 +1,6 @@
 let currentDialog = null;
 let dialogReference = null;
+let courtListPageReference = null;
 
 function openDialog(element, objRef) {
     currentDialog = element;
@@ -19,9 +20,16 @@ const onEscapePressed = (e, element) => {
         return;
     }
 
-    if (currentDialog.id === "new-court-list") {
+    if (currentDialog.id === "new-court-list-dialog") {
         if (dialogReference !== null) {
             dialogReference.invokeMethodAsync("CloseLoadNewCourtListDialog");
+        }
+    }
+    else if (currentDialog.id === "search-dialog") {
+        if (courtListPageReference !== null) {
+            const searchField = document.getElementById("search-field");
+            searchField.value = "";
+            courtListPageReference.invokeMethodAsync("CloseSearchDialog");
         }
     }
 
@@ -87,10 +95,12 @@ const handleSearch = (event) => {
 
     event.preventDefault();
     const searchDialog = document.getElementById("search-dialog");
-    openDialog(searchDialog, null);
+
+    courtListPageReference.invokeMethodAsync("OpenSearchDialog");
 }
 
-function addSearchEventHandler() {
+function addSearchEventHandler(courtListPageRef) {
+    courtListPageReference = courtListPageRef;
     window.addEventListener("keydown", handleSearch);
 }
 

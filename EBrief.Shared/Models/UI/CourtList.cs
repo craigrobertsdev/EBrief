@@ -53,4 +53,19 @@ public class CourtList
 
         return caseFiles;
     }
+
+    public List<CaseFile> GetCaseFiles(int amount)
+    {
+        var caseFiles = new List<CaseFile>();
+        foreach (var defendant in Defendants)
+        {
+            caseFiles.AddRange(defendant.CaseFiles);
+            if (caseFiles.Count == amount)
+            {
+                break;
+            }
+        }
+
+        return caseFiles;
+    }
 }
