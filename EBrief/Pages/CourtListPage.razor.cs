@@ -23,7 +23,7 @@ public partial class CourtListPage : ICourtListPage
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
     private bool IncludeDocuments { get; set; }
-    private List<CaseFile> SearchResults { get; set; } = [];
+    private List<SearchResult> SearchResults { get; set; } = [];
     private ElementReference? _unsavedChangesDialog { get; set; }
     private ElementReference? _addCaseFilesDialog { get; set; }
     private string CaseFilesToAdd { get; set; } = string.Empty;

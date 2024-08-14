@@ -152,15 +152,32 @@ else
     }
 </dialog>
 
-<dialog id="search-dialog">
-    <h1>This is the search box</h1>
-    <input @oninput="SearchCaseFiles" />
-    <p>
+<dialog id="search-dialog" class="p-2 border border-gunmetal h-[800px] w-[400px]">
+    <h1 class="text-lg font-semibold">Search by Case file or Court file number</h1>
+    <input class="border border-gunmetal w-full p-1" @oninput="SearchCaseFiles" />
+    <ul>
         @foreach (var result in SearchResults)
         {
-        <p>@result.CaseFileNumber</p>
+            <li class="border-b border-gunmetal">
+                <p class="font-semibold text-center">@result.CaseFile.Defendant.FullName</p>
+                @if (result.CaseFile.CaseFileNumber.ToLower().Contains(result.SearchTerm))
+                {
+                    <div class="flex justify-around">
+                        <span class="font-bold">@result.CaseFile.CaseFileNumber</span>
+                        @if (result.CaseFile.CourtFileNumber is not null)
+                        {
+                            <span>@result.CaseFile.CourtFileNumber</span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="font-bold">@result.CaseFile.CourtFileNumber</p>
+                    <p>@result.CaseFile.CaseFileNumber</p>
+                }
+            </li>
         }
-    </p>
+    </ul>
 </dialog>
 
 @code {

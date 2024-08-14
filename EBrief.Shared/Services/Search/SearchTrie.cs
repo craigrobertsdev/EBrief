@@ -10,6 +10,9 @@ public class SearchTrie
         public Dictionary<char, TrieNode> Children = [];
         public CaseFile? Value;
         public bool HasValue => Value != null;
+
+        public TrieNode() { }
+        public TrieNode(char key) => Key = Char.ToLower(key);
     }
 
     public SearchTrie() => Root = new();
@@ -25,17 +28,18 @@ public class SearchTrie
             }
             else
             {
-                current.Children.Add(key[i], new TrieNode());
-                // update current here to the new TrieNode()?
+                var child = new TrieNode(key[i]);
+                current.Children.Add(key[i], child);
+                current = child;
             }
         }
 
         current.Value = value;
     }
 
-    public List<CaseFile> GetSearchResults(string key)
+    public List<SearchResult> GetSearchResults(string key)
     {
-        List<CaseFile> results = [];
+        List<SearchResult> results = [];
 
         TrieNode? current = Search(key);
         if (current is null) // key not found, return empty set
@@ -44,7 +48,7 @@ public class SearchTrie
         }
         else if (current.HasValue) // key exists so return only that key
         {
-            results.Add(current.Value!);
+            results.Add(new SearchResult(current.Value!, key));
         }
         else // build list of child nodes that branch off the endpoint of key and return them
         {
@@ -81,11 +85,11 @@ public class SearchTrie
      * if so, return.
      * Does this need a bool flag atMax, or will it have the maxCheck at the right point of the function?
      */
-    private static List<CaseFile> FindWords(TrieNode node, string key, List<CaseFile> results, int maxResults)
+    private static List<SearchResult> FindWords(TrieNode node, string key, List<SearchResult> results, int maxResults)
     {
         if (node.HasValue)
         {
-            results.Add(node.Value!);
+            results.Add(new SearchResult(node.Value!, key));
             if (results.Count == maxResults)
             {
                 return results;
@@ -94,7 +98,7 @@ public class SearchTrie
 
         foreach (var child in node.Children.Values)
         {
-            return FindWords(child, key + child.Value, results, maxResults);
+            FindWords(child, key + child.Value, results, maxResults);
         }
 
         return results;

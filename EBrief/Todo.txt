@@ -20,10 +20,17 @@ FUNCTIONALITY:
 		* Follow ups page needs to be updated to use the user
 	- Templates for court updates
 		* Add the judicial officer and some template text like "COURT UPDATE" in an editable text field so every entry can be quickly started for prosecutors to do an update.
-		* If admin are coming to court to assist with court lists, they should be provided with the same court list to so they can do updates to CFELs. Follow up tasks should be able to be created for the prosecutor they are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
-	- Make dropdown menu close when clicking out of the menu area
+		* If admin are coming to court to assist with court lists, they should be provided with the same court list 
+			so they can do updates to CFELs. 
+		* Follow up tasks should be able to be created for the prosecutor they 
+			are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
+
+UI:
+	- Case files and other scrolling documents should have the ability to be opened in a pop-out screen 
+		that takes up most of/all of the screen for easier reading.
+	- Add the ability to zoom in and out.
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
@@ -31,6 +38,7 @@ STYLING:
 	- When expanding a court session, make scroll snap to the botton of the newly opened session, or as far down as possible if the session is too long
 	- OpenPreviousCourtList - create grid for each element of CourtListEntry (date, court code, court room)
 	- Colour palette!
+	- Defendants from custody have the (C) appended to the end of their first name. This should be removed
 	
 TESTING:
 	- Add tests for models and data access where it makes sense
