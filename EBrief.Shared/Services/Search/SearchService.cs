@@ -32,11 +32,11 @@ public class SearchService
                 break;
             }
 
+            key = key.ToUpper();
             if (caseFile.CaseFileNumber.Contains(key) ||
                 (caseFile.CourtFileNumber is not null && caseFile.CourtFileNumber!.Contains(key)))
             {
                 results.Add(new(SearchTrie.Find(caseFile.CaseFileNumber), key));
-                continue;
             }
         }
 
