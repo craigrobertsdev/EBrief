@@ -3,7 +3,8 @@
 namespace EBrief.Shared.Services.Search;
 public class SearchTrie
 {
-    public TrieNode Root { get; private set; }
+    public TrieNode Root { get; private set; } = new();
+
     public class TrieNode
     {
         public char Key;
@@ -12,10 +13,8 @@ public class SearchTrie
         public bool HasValue => Value != null;
 
         public TrieNode() { }
-        public TrieNode(char key) => Key = Char.ToLower(key);
+        public TrieNode(char key) => Key = Char.ToUpper(key);
     }
-
-    public SearchTrie() => Root = new();
 
     public void Insert(string key, CaseFile value)
     {

@@ -1,6 +1,7 @@
 ﻿using EBrief.Shared.Models.UI;
 
 namespace EBrief.Shared.Services.Search;
+
 public class SearchService
 {
     public SearchTrie SearchTrie { get; private set; }
@@ -9,13 +10,16 @@ public class SearchService
     public SearchService(CourtList courtList)
     {
         SearchTrie = BuildTrie(courtList);
-        var caseFiles = courtList.GetCaseFiles();
+        var courtListCaseFiles = courtList.GetCaseFiles();
+        var caseFiles = new CaseFile[courtListCaseFiles.Count];
+        courtList.GetCaseFiles().CopyTo(caseFiles, 0);
         foreach (var cf in caseFiles)
         {
-            cf.CaseFileNumber = cf.CaseFileNumber.ToLower();
-            cf.CourtFileNumber = cf.CourtFileNumber?.ToLower();
+            cf.CaseFileNumber = cf.CaseFileNumber.ToUpper();
+            cf.CourtFileNumber = cf.CourtFileNumber?.ToUpper();
         }
-        _caseFiles = [.. caseFiles];
+
+        _caseFiles = [..caseFiles];
     }
 
     public List<SearchResult> Find(string key)
@@ -28,7 +32,7 @@ public class SearchService
                 break;
             }
 
-            if (caseFile.CaseFileNumber.Contains(key) || 
+            if (caseFile.CaseFileNumber.Contains(key) ||
                 (caseFile.CourtFileNumber is not null && caseFile.CourtFileNumber!.Contains(key)))
             {
                 results.Add(new(SearchTrie.Find(caseFile.CaseFileNumber), key));
@@ -50,13 +54,13 @@ public class SearchService
         // go through each item, create trie node and add reference at leaf of the key.
         foreach (var cf in caseFiles)
         {
-            trie.Insert(cf.CaseFileNumber.ToLower(), cf);
+            trie.Insert(cf.CaseFileNumber.ToUpper(), cf);
             if (cf.CourtFileNumber is not null)
             {
-                trie.Insert(cf.CourtFileNumber.ToLower(), cf);
+                trie.Insert(cf.CourtFileNumber.ToUpper(), cf);
             }
         }
+
         return trie;
     }
 }
-

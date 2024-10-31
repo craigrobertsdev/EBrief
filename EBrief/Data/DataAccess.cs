@@ -48,7 +48,9 @@ public class DataAccess : IDataAccess
 
     public async Task UpdateCourtList(CourtList courtList)
     {
-        var courtListModel = await _context.CourtLists.FirstAsync(cl => cl.Id == courtList.Id);
+        var courtListModel = await _context.CourtLists
+            .Include(cl => cl.CaseFiles)
+            .FirstAsync(cl => cl.Id == courtList.Id);
         foreach (var caseFile in courtList.GetCaseFiles())
         {
             courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes.Text;

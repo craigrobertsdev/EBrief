@@ -1,6 +1,7 @@
 ﻿using EBrief.Shared.Helpers;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace EBrief;
 public partial class App : Application
@@ -8,9 +9,11 @@ public partial class App : Application
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         Directory.CreateDirectory(Path.Combine(FileHelpers.AppDataPath));
-        AppDomain.CurrentDomain.UnhandledException += (sender, error) =>
+
+        Current.DispatcherUnhandledException += (object sender, DispatcherUnhandledExceptionEventArgs e) =>
         {
-            MessageBox.Show(error.ExceptionObject.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(e.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            e.Handled = true;
         };
     }
 }

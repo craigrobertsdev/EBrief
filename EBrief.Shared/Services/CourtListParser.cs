@@ -81,7 +81,8 @@ public class CourtListParser
             pos++;
             return;
         }
-        else if (row.InnerText.StartsWith("COURT"))
+        
+        if (row.InnerText.StartsWith("COURT"))
         {
             _endOfCourtRoom = IsNewCourtRoom(row, courtList.CourtRoom);
             if (!_endOfCourtRoom)
@@ -138,7 +139,7 @@ public class CourtListParser
         //elements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
         caseFile.OffenceDetails = elements[5].InnerText.Split("/ ").Select(o => o.Trim()).ToArray();
 
-        // elements[6] && elements[7]
+        // elements[6] && elements[7] 
         if (elements[6].InnerText != string.Empty)
         {
             var counsel = new DefenceCounsel
@@ -163,7 +164,6 @@ public class CourtListParser
     {
         var courtFileNumber = string.Empty;
         var policeFileNumber = string.Empty;
-        var listingType = string.Empty;
 
         // "3. MCCRM-24-016760(H3617790B)First Appearances"
         // "3. MCCRM-24-016760First Appearances"
@@ -202,7 +202,7 @@ public class CourtListParser
             }
         }
 
-        listingType = text[idTextPos..];
+        var listingType = text[idTextPos..];
 
         return new CourtIdentifiers(listNo, courtFileNumber, policeFileNumber, listingType);
     }

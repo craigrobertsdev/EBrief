@@ -35,8 +35,8 @@ public partial class CourtListPage : ICourtListPage
     private string? _addCaseFilesError;
     private bool _loading;
     private bool _loadingNewCaseFiles;
-    private readonly string CaseFileSelected = "bg-blue text-text hover:bg-blue";
-    private readonly string CaseFileNotSelected = "hover:bg-slate-300";
+    private readonly string _caseFileSelected = "bg-blue text-text hover:bg-blue";
+    private readonly string _caseFileNotSelected = "hover:bg-slate-300";
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,7 +63,7 @@ public partial class CourtListPage : ICourtListPage
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
         CourtSessions = GenerateCourtSessions();
         ActivateDefendant(CourtSessions[0].Defendants.First());
-        SearchService = new(CourtList);
+        SearchService = new SearchService(CourtList);
 
         AppState.CurrentCourtList = CourtList;
         _loading = false;
@@ -73,12 +73,7 @@ public partial class CourtListPage : ICourtListPage
     {
         var courtList = (await DataAccess.GetCourtList(courtCode, courtDate, courtRoom))?.ToUIModel();
 
-        if (courtList is null)
-        {
-            throw new Exception("Failed to load court list.");
-        }
-
-        CourtList = courtList;
+        CourtList = courtList ?? throw new Exception("Failed to load court list.");
         CourtList.CourtCode = courtCode;
         CourtList.CourtDate = courtDate;
         CourtList.CourtRoom = courtRoom;

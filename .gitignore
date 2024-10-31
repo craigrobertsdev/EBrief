@@ -15,6 +15,7 @@
 **/*.crt
 EBrief.Installer/
 EBrief.Installer/certs
+LandscapeLists/
 **/*.iss
 
 # User-specific files (MonoDevelop/Xamarin Studio)
