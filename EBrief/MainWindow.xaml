@@ -9,8 +9,7 @@
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf" 
         xmlns:custom="clr-namespace:ModalControl;assembly=ModalControl"
         mc:Ignorable="d"
-        Title="EBrief" Height="900" Width="1440"
-        ThemeMode="System">
+        Title="EBrief" Height="900" Width="1440">
     <Grid>
         <Grid.Resources>
             <DataTemplate DataType="{x:Type vms:HomeViewModel}">
