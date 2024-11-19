@@ -5,12 +5,12 @@ using System.Windows.Input;
 namespace EBrief.ViewModels;
 public class HomeViewModel : ViewModelBase
 {
-    public ICommand AddNewCourtListCommand { get; }
+    public ICommand NavigateAddNewCourtListCommand { get; }
     public ICommand LoadPreviousCourtListCommand { get; }
     public ICommand OpenCourtListFromFileCommand { get; }
 
-    public HomeViewModel(INavigationService modalNavigationService, INavigationService courtListNavigationService)
+    public HomeViewModel(INavigationService addCourtListNavigationService)
     {
-        AddNewCourtListCommand = new AddNewCourtListCommand(modalNavigationService, courtListNavigationService);
+        NavigateAddNewCourtListCommand = new NavigateCommand(addCourtListNavigationService);
     }
 }

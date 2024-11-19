@@ -16,17 +16,32 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         services.AddSingleton<NavigationStore>();
-        services.AddSingleton<MainViewModel>();
-        services.AddSingleton<INavigationService>(CreateHomeNavigationService);
+        services.AddSingleton<ModalNavigationStore>();
 
+        services.AddSingleton<INavigationService>(CreateHomeNavigationService);
+        services.AddSingleton<CloseModalNavigationService>();
+
+        services.AddSingleton<MainViewModel>();
         services.AddSingleton<MainWindow>(s => new MainWindow()
         {
             DataContext = s.GetRequiredService<MainViewModel>()
         });
 
-        services.AddTransient<HomeViewModel>(s => new HomeViewModel());
+        services.AddTransient<HomeViewModel>(s => new HomeViewModel(CreateAddNewCourtListNavigationService(s)));
+        services.AddTransient<AddNewCourtListViewModel>(s => new AddNewCourtListViewModel());
 
         _serviceProvider = services.BuildServiceProvider();
+
+
+    }
+
+    private INavigationService CreateAddNewCourtListNavigationService(IServiceProvider serviceProvider)
+    {
+        var modalNavigationStore = serviceProvider.GetRequiredService<ModalNavigationStore>();
+
+        return new ModalNavigationService<AddNewCourtListViewModel>(
+            modalNavigationStore,
+            () => serviceProvider.GetRequiredService<AddNewCourtListViewModel>());
     }
 
     protected override void OnStartup(StartupEventArgs e)

@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EBrief.Services;
 
 namespace EBrief.Commands
 {
-    class AddNewCourtListCommand
+    public class AddNewCourtListCommand : CommandBase
     {
+        private readonly INavigationService _courtListNavigationService;
+
+        public AddNewCourtListCommand(INavigationService courtListNavigationService)
+        {
+            _courtListNavigationService = courtListNavigationService;
+        }
+
+        public override void Execute(object? parameter)
+        {
+            _courtListNavigationService.Navigate();
+        }
     }
 }
