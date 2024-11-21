@@ -16,7 +16,7 @@ public partial class CourtListPage : ICourtListPage
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
     [Inject] public IFileService FileService { get; set; } = default!;
     [Inject] public AppState AppState { get; set; } = default!;
-    public HttpService HttpService { get; set; } = default!;
+    [Inject] public HttpService HttpService { get; set; } = default!;
     public SearchService SearchService { get; set; } = default!;
     private CourtList CourtList { get; set; } = default!;
     public List<CourtSession> CourtSessions { get; set; } = [];
@@ -41,7 +41,6 @@ public partial class CourtListPage : ICourtListPage
     protected override async Task OnInitializedAsync()
     {
         await JSRuntime.InvokeVoidAsync("addSearchEventHandler", DotNetObjectReference.Create(this));
-        HttpService = new();
         _loading = true;
         var queries = QueryHelpers.ParseQuery(NavManager.ToAbsoluteUri(NavManager.Uri).Query);
         IncludeDocuments = queries.ContainsKey("includeDocuments");
@@ -206,7 +205,7 @@ public partial class CourtListPage : ICourtListPage
         StateHasChanged();
     }
 
-    private void CaseFileChanged(CaseFile caseFile)
+    private void CaseFileChanged(Casefile caseFile)
     {
         if (ActiveDefendant is not null)
         {
@@ -240,7 +239,7 @@ public partial class CourtListPage : ICourtListPage
 
     public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;
 
-    private bool IsSelected(CaseFile caseFile) => ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber;
+    private bool IsSelected(Casefile caseFile) => ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber;
 
     private void SaveCourtList()
     {

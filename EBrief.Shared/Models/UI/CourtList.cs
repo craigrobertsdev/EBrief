@@ -22,7 +22,7 @@ public class CourtList
         }
     }
 
-    public void AddCaseFiles(List<CaseFile> caseFiles)
+    public void AddCaseFiles(List<Casefile> caseFiles)
     {
         foreach (var caseFile in caseFiles)
         {
@@ -43,9 +43,9 @@ public class CourtList
         }
     }
 
-    public List<CaseFile> GetCaseFiles()
+    public List<Casefile> GetCaseFiles()
     {
-        var caseFiles = new List<CaseFile>();
+        var caseFiles = new List<Casefile>();
         foreach (var defendant in Defendants)
         {
             caseFiles.AddRange(defendant.CaseFiles);
@@ -54,9 +54,9 @@ public class CourtList
         return caseFiles;
     }
 
-    public List<CaseFile> GetCaseFiles(int amount)
+    public List<Casefile> GetCaseFiles(int amount)
     {
-        var caseFiles = new List<CaseFile>();
+        var caseFiles = new List<Casefile>();
         foreach (var defendant in Defendants)
         {
             caseFiles.AddRange(defendant.CaseFiles);

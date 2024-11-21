@@ -22,7 +22,7 @@
 
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
-    private List<CaseFileEnquiryLogEntry> _cfelEntries = [];
+    private List<CasefileEnquiryLogEntry> _cfelEntries = [];
 
     protected override void OnInitialized() {
         if (Parent?.ActiveDefendant?.ActiveCaseFile?.Cfel is var entries && entries is not null) {

@@ -1,8 +1,7 @@
-﻿using EBrief.Shared.Models.Data;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EBrief.Shared.Models.UI;
-public class CaseFileEnquiryLogEntry
+public class CasefileEnquiryLogEntry
 {
     [Key]
     public int Id { get; set; }
@@ -10,13 +9,13 @@ public class CaseFileEnquiryLogEntry
     public string EnteredBy { get; set; }
 
     public DateTime EntryDate { get; set; }
-    public CaseFileEnquiryLogEntry(string entryText, string enteredBy, DateTime? entryDate = null)
+    public CasefileEnquiryLogEntry(string entryText, string enteredBy, DateTime? entryDate = null)
     {
         EntryText = entryText;
         EnteredBy = enteredBy;
         EntryDate = entryDate ?? DateTime.Now;
     }
-    public CaseFileEnquiryLogEntry(int id, string entryText, string enteredBy, DateTime entryDate)
+    public CasefileEnquiryLogEntry(int id, string entryText, string enteredBy, DateTime entryDate)
     {
         Id = id;
         EntryText = entryText;

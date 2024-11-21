@@ -32,9 +32,9 @@ public class CaseFileModel
     public bool DocumentsLoaded { get; set; }
     public string Notes { get; set; } = string.Empty;
 
-    public CaseFile ToUIModel()
+    public Casefile ToUIModel()
     {
-        return new CaseFile
+        return new Casefile
         {
             CaseFileNumber = CaseFileNumber,
             Defendant = Defendant.ToUIModel(),
@@ -66,7 +66,7 @@ public class CaseFileModel
 
 public static class CaseFileModelExtensions
 {
-    public static List<CaseFile> ToUIModels(this IEnumerable<CaseFileModel> caseFiles)
+    public static List<Casefile> ToUIModels(this IEnumerable<CaseFileModel> caseFiles)
     {
         return caseFiles.Select(cf => cf.ToUIModel()).ToList();
     }

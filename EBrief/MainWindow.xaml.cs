@@ -16,52 +16,53 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-//        try
-//        {
-//            Log.Information("Application starting up");
+        try
+        {
+            Log.Information("Application starting up");
 
-//            var serviceCollection = new ServiceCollection();
-//            serviceCollection.AddWpfBlazorWebView();
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddWpfBlazorWebView();
 
-//#if DEBUG
-//            serviceCollection.AddBlazorWebViewDeveloperTools();
-//#endif
+#if DEBUG
+            serviceCollection.AddBlazorWebViewDeveloperTools();
+#endif
 
-//            serviceCollection.AddLogging(builder =>
-//            {
-//                var loggerConfiguration = new LoggerConfiguration()
-//                    .WriteTo.File("test.txt", rollingInterval: RollingInterval.Day)
-//                    .WriteTo.Console()
-//                    .MinimumLevel.Information()
-//                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning);
+            serviceCollection.AddLogging(builder =>
+            {
+                var loggerConfiguration = new LoggerConfiguration()
+                    .WriteTo.File("test.txt", rollingInterval: RollingInterval.Day)
+                    .WriteTo.Console()
+                    .MinimumLevel.Information()
+                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning);
 
-//                builder.AddSerilog(loggerConfiguration.CreateLogger());
-//            });
+                builder.AddSerilog(loggerConfiguration.CreateLogger());
+            });
 
-//            serviceCollection.AddDbContext<ApplicationDbContext>(options =>
-//            {
-//                string dbPath = Path.Combine(FileHelpers.AppDataPath, "EBrief.db");
-//                options.UseSqlite($"Filename={dbPath}");
-//                options.EnableSensitiveDataLogging();
-//            });
-//            serviceCollection.AddScoped<IDataAccess, DataAccess>();
-//            serviceCollection.AddScoped<IFileService, FileService>();
-//            serviceCollection.AddSingleton(new AppState());
+            serviceCollection.AddDbContext<ApplicationDbContext>(options =>
+            {
+                string dbPath = Path.Combine(FileHelpers.AppDataPath, "EBrief.db");
+                options.UseSqlite($"Filename={dbPath}");
+                options.EnableSensitiveDataLogging();
+            });
+            serviceCollection.AddScoped<IDataAccess, DataAccess>();
+            serviceCollection.AddScoped<IFileService, FileService>();
+            serviceCollection.AddSingleton(new AppState());
+            serviceCollection.AddSingleton<HttpService>();
 
-//            Resources.Add("services", serviceCollection.BuildServiceProvider());
+            Resources.Add("services", serviceCollection.BuildServiceProvider());
 
-//            WindowState = WindowState.Maximized;
-//            Closing += OnWindowClosing;
-//        }
-        //catch (Exception ex)
-        //{
-        //    Log.Fatal(ex, "The application failed to start correctly.");
-        //    throw;
-        //}
-        //finally
-        //{
-        //    Log.CloseAndFlush();
-        //}
+            WindowState = WindowState.Maximized;
+            Closing += OnWindowClosing;
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "The application failed to start correctly.");
+            throw;
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 
     private void OnWindowClosing(object? sender, CancelEventArgs e)

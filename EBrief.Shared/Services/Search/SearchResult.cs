@@ -5,10 +5,10 @@ namespace EBrief.Shared.Services.Search;
 public class SearchResult : IComparable<SearchResult>
 {
     private readonly string _searchString;
-    public CaseFile CaseFile { get; }
+    public Casefile CaseFile { get; }
     public string SearchQuery { get; } = string.Empty;
 
-    public SearchResult(CaseFile caseFile, string searchQuery)
+    public SearchResult(Casefile caseFile, string searchQuery)
     {
         CaseFile = caseFile;
         SearchQuery = searchQuery;

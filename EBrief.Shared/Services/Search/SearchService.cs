@@ -5,13 +5,13 @@ namespace EBrief.Shared.Services.Search;
 public class SearchService
 {
     public SearchTrie SearchTrie { get; private set; }
-    private readonly CaseFile[] _caseFiles;
+    private readonly Casefile[] _caseFiles;
 
     public SearchService(CourtList courtList)
     {
         SearchTrie = BuildTrie(courtList);
         var courtListCaseFiles = courtList.GetCaseFiles();
-        var caseFiles = new CaseFile[courtListCaseFiles.Count];
+        var caseFiles = new Casefile[courtListCaseFiles.Count];
         courtList.GetCaseFiles().CopyTo(caseFiles, 0);
         foreach (var cf in caseFiles)
         {

@@ -9,14 +9,14 @@ public class SearchTrie
     {
         public char Key;
         public Dictionary<char, TrieNode> Children = [];
-        public CaseFile? Value;
+        public Casefile? Value;
         public bool HasValue => Value != null;
 
         public TrieNode() { }
         public TrieNode(char key) => Key = Char.ToUpper(key);
     }
 
-    public void Insert(string key, CaseFile value)
+    public void Insert(string key, Casefile value)
     {
         TrieNode current = Root;
         for (int i = 0; i < key.Length; i++)
@@ -41,14 +41,14 @@ public class SearchTrie
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public CaseFile Find(string key)
+    public Casefile Find(string key)
     {
         return Search(key)!.Value!;
     }
 
-    public List<CaseFile> GetSearchResults(string key)
+    public List<Casefile> GetSearchResults(string key)
     {
-        List<CaseFile> results = [];
+        List<Casefile> results = [];
 
         TrieNode? current = Search(key);
         if (current is null) // key not found, return empty set
@@ -94,7 +94,7 @@ public class SearchTrie
      * if so, return.
      * Does this need a bool flag atMax, or will it have the maxCheck at the right point of the function?
      */
-    private static List<CaseFile> FindWords(TrieNode node, string key, List<CaseFile> results, int maxResults)
+    private static List<Casefile> FindWords(TrieNode node, string key, List<Casefile> results, int maxResults)
     {
         if (node.HasValue)
         {

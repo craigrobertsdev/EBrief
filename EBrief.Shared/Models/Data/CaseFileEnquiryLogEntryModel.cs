@@ -13,8 +13,8 @@ public class CaseFileEnquiryLogEntryModel
 
     public DateTime EntryDate { get; set; }
 
-    public CaseFileEnquiryLogEntry ToUIModel()
+    public CasefileEnquiryLogEntry ToUIModel()
     {
-        return new CaseFileEnquiryLogEntry(Id, EntryText, EnteredBy, EntryDate);
+        return new CasefileEnquiryLogEntry(Id, EntryText, EnteredBy, EntryDate);
     }
 }

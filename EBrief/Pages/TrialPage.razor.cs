@@ -12,7 +12,7 @@ public partial class TrialPage
     [Inject] private DataAccess DataAccess { get; set; } = default!;
     [Inject] private IFileService FileService { get; set; } = default!;
     [Inject] public AppState AppState { get; set; } = default!;
-    public HttpService HttpService { get; set; } = default!;
+    [Inject] public HttpService HttpService { get; set; } = default!;
     private string? _error;
     private string? _addCaseFilesError;
     private bool _loading;
@@ -21,11 +21,6 @@ public partial class TrialPage
     private ElementReference? _unsavedChangesDialog { get; set; }
     private ElementReference? _addCaseFilesDialog { get; set; }
     private CourtList CourtList { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        HttpService = new();
-    }
 
     private async Task HandleReturnHome()
     {

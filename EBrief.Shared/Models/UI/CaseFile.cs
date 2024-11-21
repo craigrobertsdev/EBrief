@@ -1,11 +1,11 @@
 ﻿namespace EBrief.Shared.Models.UI;
-public class CaseFile
+public class Casefile
 {
     public string CaseFileNumber { get; set; } = string.Empty;
     public Defendant Defendant { get; set; } = default!;
     public string? CourtFileNumber { get; set; } = string.Empty;
     public List<HearingEntry> Schedule { get; set; } = [];
-    public List<CaseFileEnquiryLogEntry> Cfel { get; set; } = [];
+    public List<CasefileEnquiryLogEntry> Cfel { get; set; } = [];
     public string FactsOfCharge { get; set; } = default!;
     public Information Information { get; set; } = default!;
     public TimeSpan? TimeInCustody { get; set; }
@@ -31,9 +31,23 @@ public class CaseFile
             Charges = charges
         };
     }
+
+    public void Update(Casefile casefile)
+    {
+        Schedule = casefile.Schedule;
+        Cfel = casefile.Cfel;
+        FactsOfCharge = casefile.FactsOfCharge;
+        Information = casefile.Information;
+        TimeInCustody = casefile.TimeInCustody;
+        Charges = casefile.Charges;
+        CaseFileDocuments = casefile.CaseFileDocuments;
+        OccurrenceDocuments = casefile.OccurrenceDocuments;
+
+        Cfel.Sort((x, y) => y.EntryDate.CompareTo(x.EntryDate));
+    }
 }
 
 public static class CaseFileExtensions
 {
-    public static void AddReferenceToDefendants(this List<CaseFile> caseFiles) => caseFiles.ForEach(cf => cf.Defendant.CaseFiles.Add(cf));
+    public static void AddReferenceToDefendants(this List<Casefile> caseFiles) => caseFiles.ForEach(cf => cf.Defendant.CaseFiles.Add(cf));
 }

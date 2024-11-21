@@ -4,34 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EBrief"
-        xmlns:vms="clr-namespace:EBrief.ViewModels"
-        xmlns:views="clr-namespace:EBrief.Views"
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf" 
         xmlns:custom="clr-namespace:ModalControl;assembly=ModalControl"
         mc:Ignorable="d"
         Title="EBrief" Height="900" Width="1440">
     <Grid>
-        <Grid.Resources>
-            <DataTemplate DataType="{x:Type vms:HomeViewModel}">
-                <views:HomeView />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type vms:AddNewCourtListViewModel}">
-                <views:AddNewCourtListView />
-            </DataTemplate>
-        </Grid.Resources>
-
-        <custom:Modal Panel.ZIndex="1" IsOpen="{Binding IsOpen}">
-            <ContentControl Content="{Binding CurrentModalViewModel}" />
-        </custom:Modal>
-
-        <ContentPresenter Content="{Binding CurrentViewModel}" />
+        <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
+            <blazor:BlazorWebView.RootComponents>
+                <blazor:RootComponent Selector="#app" ComponentType="{x:Type local:AppRouter}" />
+            </blazor:BlazorWebView.RootComponents>
+        </blazor:BlazorWebView>
     </Grid>
 
 </Window>
 
 
-<!--<blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{DynamicResource services}">
-    <blazor:BlazorWebView.RootComponents>
-        <blazor:RootComponent Selector="#app" ComponentType="{x:Type local:AppRouter}" />
-    </blazor:BlazorWebView.RootComponents>
-</blazor:BlazorWebView>-->
