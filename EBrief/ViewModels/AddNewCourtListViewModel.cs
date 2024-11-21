@@ -4,7 +4,7 @@ namespace EBrief.ViewModels
 {
     public class AddNewCourtListViewModel : ViewModelBase
     {
-		private string _selectedFileName;
+		private string _selectedFileName = "Landscape List 20112024.docx";
 		public string SelectedFileName
 		{
 			get
