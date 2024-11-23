@@ -44,16 +44,16 @@ else
                 <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full relative">
                     <div id="casefile-container" class="overflow-x-auto">
                         <div class="flex w-auto w-full first:border-l first:border-slate-500">
-                            @foreach (var caseFile in ActiveDefendant.CaseFiles)
+                            @foreach (var casefile in ActiveDefendant.Casefiles)
                             {
-                                <Tooltip Text="@GenerateCaseFileTooltipText(caseFile)" Id="@caseFile.CaseFileNumber">
+                                <Tooltip Text="@GenerateCasefileTooltipText(casefile)" Id="@casefile.CasefileNumber">
                                     <div class="border-r border-t border-b border-slate-500 font-normal min-w-[18ch] text-center text-sm laptop:text-base
-                                        @(IsSelected(caseFile) ? _caseFileSelected : _caseFileNotSelected)" @onclick="() => CaseFileChanged(caseFile)">
+                                        @(IsSelected(casefile) ? _casefileSelected : _casefileNotSelected)" @onclick="() => CasefileChanged(casefile)">
                                         <p class="select-none">
-                                            @caseFile.CaseFileNumber
+                                            @casefile.CasefileNumber
                                         </p>
                                         <p class="select-none">
-                                            @caseFile.CourtFileNumber
+                                            @casefile.CourtFileNumber
                                         </p>
                                     </div>
                                 </Tooltip>
@@ -65,7 +65,8 @@ else
                     <div class="max-w-2xl flex items-center">
                         <DropdownMenu Text="Menu">
                             <DropdownMenuItem Text="Save" OnClick="SaveCourtList" />
-                            <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCaseFilesDialog" />
+                            <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCasefilesDialog" />
+                            <DropdownMenuItem Text="Refresh Data" OnClick="RefreshData" />
                             <DropdownMenuItem Text="Export Court List" OnClick="ExportCourtList" />
                             <DropdownMenuItem Text="Return Home" OnClick="HandleReturnHome" />
                         </DropdownMenu>
@@ -125,8 +126,8 @@ else
     </div>
 </dialog>
 
-<dialog @ref="_addCaseFilesDialog" class="p-5">
-    @if (_loadingNewCaseFiles)
+<dialog @ref="_addCasefilesDialog" class="p-5">
+    @if (_loadingNewCasefiles)
     {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     }
@@ -136,42 +137,42 @@ else
             Enter the case file numbers you want to add, separated by a space or new line
         </h3>
         <div class="w-full pb-4">
-            <textarea @bind="@CaseFilesToAdd" rows="10" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
+            <textarea @bind="@CasefilesToAdd" rows="10" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
         </div>
         <div class="flex w-full justify-end gap-3 pb-2">
-            <RadzenButton Text="Add" Click="AddCaseFiles" />
-            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCaseFilesDialog" />
+            <RadzenButton Text="Add" Click="AddCasefiles" />
+            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCasefilesDialog" />
         </div>
 
-        @if (_addCaseFilesError is not null)
+        @if (_addCasefilesError is not null)
         {
-            <p class="text-red-500 text-center text-lg">@_addCaseFilesError</p>
+            <p class="text-red-500 text-center text-lg">@_addCasefilesError</p>
         }
     }
 </dialog>
 
 <dialog @ref=_searchDialog id="search-dialog" class="p-2 border border-gunmetal w-[400px]">
     <h1 class="text-lg font-semibold">Search by Case file or Court file number</h1>
-    <input id="search-field" class="border border-gunmetal w-full p-1" @oninput="SearchCaseFiles" />
+    <input id="search-field" class="border border-gunmetal w-full p-1" @oninput="SearchCasefiles" />
     <ul>
         @foreach (var result in SearchResults)
         {
             <li class="border-b border-gunmetal">
-                <p class="font-semibold text-center">@result.CaseFile.Defendant.FullName</p>
-                @if (result.CaseFile.CaseFileNumber.ToLower().Contains(result.SearchQuery))
+                <p class="font-semibold text-center">@result.Casefile.Defendant.FullName</p>
+                @if (result.Casefile.CasefileNumber.ToLower().Contains(result.SearchQuery))
                 {
                     <div class="flex justify-around">
-                        <span class="font-bold">@result.CaseFile.CaseFileNumber</span>
-                        @if (result.CaseFile.CourtFileNumber is not null)
+                        <span class="font-bold">@result.Casefile.CasefileNumber</span>
+                        @if (result.Casefile.CourtFileNumber is not null)
                         {
-                            <span>@result.CaseFile.CourtFileNumber</span>
+                            <span>@result.Casefile.CourtFileNumber</span>
                         }
                     </div>
                 }
                 else
                 {
-                    <p class="font-bold">@result.CaseFile.CourtFileNumber</p>
-                    <p>@result.CaseFile.CaseFileNumber</p>
+                    <p class="font-bold">@result.Casefile.CourtFileNumber</p>
+                    <p>@result.Casefile.CasefileNumber</p>
                 }
             </li>
         }
@@ -179,16 +180,16 @@ else
 </dialog>
 
 @code {
-    private MarkupString GenerateCaseFileTooltipText(Casefile caseFile)
+    private MarkupString GenerateCasefileTooltipText(Casefile casefile)
     {
         var markup = new StringBuilder();
         int maxCharges = 4;
 
-        if (caseFile.Charges.Count > maxCharges)
+        if (casefile.Charges.Count > maxCharges)
         {
-            markup.Append($"<p class=\"pb-2 text-sm\">{caseFile.Charges.Count} total charges</p>");
+            markup.Append($"<p class=\"pb-2 text-sm\">{casefile.Charges.Count} total charges</p>");
         }
-        foreach (var (charge, i) in caseFile.Charges.Take(maxCharges).Select((c, i) => (c, i)))
+        foreach (var (charge, i) in casefile.Charges.Take(maxCharges).Select((c, i) => (c, i)))
         {
             if (i == maxCharges)
             {

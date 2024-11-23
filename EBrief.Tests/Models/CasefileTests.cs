@@ -77,7 +77,7 @@ public class CasefileTests
             {
                 new Charge() { ChargeWording = "Charge 1", Sequence = 1 },
             },
-            CaseFileDocuments = [],
+            CasefileDocuments = [],
             OccurrenceDocuments = [],
             TimeInCustody = TimeSpan.FromDays(1)
         };
@@ -91,7 +91,7 @@ public class CasefileTests
                 new Charge() { ChargeWording = "Charge 1", Sequence = 1 },
                 new Charge() { ChargeWording = "Charge 2", Sequence = 2 },
             },
-            CaseFileDocuments = new List<Document>
+            CasefileDocuments = new List<Document>
             {
                 new Document()
             },
@@ -101,13 +101,15 @@ public class CasefileTests
             },
             TimeInCustody = TimeSpan.FromDays(2)
         };
+
         // Act 
         casefile.Update(updatedCasefile);
+
         // Assert
         Assert.Equal("Updated facts", casefile.FactsOfCharge);
         Assert.Equal(2, casefile.Information.Charges.Count);
         Assert.Equal(2, casefile.Charges.Count);
-        Assert.Single(casefile.CaseFileDocuments);
+        Assert.Single(casefile.CasefileDocuments);
         Assert.Single(casefile.OccurrenceDocuments);
         Assert.Equal(TimeSpan.FromDays(2), casefile.TimeInCustody);
     }

@@ -10,7 +10,7 @@ public class InformationModel
     [Key]
     [JsonIgnore]
     public int Id { get; set; }
-    public Guid CaseFileId { get; set; }
+    public Guid CasefileId { get; set; }
     public List<InformationEntryModel> Charges { get; set; } = [];
 
     public Information ToUIModel()

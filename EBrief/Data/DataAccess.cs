@@ -28,7 +28,7 @@ public class DataAccess : IDataAccess
             return;
         }
 
-        courtList.CombineAndSortDefendantCaseFiles();
+        courtList.CombineAndSortDefendantCasefiles();
 
         _context.CourtLists.Add(courtList);
         _context.SaveChanges();
@@ -49,25 +49,25 @@ public class DataAccess : IDataAccess
     public async Task UpdateCourtList(CourtList courtList)
     {
         var courtListModel = await _context.CourtLists
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .FirstAsync(cl => cl.Id == courtList.Id);
-        foreach (var caseFile in courtList.GetCaseFiles())
+        foreach (var casefile in courtList.GetCasefiles())
         {
-            courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes.Text;
+            courtListModel.Casefiles.First(cf => cf.CasefileNumber == casefile.CasefileNumber).Notes = casefile.Notes.Text;
         }
 
         _context.CourtLists.Update(courtListModel);
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateCaseFiles(IEnumerable<string> caseFileNumbers, string updateText)
+    public async Task UpdateCfels(IEnumerable<string> casefileNumbers, string updateText)
     {
-        var caseFilesToUpdate = _context.CaseFiles.Where(cf => caseFileNumbers.Contains(cf.CaseFileNumber))
-            .ToDictionary(cf => cf.CaseFileNumber);
+        var casefilesToUpdate = _context.Casefiles.Where(cf => casefileNumbers.Contains(cf.CasefileNumber))
+            .ToDictionary(cf => cf.CasefileNumber);
 
-        foreach (var caseFile in caseFileNumbers)
+        foreach (var casefile in casefileNumbers)
         {
-            caseFilesToUpdate[caseFile].CfelEntries
+            casefilesToUpdate[casefile].CfelEntries
                 .Add(new()
                 {
                     EntryText = updateText,
@@ -79,7 +79,7 @@ public class DataAccess : IDataAccess
         await _context.SaveChangesAsync();
     }
 
-    public async Task AddCaseFiles(List<CaseFileModel> newCaseFiles, CourtList courtList)
+    public async Task AddCasefiles(List<CasefileModel> newCasefiles, CourtList courtList)
     {
         var existingCourtList = await _context.CourtLists
             .Where(cl => cl.CourtDate == courtList.CourtDate && cl.CourtCode == courtList.CourtCode && cl.CourtRoom == courtList.CourtRoom)
@@ -87,11 +87,11 @@ public class DataAccess : IDataAccess
 
         if (existingCourtList is null)
         {
-            _logger.LogError("AddCaseFiles - CourtListNotFound - {date:ddMMyyyy} / {courtCode} / {courtRoom}", courtList.CourtDate, courtList.CourtCode, courtList.CourtRoom);
+            _logger.LogError("AddCasefiles - CourtListNotFound - {date:ddMMyyyy} / {courtCode} / {courtRoom}", courtList.CourtDate, courtList.CourtCode, courtList.CourtRoom);
             throw new Exception("Error adding new case files.");
         }
 
-        existingCourtList.CaseFiles.AddRange(newCaseFiles);
+        existingCourtList.Casefiles.AddRange(newCasefiles);
         await _context.SaveChangesAsync();
     }
 
@@ -116,25 +116,25 @@ public class DataAccess : IDataAccess
     {
         return await _context.CourtLists
             .Where(cl => cl.CourtCode == courtCode && cl.CourtDate == courtDate && cl.CourtRoom == courtRoom)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.Documents)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.CfelEntries)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.Charges)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.Defendant)
             .ThenInclude(d => d.BailAgreements)
             .ThenInclude(ba => ba.Conditions)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.Defendant)
             .ThenInclude(d => d.InterventionOrders)
             .ThenInclude(io => io.ProtectedPerson)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.Defendant)
             .ThenInclude(d => d.InterventionOrders)
             .ThenInclude(io => io.Conditions)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .ThenInclude(cf => cf.Schedule)
             .AsSplitQuery()
             .FirstOrDefaultAsync();
@@ -157,5 +157,23 @@ public class DataAccess : IDataAccess
             document.FileName = newFileName;
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task UpdateCasefiles(List<CasefileModel> newCasefiles)
+    {
+        var casefileNumbers = newCasefiles.Select(cf => cf.CasefileNumber);
+        var existingCasefiles = await _context.Casefiles
+            .Where(cf => casefileNumbers.Contains(cf.CasefileNumber))
+            .ToListAsync();
+
+        existingCasefiles.Sort((a, b) => a.CasefileNumber.CompareTo(b.CasefileNumber));
+        newCasefiles.Sort((a, b) => a.CasefileNumber.CompareTo(b.CasefileNumber));
+
+        for (int i = 0; i < existingCasefiles.Count; i++)
+        {
+            existingCasefiles[i].Update(newCasefiles[i]);
+        }
+
+        await _context.SaveChangesAsync();
     }
 }

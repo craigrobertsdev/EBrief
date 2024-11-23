@@ -11,7 +11,7 @@ public class CourtListModel
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    public List<CaseFileModel> CaseFiles { get; set; } = [];
+    public List<CasefileModel> Casefiles { get; set; } = [];
     public DateTime CourtDate { get; set; }
     public CourtCode CourtCode { get; set; }
     public int CourtRoom { get; set; }
@@ -19,18 +19,18 @@ public class CourtListModel
     public CourtList ToUIModel()
     {
         var defendants = new List<Defendant>();
-        foreach (var caseFileModel in CaseFiles)
+        foreach (var casefileModel in Casefiles)
         {
-            var caseFile = caseFileModel.ToUIModel();
-            caseFile.GenerateInformationFromCharges();
-            if (!defendants.Any(d => d.Id == caseFile.Defendant.Id))
+            var casefile = casefileModel.ToUIModel();
+            casefile.GenerateInformationFromCharges();
+            if (!defendants.Any(d => d.Id == casefile.Defendant.Id))
             {
-                defendants.Add(caseFile.Defendant);
-                caseFile.Defendant.CaseFiles.Add(caseFile);
+                defendants.Add(casefile.Defendant);
+                casefile.Defendant.Casefiles.Add(casefile);
             }
             else
             {
-                defendants.First(d => d.Id == caseFile.Defendant.Id).CaseFiles.Add(caseFile);
+                defendants.First(d => d.Id == casefile.Defendant.Id).Casefiles.Add(casefile);
             }
         }
 
@@ -44,16 +44,16 @@ public class CourtListModel
         };
     }
 
-    public void CombineCaseFiles(List<CaseFileModel> caseFiles)
+    public void CombineCasefiles(List<CasefileModel> casefiles)
     {
-        CaseFiles.Sort((c1, c2) => c1.CaseFileNumber.CompareTo(c2.CaseFileNumber));
-        caseFiles.Sort((c1, c2) => c1.CaseFileNumber.CompareTo(c2.CaseFileNumber));
+        Casefiles.Sort((c1, c2) => c1.CasefileNumber.CompareTo(c2.CasefileNumber));
+        casefiles.Sort((c1, c2) => c1.CasefileNumber.CompareTo(c2.CasefileNumber));
 
-        for (int i = 0; i < CaseFiles.Count; i++)
+        for (int i = 0; i < Casefiles.Count; i++)
         {
-            var c1 = CaseFiles[i];
-            var c2 = caseFiles[i];
-            if (c1.CaseFileNumber != c2.CaseFileNumber)
+            var c1 = Casefiles[i];
+            var c2 = casefiles[i];
+            if (c1.CasefileNumber != c2.CasefileNumber)
             {
                 throw new InvalidDataException("Casefile numbers should be equal");
             }
@@ -62,15 +62,15 @@ public class CourtListModel
         }
     }
 
-    public void CombineDefendantsWithServerResponse(List<CaseFileModel> caseFiles)
+    public void CombineDefendantsWithServerResponse(List<CasefileModel> casefiles)
     {
-        CaseFiles.Sort((c1, c2) => c1.CaseFileNumber.CompareTo(c2.CaseFileNumber));
-        caseFiles.Sort((c1, c2) => c1.CaseFileNumber.CompareTo(c2.CaseFileNumber));
+        Casefiles.Sort((c1, c2) => c1.CasefileNumber.CompareTo(c2.CasefileNumber));
+        casefiles.Sort((c1, c2) => c1.CasefileNumber.CompareTo(c2.CasefileNumber));
 
-        for (int i = 0; i < CaseFiles.Count; i++)
+        for (int i = 0; i < Casefiles.Count; i++)
         {
-            var d1 = CaseFiles[i].Defendant;
-            var d2 = caseFiles[i].Defendant;
+            var d1 = Casefiles[i].Defendant;
+            var d2 = casefiles[i].Defendant;
 
             d1.DateOfBirth = d2.DateOfBirth;
             d1.Phone = d2.Phone;
@@ -85,26 +85,26 @@ public class CourtListModel
     // This handles the situation where a defendant has multiple case files
     // Every object from the server has a different reference, so we need to combine them
 
-    public void CombineAndSortDefendantCaseFiles()
+    public void CombineAndSortDefendantCasefiles()
     {
-        var defendants = CaseFiles.Select(cf => cf.Defendant).DistinctBy(d => d.Id).ToList();
+        var defendants = Casefiles.Select(cf => cf.Defendant).DistinctBy(d => d.Id).ToList();
         defendants.ForEach(d =>
         {
             d.ListStart = int.MaxValue;
             d.ListEnd = 0;
         });
-        CaseFiles.Sort((a, b) => a.Charges.First().Date.CompareTo(b.Charges.First().Date));
+        Casefiles.Sort((a, b) => a.Charges.First().Date.CompareTo(b.Charges.First().Date));
 
-        foreach (var caseFile in CaseFiles)
+        foreach (var casefile in Casefiles)
         {
-            caseFile.Defendant = defendants.First(d => d.Id == caseFile.Defendant.Id);
-            if (caseFile.Defendant.ListStart > caseFile.ListNumber)
+            casefile.Defendant = defendants.First(d => d.Id == casefile.Defendant.Id);
+            if (casefile.Defendant.ListStart > casefile.ListNumber)
             {
-                caseFile.Defendant.ListStart = caseFile.ListNumber;
+                casefile.Defendant.ListStart = casefile.ListNumber;
             }
-            if (caseFile.Defendant.ListEnd < caseFile.ListNumber)
+            if (casefile.Defendant.ListEnd < casefile.ListNumber)
             {
-                caseFile.Defendant.ListEnd = caseFile.ListNumber;
+                casefile.Defendant.ListEnd = casefile.ListNumber;
             }
         }
 
@@ -112,11 +112,11 @@ public class CourtListModel
 
     public void OrderAndAssignListingNumbers()
     {
-        CaseFiles.Sort((a, b) => a.Schedule.Last().HearingDate.CompareTo(b.Schedule.Last().HearingDate));
+        Casefiles.Sort((a, b) => a.Schedule.Last().HearingDate.CompareTo(b.Schedule.Last().HearingDate));
         int listNo = 1;
-        foreach (var caseFile in CaseFiles)
+        foreach (var casefile in Casefiles)
         {
-            caseFile.ListNumber = listNo++;
+            casefile.ListNumber = listNo++;
         }
     }
 

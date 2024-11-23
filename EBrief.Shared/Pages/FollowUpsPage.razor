@@ -2,6 +2,7 @@
 @using EBrief.Shared.Models
 @using EBrief.Shared.Models.Shared
 @using EBrief.Shared.Models.UI
+@using EBrief.Shared.Services
 @using Radzen
 @using Radzen.Blazor
 @implements IDisposable
@@ -10,17 +11,17 @@
     @* Case file selectors *@
     <div>
         <h3 class="text-lg pb-2">Select case files to update</h3>
-        <RadzenCheckBoxList Data="CaseFiles" @bind-Value=@SelectedCaseFiles TextProperty="CaseFileNumber" AllowSelectAll="true"
-                            SelectAllText="Select all" ValueProperty="CaseFileNumber" Orientation="Orientation.Horizontal"
-                            Style="font-weight: bold;" />
+        <RadzenCheckBoxList Data="Casefiles" @bind-Value=@SelectedCasefiles TextProperty="CasefileNumber" AllowSelectAll="true"
+        SelectAllText="Select all" ValueProperty="CasefileNumber" Orientation="Orientation.Horizontal"
+        Style="font-weight: bold;" />
     </div>
 
     @* Create task section *@
     <div class="pb-4">
         @* Should be a flex box with the text section and case files side-by-side *@
         <h3 class="text-lg pb-2">Create follow up task</h3>
-        <textarea placeholder="Enter task remarks here..." @bind=Parent.ActiveDefendant!.ActiveCaseFile!.FollowUpText
-                  class="block resize-none mb-2 w-3/4 p-2 border border-black" rows="10" />
+        <textarea placeholder="Enter task remarks here..." @bind=Parent.ActiveDefendant!.ActiveCasefile!.FollowUpText
+        class="block resize-none mb-2 w-3/4 p-2 border border-black" rows="10" />
         <RadzenButton Text="Create follow up task" />
     </div>
 
@@ -28,7 +29,7 @@
     <div>
         <h3 class="text-lg pb-2">Enter text to add to all selected case files' CFELs</h3>
         <textarea name="cfel-entry" id="cfel-entry" @bind="@Parent.ActiveDefendant!.AddCfelText"
-                  class="block resize-none mb-2 w-3/4 p-2 border border-black" rows="10" />
+        class="block resize-none mb-2 w-3/4 p-2 border border-black" rows="10" />
         <div class="flex gap-6 items-center">
             <RadzenButton Text="Update CFELs" Click="HandleAddCfelEntry" />
             @if (_error is not null)
@@ -42,10 +43,11 @@
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
     [Inject] IDataAccess DataAccess { get; set; } = default!;
+    [Inject] HttpService _httpService { get; set; } = default!;
     private string? RemarksText { get; set; }
     private string? CfelText { get; set; }
-    private IEnumerable<string> SelectedCaseFiles { get; set; } = [];
-    private List<Casefile> CaseFiles { get; set; } = [];
+    private IEnumerable<string> SelectedCasefiles { get; set; } = [];
+    private List<Casefile> Casefiles { get; set; } = [];
     private string? _error;
 
     protected override async Task OnInitializedAsync()
@@ -57,23 +59,23 @@
     public async Task HandleDefendantChange()
     {
         await Task.CompletedTask;
-        if (Parent?.ActiveDefendant?.CaseFiles is not null)
+        if (Parent?.ActiveDefendant?.Casefiles is not null)
         {
-            CaseFiles = Parent.ActiveDefendant.CaseFiles;
+            Casefiles = Parent.ActiveDefendant.Casefiles;
         }
     }
 
     public void Dispose()
     {
-        CaseFiles = null!;
-        SelectedCaseFiles = null!;
+        Casefiles = null!;
+        SelectedCasefiles = null!;
         Parent.OnDefendantChange -= HandleDefendantChange;
     }
 
     private async Task HandleAddCfelEntry()
     {
         _error = null;
-        if (SelectedCaseFiles.Count() == 0)
+        if (SelectedCasefiles.Count() == 0)
         {
             _error = "No case files selected";
             return;
@@ -85,20 +87,20 @@
             return;
         }
 
-        var caseFiles = Parent.ActiveDefendant!.CaseFiles.Where(cf => SelectedCaseFiles.Contains(cf.CaseFileNumber));
-        if (caseFiles is null)
+        var casefiles = Parent.ActiveDefendant!.Casefiles.Where(cf => SelectedCasefiles.Contains(cf.CasefileNumber));
+        if (casefiles is null)
         {
             _error = "No case files found";
             return;
         }
 
-        foreach (var caseFile in caseFiles)
+        foreach (var casefile in casefiles)
         {
-            caseFile.Cfel.Add(new(Parent.ActiveDefendant.AddCfelText, "Craig Roberts"));
+            casefile.Cfel.Add(new(Parent.ActiveDefendant.AddCfelText, "Craig Roberts"));
         }
 
-        await DataAccess.UpdateCaseFiles(SelectedCaseFiles, Parent.ActiveDefendant.AddCfelText);
-
+        await DataAccess.UpdateCfels(SelectedCasefiles, Parent.ActiveDefendant.AddCfelText);
+        await _httpService.UpdateCasefileLogs(SelectedCasefiles, Parent.ActiveDefendant.AddCfelText);
         Parent.ActiveDefendant.AddCfelText = string.Empty;
     }
 }

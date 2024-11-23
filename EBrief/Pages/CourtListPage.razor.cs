@@ -8,7 +8,6 @@ using Microsoft.JSInterop;
 using Radzen;
 using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Services.Search;
-using DocumentFormat.OpenXml.Vml.Spreadsheet;
 
 namespace EBrief.Pages;
 public partial class CourtListPage : ICourtListPage
@@ -26,17 +25,17 @@ public partial class CourtListPage : ICourtListPage
     private bool IncludeDocuments { get; set; }
     private List<SearchResult> SearchResults { get; set; } = [];
     private ElementReference? _unsavedChangesDialog { get; set; }
-    private ElementReference? _addCaseFilesDialog { get; set; }
+    private ElementReference? _addCasefilesDialog { get; set; }
     private ElementReference? _searchDialog { get; set; }
-    private string CaseFilesToAdd { get; set; } = string.Empty;
+    private string CasefilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
     private string? _error;
-    private string? _addCaseFilesError;
+    private string? _addCasefilesError;
     private bool _loading;
-    private bool _loadingNewCaseFiles;
-    private readonly string _caseFileSelected = "bg-blue text-text hover:bg-blue";
-    private readonly string _caseFileNotSelected = "hover:bg-slate-300";
+    private bool _loadingNewCasefiles;
+    private readonly string _casefileSelected = "bg-blue text-text hover:bg-blue";
+    private readonly string _casefileNotSelected = "hover:bg-slate-300";
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,7 +80,7 @@ public partial class CourtListPage : ICourtListPage
     private List<CourtSession> GenerateCourtSessions()
     {
         // iterate over the list of defendants and group them by the appearance time of their first case file in the list
-        var courtSessions = CourtList.Defendants.SelectMany(d => d.CaseFiles)
+        var courtSessions = CourtList.Defendants.SelectMany(d => d.Casefiles)
             .GroupBy(cf => cf.Schedule.Last().HearingDate)
             .OrderBy(g => g.Key)
             .Select((g, i) => new CourtSession(i, g.Key))
@@ -89,7 +88,7 @@ public partial class CourtListPage : ICourtListPage
 
         foreach (var defendant in CourtList.Defendants)
         {
-            var hearingTime = defendant.CaseFiles.First().Schedule.Last().HearingDate;
+            var hearingTime = defendant.Casefiles.First().Schedule.Last().HearingDate;
             courtSessions.First(cs => cs.SittingTime.TimeOfDay == hearingTime.TimeOfDay).Defendants.Add(defendant);
         }
 
@@ -98,51 +97,51 @@ public partial class CourtListPage : ICourtListPage
         return courtSessions;
     }
 
-    private async Task OpenAddCaseFilesDialog()
+    private async Task OpenAddCasefilesDialog()
     {
-        if (_addCaseFilesDialog is not null)
+        if (_addCasefilesDialog is not null)
         {
             _error = null;
-            await JSRuntime.InvokeAsync<string>("openDialog", _addCaseFilesDialog);
+            await JSRuntime.InvokeAsync<string>("openDialog", _addCasefilesDialog);
         }
     }
 
-    private async Task CloseAddCaseFilesDialog()
+    private async Task CloseAddCasefilesDialog()
     {
-        CaseFilesToAdd = string.Empty;
-        await JSRuntime.InvokeVoidAsync("closeDialog", _addCaseFilesDialog);
+        CasefilesToAdd = string.Empty;
+        await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
     }
 
-    private async Task AddCaseFiles()
+    private async Task AddCasefiles()
     {
-        _loadingNewCaseFiles = true;
-        var caseFileNumbers = CaseFilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
-        var newCaseFileNumbers = caseFileNumbers.Except(CourtList.GetCaseFiles().Select(cf => cf.CaseFileNumber)).ToList();
+        _loadingNewCasefiles = true;
+        var casefileNumbers = CasefilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
+        var newCasefileNumbers = casefileNumbers.Except(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber)).ToList();
 
-        if (newCaseFileNumbers.Count == 0)
+        if (newCasefileNumbers.Count == 0)
         {
-            _addCaseFilesError = "All of those case files are in the list already";
+            _addCasefilesError = "All of those case files are in the list already";
             return;
         }
 
         try
         {
-            _addCaseFilesError = null;
-            var newCaseFileModels = await HttpService.GetCaseFiles(newCaseFileNumbers, CourtDate);
-            await DataAccess.AddCaseFiles(newCaseFileModels, CourtList);
-            var newCaseFiles = newCaseFileModels.ToUIModels();
-            newCaseFiles.AddReferenceToDefendants();
-            CourtList.AddCaseFiles(newCaseFiles);
-            UpdateCourtSessions(newCaseFiles.Select(cf => cf.Defendant).ToList());
+            _addCasefilesError = null;
+            var newCasefileModels = await HttpService.GetCasefiles(newCasefileNumbers, CourtDate);
+            await DataAccess.AddCasefiles(newCasefileModels, CourtList);
+            var newCasefiles = newCasefileModels.ToUIModels();
+            newCasefiles.AddReferenceToDefendants();
+            CourtList.AddCasefiles(newCasefiles);
+            UpdateCourtSessions(newCasefiles.Select(cf => cf.Defendant).ToList());
 
-            CaseFilesToAdd = string.Empty;
-            await JSRuntime.InvokeVoidAsync("closeDialog", _addCaseFilesDialog);
-            _loadingNewCaseFiles = false;
+            CasefilesToAdd = string.Empty;
+            await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
+            _loadingNewCasefiles = false;
         }
         catch
         {
-            _addCaseFilesError = "Failed to add case files";
-            _loadingNewCaseFiles = false;
+            _addCasefilesError = "Failed to add case files";
+            _loadingNewCasefiles = false;
             return;
         }
 
@@ -152,10 +151,10 @@ public partial class CourtListPage : ICourtListPage
     {
         foreach (var defendant in defendants)
         {
-            var courtSession = CourtSessions.FirstOrDefault(cs => cs.SittingTime == defendant.CaseFiles.First().Schedule.Last().HearingDate);
+            var courtSession = CourtSessions.FirstOrDefault(cs => cs.SittingTime == defendant.Casefiles.First().Schedule.Last().HearingDate);
             if (courtSession is null)
             {
-                courtSession = new(CourtSessions.Count, defendant.CaseFiles.First().Schedule.Last().HearingDate);
+                courtSession = new(CourtSessions.Count, defendant.Casefiles.First().Schedule.Last().HearingDate);
             }
 
             courtSession.Defendants.Add(defendant);
@@ -196,25 +195,25 @@ public partial class CourtListPage : ICourtListPage
     public void ActivateDefendant(Defendant defendant)
     {
         ActiveDefendant = defendant;
-        if (ActiveDefendant.ActiveCaseFile is null)
+        if (ActiveDefendant.ActiveCasefile is null)
         {
-            ActiveDefendant.ActiveCaseFile = ActiveDefendant.CaseFiles.First();
+            ActiveDefendant.ActiveCasefile = ActiveDefendant.Casefiles.First();
         }
 
         OnDefendantChange?.Invoke();
         StateHasChanged();
     }
 
-    private void CaseFileChanged(Casefile caseFile)
+    private void CasefileChanged(Casefile casefile)
     {
         if (ActiveDefendant is not null)
         {
-            ActiveDefendant.ActiveCaseFile = caseFile;
+            ActiveDefendant.ActiveCasefile = casefile;
         }
         ActivateDefendant(ActiveDefendant!);
     }
 
-    private void SearchCaseFiles(ChangeEventArgs e)
+    private void SearchCasefiles(ChangeEventArgs e)
     {
         if (e.Value is not null)
         {
@@ -225,8 +224,8 @@ public partial class CourtListPage : ICourtListPage
     [JSInvokable]
     public async void OpenSearchDialog()
     {
-        var caseFiles = CourtList.GetCaseFiles(10);
-        SearchResults = caseFiles.Select(cf => new SearchResult(cf, "")).ToList();
+        var casefiles = CourtList.GetCasefiles(10);
+        SearchResults = casefiles.Select(cf => new SearchResult(cf, "")).ToList();
         await JSRuntime.InvokeVoidAsync("openDialog", _searchDialog);
         StateHasChanged();
     }
@@ -239,15 +238,15 @@ public partial class CourtListPage : ICourtListPage
 
     public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;
 
-    private bool IsSelected(Casefile caseFile) => ActiveDefendant?.ActiveCaseFile?.CaseFileNumber == caseFile.CaseFileNumber;
+    private bool IsSelected(Casefile casefile) => ActiveDefendant?.ActiveCasefile?.CasefileNumber == casefile.CasefileNumber;
 
     private void SaveCourtList()
     {
         DataAccess.UpdateCourtList(CourtList);
 
-        foreach (var caseFile in CourtList.GetCaseFiles())
+        foreach (var casefile in CourtList.GetCasefiles())
         {
-            caseFile.Notes.HasChanged = false;
+            casefile.Notes.HasChanged = false;
         }
     }
 
@@ -264,14 +263,30 @@ public partial class CourtListPage : ICourtListPage
             return false;
         }
 
-        foreach (var caseFile in CourtList.GetCaseFiles())
+        foreach (var casefile in CourtList.GetCasefiles())
         {
-            if (caseFile.Notes.HasChanged)
+            if (casefile.Notes.HasChanged)
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private async Task RefreshData()
+    {
+        try
+        {
+            var updatedCasefiles = await HttpService.RefreshData(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber));
+            await DataAccess.UpdateCasefiles(updatedCasefiles);
+            CourtList.UpdateCasefiles(updatedCasefiles);
+            NavManager.Refresh();
+        }
+        catch (Exception e)
+        {
+            _error = e.Message;
+            return;
+        }
     }
 }

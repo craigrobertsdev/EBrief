@@ -95,14 +95,21 @@ public class FileService : IFileService
             DefaultExt = ".docx",
             Filter = "Word Document|*.docx"
         };
-        var result = dialog.ShowDialog();
 
-        if (result is null || result == false)
+        try
         {
-            return null;
-        }
+            var result = dialog.ShowDialog();
+            if (result is null || result == false)
+            {
+                return null;
+            }
 
-        return dialog.FileName;
+            return dialog.FileName;
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
     }
 
     public (List<CourtListModel>?, string?) LoadLandscapeList(string filePath)

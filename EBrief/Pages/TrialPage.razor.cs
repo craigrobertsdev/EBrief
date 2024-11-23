@@ -14,12 +14,12 @@ public partial class TrialPage
     [Inject] public AppState AppState { get; set; } = default!;
     [Inject] public HttpService HttpService { get; set; } = default!;
     private string? _error;
-    private string? _addCaseFilesError;
+    private string? _addCasefilesError;
     private bool _loading;
-    private bool _loadingNewCaseFiles;
-    private string CaseFilesToAdd = string.Empty;
+    private bool _loadingNewCasefiles;
+    private string CasefilesToAdd = string.Empty;
     private ElementReference? _unsavedChangesDialog { get; set; }
-    private ElementReference? _addCaseFilesDialog { get; set; }
+    private ElementReference? _addCasefilesDialog { get; set; }
     private CourtList CourtList { get; set; } = default!;
 
     private async Task HandleReturnHome()
@@ -50,9 +50,9 @@ public partial class TrialPage
     {
         DataAccess.UpdateCourtList(CourtList);
 
-        foreach (var caseFile in CourtList.GetCaseFiles())
+        foreach (var casefile in CourtList.GetCasefiles())
         {
-            caseFile.Notes.HasChanged = false;
+            casefile.Notes.HasChanged = false;
         }
     }
 
@@ -69,9 +69,9 @@ public partial class TrialPage
             return false;
         }
 
-        foreach (var caseFile in CourtList.GetCaseFiles())
+        foreach (var casefile in CourtList.GetCasefiles())
         {
-            if (caseFile.Notes.HasChanged)
+            if (casefile.Notes.HasChanged)
             {
                 return true;
             }
@@ -80,50 +80,50 @@ public partial class TrialPage
         return false;
     }
 
-    private async Task OpenAddCaseFilesDialog()
+    private async Task OpenAddCasefilesDialog()
     {
-        if (_addCaseFilesDialog is not null)
+        if (_addCasefilesDialog is not null)
         {
             _error = null;
-            await JSRuntime.InvokeAsync<string>("openDialog", _addCaseFilesDialog);
+            await JSRuntime.InvokeAsync<string>("openDialog", _addCasefilesDialog);
         }
     }
 
-    private async Task CloseAddCaseFilesDialog()
+    private async Task CloseAddCasefilesDialog()
     {
-        CaseFilesToAdd = string.Empty;
-        await JSRuntime.InvokeVoidAsync("closeDialog", _addCaseFilesDialog);
+        CasefilesToAdd = string.Empty;
+        await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
     }
 
-    private async Task AddCaseFiles()
+    private async Task AddCasefiles()
     {
-        _loadingNewCaseFiles = true;
-        var caseFileNumbers = CaseFilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
-        var newCaseFileNumbers = caseFileNumbers.Except(CourtList.GetCaseFiles().Select(cf => cf.CaseFileNumber)).ToList();
+        _loadingNewCasefiles = true;
+        var casefileNumbers = CasefilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
+        var newCasefileNumbers = casefileNumbers.Except(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber)).ToList();
 
-        if (newCaseFileNumbers.Count == 0)
+        if (newCasefileNumbers.Count == 0)
         {
-            _addCaseFilesError = "All of those case files are in the list already";
+            _addCasefilesError = "All of those case files are in the list already";
             return;
         }
 
         try
         {
-            _addCaseFilesError = null;
-            var newCaseFileModels = await HttpService.GetCaseFiles(newCaseFileNumbers, CourtList.CourtDate);
-            await DataAccess.AddCaseFiles(newCaseFileModels, CourtList);
-            var newCaseFiles = newCaseFileModels.ToUIModels();
-            newCaseFiles.AddReferenceToDefendants();
-            CourtList.AddCaseFiles(newCaseFiles);
+            _addCasefilesError = null;
+            var newCasefileModels = await HttpService.GetCasefiles(newCasefileNumbers, CourtList.CourtDate);
+            await DataAccess.AddCasefiles(newCasefileModels, CourtList);
+            var newCasefiles = newCasefileModels.ToUIModels();
+            newCasefiles.AddReferenceToDefendants();
+            CourtList.AddCasefiles(newCasefiles);
 
-            CaseFilesToAdd = string.Empty;
-            await JSRuntime.InvokeVoidAsync("closeDialog", _addCaseFilesDialog);
-            _loadingNewCaseFiles = false;
+            CasefilesToAdd = string.Empty;
+            await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
+            _loadingNewCasefiles = false;
         }
         catch
         {
-            _addCaseFilesError = "Failed to add case files";
-            _loadingNewCaseFiles = false;
+            _addCasefilesError = "Failed to add case files";
+            _loadingNewCasefiles = false;
             return;
         }
     }

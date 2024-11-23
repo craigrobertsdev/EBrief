@@ -41,7 +41,7 @@ else
             <div class="max-w-2xl flex items-center">
                 <DropdownMenu Text="Menu">
                     <DropdownMenuItem Text="Save" OnClick="SaveCourtList" />
-                    <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCaseFilesDialog" />
+                    <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCasefilesDialog" />
                     <DropdownMenuItem Text="Export Court List" OnClick="ExportCourtList" />
                     <DropdownMenuItem Text="Return Home" OnClick="HandleReturnHome" />
                 </DropdownMenu>
@@ -97,8 +97,8 @@ else
     </div>
 </dialog>
 
-<dialog @ref="_addCaseFilesDialog" class="p-5">
-    @if (_loadingNewCaseFiles)
+<dialog @ref="_addCasefilesDialog" class="p-5">
+    @if (_loadingNewCasefiles)
     {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     }
@@ -108,27 +108,27 @@ else
             Enter the case file numbers you want to add, separated by a space or new line
         </h3>
         <div class="w-full pb-4">
-            <textarea @bind="@CaseFilesToAdd" rows="10" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
+            <textarea @bind="@CasefilesToAdd" rows="10" class="w-full p-2 border border-slate-500 rounded-md resize-none" />
         </div>
         <div class="flex w-full justify-end gap-3 pb-2">
-            <RadzenButton Text="Add" Click="AddCaseFiles" />
-            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCaseFilesDialog" />
+            <RadzenButton Text="Add" Click="AddCasefiles" />
+            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCasefilesDialog" />
         </div>
 
-        @if (_addCaseFilesError is not null)
+        @if (_addCasefilesError is not null)
         {
-            <p class="text-red-500 text-center text-lg">@_addCaseFilesError</p>
+            <p class="text-red-500 text-center text-lg">@_addCasefilesError</p>
         }
     }
 </dialog>
 
  @* <dialog id="search-dialog">
      <h1>This is the search box</h1>
-     <input @oninput="SearchCaseFiles" />
+     <input @oninput="SearchCasefiles" />
      <p>
          @foreach (var result in SearchResults)
          {
-         <p>@result.CaseFileNumber</p>
+         <p>@result.CasefileNumber</p>
          }
      </p>
  </dialog> *@

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.ComponentModel;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 
 namespace EBrief;
@@ -47,7 +48,9 @@ public partial class MainWindow : Window
             serviceCollection.AddScoped<IDataAccess, DataAccess>();
             serviceCollection.AddScoped<IFileService, FileService>();
             serviceCollection.AddSingleton(new AppState());
-            serviceCollection.AddSingleton<HttpService>();
+
+            serviceCollection.AddHttpClient();
+            serviceCollection.AddTransient<HttpService>();
 
             Resources.Add("services", serviceCollection.BuildServiceProvider());
 
@@ -80,9 +83,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        foreach (var caseFile in appState.CurrentCourtList.GetCaseFiles())
+        foreach (var casefile in appState.CurrentCourtList.GetCasefiles())
         {
-            if (caseFile.Notes.HasChanged)
+            if (casefile.Notes.HasChanged)
             {
                 var button = MessageBoxButton.YesNoCancel;
                 var result = MessageBox.Show($"You have unsaved changes to your court list. Save before closing?", "Save changes", button, MessageBoxImage.Question);
@@ -104,12 +107,12 @@ public partial class MainWindow : Window
 
         var courtListModel = dbContext.CourtLists
             .Where(cl => cl.Id == appState.CurrentCourtList.Id)
-            .Include(cl => cl.CaseFiles)
+            .Include(cl => cl.Casefiles)
             .First();
 
-        foreach (var caseFile in appState.CurrentCourtList.GetCaseFiles())
+        foreach (var casefile in appState.CurrentCourtList.GetCasefiles())
         {
-            courtListModel.CaseFiles.First(cf => cf.CaseFileNumber == caseFile.CaseFileNumber).Notes = caseFile.Notes.Text;
+            courtListModel.Casefiles.First(cf => cf.CasefileNumber == casefile.CasefileNumber).Notes = casefile.Notes.Text;
         }
 
         dbContext.CourtLists.Update(courtListModel);

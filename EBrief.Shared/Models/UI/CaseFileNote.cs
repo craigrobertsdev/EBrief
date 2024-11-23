@@ -1,5 +1,5 @@
 ﻿namespace EBrief.Shared.Models.UI;
-public class CaseFileNote
+public class CasefileNote
 {
     private string _text = string.Empty;
     public string Text

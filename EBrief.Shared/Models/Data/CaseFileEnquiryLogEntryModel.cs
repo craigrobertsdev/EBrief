@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace EBrief.Shared.Models.Data;
-public class CaseFileEnquiryLogEntryModel
+public class CasefileEnquiryLogEntryModel
 {
     [Key]
     [JsonIgnore]

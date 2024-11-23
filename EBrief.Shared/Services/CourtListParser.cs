@@ -93,29 +93,29 @@ public class CourtListParser
         }
 
         var elements = row.ChildElements;
-        var caseFile = new CaseFileModel();
+        var casefile = new CasefileModel();
 
         //elements[3] = "3. MCCRM-XX-XXXXXX(H1234567B)First Appearances"
         if (elements[3].InnerText == string.Empty) // this happens for co-accused
         {
-            var lastCaseFile = courtList.CaseFiles.Last();
-            caseFile.CourtFileNumber = lastCaseFile.CourtFileNumber;
-            caseFile.CaseFileNumber = lastCaseFile.CaseFileNumber;
-            caseFile.ListNumber = lastCaseFile.ListNumber;
-            caseFile.ListingType = lastCaseFile.ListingType;
+            var lastCasefile = courtList.Casefiles.Last();
+            casefile.CourtFileNumber = lastCasefile.CourtFileNumber;
+            casefile.CasefileNumber = lastCasefile.CasefileNumber;
+            casefile.ListNumber = lastCasefile.ListNumber;
+            casefile.ListingType = lastCasefile.ListingType;
         }
         else
         {
             var ids = SplitCourtIdentifiers(elements[3].InnerText);
-            caseFile.CaseFileNumber = ids.PoliceFileNumber;
-            caseFile.CourtFileNumber = ids.CourtFileNumber;
-            caseFile.ListNumber = ids.ListNo;
-            caseFile.ListingType = ids.ListingType;
+            casefile.CasefileNumber = ids.PoliceFileNumber;
+            casefile.CourtFileNumber = ids.CourtFileNumber;
+            casefile.ListNumber = ids.ListNo;
+            casefile.ListingType = ids.ListingType;
         }
 
         //elements[4] = "SURNAME, FirstName"
         var defendantName = elements[4].InnerText.Split(", ");
-        caseFile.Defendant = new DefendantModel
+        casefile.Defendant = new DefendantModel
         {
             FirstName = defendantName[1].Trim(),
             LastName = defendantName[0].Trim()
@@ -123,21 +123,21 @@ public class CourtListParser
 
         /*********DELETE THIS IN PROD*********/
         var defendant = defendantNames.LastOrDefault();
-        if (defendant is not null && defendant.First == caseFile.Defendant.FirstName && defendant.Last == caseFile.Defendant.LastName)
+        if (defendant is not null && defendant.First == casefile.Defendant.FirstName && defendant.Last == casefile.Defendant.LastName)
         {
-            caseFile.Defendant.Id = defendant.Id;
+            casefile.Defendant.Id = defendant.Id;
         }
         else
         {
-            caseFile.Defendant.Id = currentId;
-            defendantNames.Add(new(caseFile.Defendant.FirstName, caseFile.Defendant.LastName, currentId));
+            casefile.Defendant.Id = currentId;
+            defendantNames.Add(new(casefile.Defendant.FirstName, casefile.Defendant.LastName, currentId));
             currentId++;
         }
         /*************************************/
 
 
         //elements[5] = "Prescribed Road, Truck/Bus Exceed Speed Limit >= 10Km/Hr (Camera Offence)"
-        caseFile.OffenceDetails = elements[5].InnerText.Split("/ ").Select(o => o.Trim()).ToArray();
+        casefile.OffenceDetails = elements[5].InnerText.Split("/ ").Select(o => o.Trim()).ToArray();
 
         // elements[6] && elements[7] 
         if (elements[6].InnerText != string.Empty)
@@ -147,16 +147,16 @@ public class CourtListParser
                 Name = elements[6].InnerText,
                 Number = elements[7].InnerText
             };
-            caseFile.Counsel = counsel;
+            casefile.Counsel = counsel;
         }
 
         //elements[8] = "Hearing"
-        caseFile.HearingType = elements[8].InnerText;
+        casefile.HearingType = elements[8].InnerText;
 
         //elements[9] = "Gaol/Bail"
-        caseFile.DefendantAppearanceMethod = elements[9].InnerText;
+        casefile.DefendantAppearanceMethod = elements[9].InnerText;
 
-        courtList.CaseFiles.Add(caseFile);
+        courtList.Casefiles.Add(casefile);
         pos++;
     }
 

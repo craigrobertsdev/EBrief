@@ -1,9 +1,9 @@
 @using EBrief.Shared.Models
 @using EBrief.Shared.Models.Shared
 
-@if (Parent.ActiveDefendant?.ActiveCaseFile?.FactsOfCharge is not null)
+@if (Parent.ActiveDefendant?.ActiveCasefile?.FactsOfCharge is not null)
 {
-    @foreach (var paragraph in Parent.ActiveDefendant.ActiveCaseFile.FactsOfCharge.Split("\n"))
+    @foreach (var paragraph in Parent.ActiveDefendant.ActiveCasefile.FactsOfCharge.Split("\n"))
     {
         <p class="max-w-[120ch]">@paragraph</p>
         <br />

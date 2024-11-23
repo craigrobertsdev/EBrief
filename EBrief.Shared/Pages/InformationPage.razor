@@ -2,8 +2,8 @@
 @using EBrief.Shared.Models.Shared
 
 <div>
-    @if (Parent.ActiveDefendant?.ActiveCaseFile?.Information is not null) {
-        foreach (var entry in Parent.ActiveDefendant.ActiveCaseFile.Information.Charges) {
+    @if (Parent.ActiveDefendant?.ActiveCasefile?.Information is not null) {
+        foreach (var entry in Parent.ActiveDefendant.ActiveCasefile.Information.Charges) {
             <div class="flex">
                 <span class="pr-2">@entry.Sequence.</span>
                 <div>

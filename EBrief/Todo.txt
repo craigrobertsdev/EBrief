@@ -17,7 +17,7 @@ FUNCTIONALITY:
 	- Implement OAuth2
 	    * If the user's credentials change while the application is open (ie they make a request and get an unauthorised error code, they should be prompted to log in again
 	- Add auth tokens and use them to send requests and populate user data for CFEL updates:
-		* CaseFileEnquiryLogEntry constructor needs to accept a user rather than a string
+		* CasefileEnquiryLogEntry constructor needs to accept a user rather than a string
 		* Follow ups page needs to be updated to use the user
 	- Templates for court updates
 		* Add the judicial officer and some template text like "COURT UPDATE" in an editable text field so every entry can be quickly started for prosecutors to do an update.
@@ -25,6 +25,8 @@ FUNCTIONALITY:
 			so they can do updates to CFELs. 
 		* Follow up tasks should be able to be created for the prosecutor they 
 			are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
+
+	- Fix issue where AddCourtList confirm button is disabled even when there is an error.
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 

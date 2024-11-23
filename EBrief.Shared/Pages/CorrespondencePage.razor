@@ -6,18 +6,18 @@
 @implements IDisposable
 
 <div class="flex h-full">
-    @if (Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.Count == 0)
+    @if (Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocuments.Count == 0)
     {
         <p>No correspondence to display</p>
     }
-    else if (Parent.ActiveDefendant?.ActiveCaseFile?.DocumentsLoaded == false)
+    else if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
     {
         <p>No documents loaded for this court list</p>
     }
     else
     {
         <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto w-40 laptop:w-56">
-            @foreach (var document in Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments!)
+            @foreach (var document in Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocuments!)
             {
                 <div class="text-md laptop:text-base p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" 
                     @onclick=@(() => SelectDocument(document)) title="@document.Title">
@@ -46,7 +46,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Parent.ActiveDefendant?.ActiveCaseFile?.DocumentsLoaded == false)
+        if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
         {
             return;
         }
@@ -57,8 +57,8 @@
 
     private async Task HandleDefendantChange()
     {
-        var file = Parent.ActiveDefendant?.ActiveCaseFile?.SelectedCaseFileDocument ??
-            Parent.ActiveDefendant?.ActiveCaseFile?.CaseFileDocuments.FirstOrDefault();
+        var file = Parent.ActiveDefendant?.ActiveCasefile?.SelectedCasefileDocument ??
+            Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocuments.FirstOrDefault();
         if (file != null)
         {
             await SelectDocument(file);
@@ -68,8 +68,8 @@
 
     private async Task SelectDocument(Document document)
     {
-        _selectedDocument = Parent!.ActiveDefendant!.ActiveCaseFile!.CaseFileDocuments.FirstOrDefault(d => d.Title == document.Title);
-        Parent!.ActiveDefendant!.ActiveCaseFile!.SelectedCaseFileDocument = _selectedDocument;
+        _selectedDocument = Parent!.ActiveDefendant!.ActiveCasefile!.CasefileDocuments.FirstOrDefault(d => d.Title == document.Title);
+        Parent!.ActiveDefendant!.ActiveCasefile!.SelectedCasefileDocument = _selectedDocument;
         await LoadDocument(document.FileName);
     }
 

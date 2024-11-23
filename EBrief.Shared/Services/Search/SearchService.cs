@@ -5,27 +5,27 @@ namespace EBrief.Shared.Services.Search;
 public class SearchService
 {
     public SearchTrie SearchTrie { get; private set; }
-    private readonly Casefile[] _caseFiles;
+    private readonly Casefile[] _casefiles;
 
     public SearchService(CourtList courtList)
     {
         SearchTrie = BuildTrie(courtList);
-        var courtListCaseFiles = courtList.GetCaseFiles();
-        var caseFiles = new Casefile[courtListCaseFiles.Count];
-        courtList.GetCaseFiles().CopyTo(caseFiles, 0);
-        foreach (var cf in caseFiles)
+        var courtListCasefiles = courtList.GetCasefiles();
+        var casefiles = new Casefile[courtListCasefiles.Count];
+        courtList.GetCasefiles().CopyTo(casefiles, 0);
+        foreach (var cf in casefiles)
         {
-            cf.CaseFileNumber = cf.CaseFileNumber.ToUpper();
+            cf.CasefileNumber = cf.CasefileNumber.ToUpper();
             cf.CourtFileNumber = cf.CourtFileNumber?.ToUpper();
         }
 
-        _caseFiles = [..caseFiles];
+        _casefiles = [..casefiles];
     }
 
     public List<SearchResult> Find(string key)
     {
         var results = new List<SearchResult>();
-        foreach (var caseFile in _caseFiles)
+        foreach (var casefile in _casefiles)
         {
             if (results.Count == 10)
             {
@@ -33,10 +33,10 @@ public class SearchService
             }
 
             key = key.ToUpper();
-            if (caseFile.CaseFileNumber.Contains(key) ||
-                (caseFile.CourtFileNumber is not null && caseFile.CourtFileNumber!.Contains(key)))
+            if (casefile.CasefileNumber.Contains(key) ||
+                (casefile.CourtFileNumber is not null && casefile.CourtFileNumber!.Contains(key)))
             {
-                results.Add(new(SearchTrie.Find(caseFile.CaseFileNumber), key));
+                results.Add(new(SearchTrie.Find(casefile.CasefileNumber), key));
             }
         }
 
@@ -48,13 +48,13 @@ public class SearchService
     private static SearchTrie BuildTrie(CourtList courtList)
     {
         SearchTrie trie = new();
-        var caseFiles = courtList.GetCaseFiles();
-        var caseFileNumbers = caseFiles.Select(cf => cf.CaseFileNumber);
-        var courtFileNumbers = caseFiles.Select(cf => cf.CourtFileNumber);
+        var casefiles = courtList.GetCasefiles();
+        var casefileNumbers = casefiles.Select(cf => cf.CasefileNumber);
+        var courtFileNumbers = casefiles.Select(cf => cf.CourtFileNumber);
         // go through each item, create trie node and add reference at leaf of the key.
-        foreach (var cf in caseFiles)
+        foreach (var cf in casefiles)
         {
-            trie.Insert(cf.CaseFileNumber.ToUpper(), cf);
+            trie.Insert(cf.CasefileNumber.ToUpper(), cf);
             if (cf.CourtFileNumber is not null)
             {
                 trie.Insert(cf.CourtFileNumber.ToUpper(), cf);

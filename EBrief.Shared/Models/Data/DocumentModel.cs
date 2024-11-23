@@ -25,6 +25,6 @@ public class DocumentModel
 
 public enum DocumentType
 {
-    CaseFile,
+    Casefile,
     Occurrence
 }

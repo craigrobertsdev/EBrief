@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace EBrief.Shared.Models.Data;
-public class CaseFileModel
+public class CasefileModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -12,7 +12,7 @@ public class CaseFileModel
     public Guid Id { get; set; }
     public CourtListModel CourtList { get; set; } = default!;
     public Guid CourtListId { get; set; }
-    public string CaseFileNumber { get; set; } = string.Empty;
+    public string CasefileNumber { get; set; } = string.Empty;
     public DefendantModel Defendant { get; set; } = default!;
     public string DefendantAppearanceMethod { get; set; } = string.Empty;
     public string[] OffenceDetails { get; set; } = [];
@@ -23,7 +23,7 @@ public class CaseFileModel
     public string ListingType { get; set; } = string.Empty;
     public string HearingType { get; set; } = string.Empty;
     public List<HearingEntryModel> Schedule { get; set; } = [];
-    public List<CaseFileEnquiryLogEntryModel> CfelEntries { get; set; } = [];
+    public List<CasefileEnquiryLogEntryModel> CfelEntries { get; set; } = [];
     public string FactsOfCharge { get; set; } = default!;
     public InformationModel? Information { get; set; }
     public TimeSpan? TimeInCustody { get; set; }
@@ -36,7 +36,7 @@ public class CaseFileModel
     {
         return new Casefile
         {
-            CaseFileNumber = CaseFileNumber,
+            CasefileNumber = CasefileNumber,
             Defendant = Defendant.ToUIModel(),
             CourtFileNumber = CourtFileNumber,
             Schedule = Schedule.Select(hearing => hearing.ToUIModel()).ToList(),
@@ -44,13 +44,13 @@ public class CaseFileModel
             FactsOfCharge = FactsOfCharge,
             TimeInCustody = TimeInCustody,
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),
-            CaseFileDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.CaseFile).Select(doc => doc.ToUIModel()).ToList(),
+            CasefileDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.Casefile).Select(doc => doc.ToUIModel()).ToList(),
             OccurrenceDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.Occurrence).Select(doc => doc.ToUIModel()).ToList(),
             DocumentsLoaded = DocumentsLoaded,
             Notes = new() { Text = Notes, HasChanged = false }
         };
     }
-    public void CombineWith(CaseFileModel model)
+    public void CombineWith(CasefileModel model)
     {
         Schedule = model.Schedule;
         CfelEntries = model.CfelEntries;
@@ -62,12 +62,22 @@ public class CaseFileModel
         DocumentsLoaded = model.DocumentsLoaded;
         Notes = model.Notes;
     }
+
+    public void Update(CasefileModel model)
+    {
+        Schedule = model.Schedule;
+        CfelEntries = model.CfelEntries;
+        FactsOfCharge = model.FactsOfCharge;
+        Information = model.Information;
+        TimeInCustody = model.TimeInCustody;
+        Charges = model.Charges;
+    }
 }
 
-public static class CaseFileModelExtensions
+public static class CasefileModelExtensions
 {
-    public static List<Casefile> ToUIModels(this IEnumerable<CaseFileModel> caseFiles)
+    public static List<Casefile> ToUIModels(this IEnumerable<CasefileModel> casefiles)
     {
-        return caseFiles.Select(cf => cf.ToUIModel()).ToList();
+        return casefiles.Select(cf => cf.ToUIModel()).ToList();
     }
 }

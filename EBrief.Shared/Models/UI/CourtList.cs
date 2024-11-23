@@ -1,4 +1,5 @@
-﻿using EBrief.Shared.Models.Shared;
+﻿using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.Shared;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,57 +16,68 @@ public class CourtList
     {
         foreach (var defendant in Defendants)
         {
-            foreach (var caseFile in defendant.CaseFiles)
+            foreach (var casefile in defendant.Casefiles)
             {
-                caseFile.GenerateInformationFromCharges();
+                casefile.GenerateInformationFromCharges();
             }
         }
     }
 
-    public void AddCaseFiles(List<Casefile> caseFiles)
+    public void AddCasefiles(List<Casefile> casefiles)
     {
-        foreach (var caseFile in caseFiles)
+        foreach (var casefile in casefiles)
         {
-            var defendant = Defendants.FirstOrDefault(d => d.Id == caseFile.Defendant.Id);
+            var defendant = Defendants.FirstOrDefault(d => d.Id == casefile.Defendant.Id);
             if (defendant is null)
             {
                 defendant = new Defendant
                 {
-                    Id = caseFile.Defendant.Id,
-                    LastName = caseFile.Defendant.LastName,
-                    FirstName = caseFile.Defendant.FirstName
+                    Id = casefile.Defendant.Id,
+                    LastName = casefile.Defendant.LastName,
+                    FirstName = casefile.Defendant.FirstName
                 };
                 Defendants.Add(defendant);
             }
 
-            defendant.CaseFiles.Add(caseFile);
-            defendant.CaseFiles.Sort((cf1, cf2) => cf1.Charges.First().Date.CompareTo(cf2.Charges.First().Date));
+            defendant.Casefiles.Add(casefile);
+            defendant.Casefiles.Sort((cf1, cf2) => cf1.Charges.First().Date.CompareTo(cf2.Charges.First().Date));
         }
     }
 
-    public List<Casefile> GetCaseFiles()
+    public List<Casefile> GetCasefiles()
     {
-        var caseFiles = new List<Casefile>();
+        var casefiles = new List<Casefile>();
         foreach (var defendant in Defendants)
         {
-            caseFiles.AddRange(defendant.CaseFiles);
+            casefiles.AddRange(defendant.Casefiles);
         }
 
-        return caseFiles;
+        return casefiles;
     }
 
-    public List<Casefile> GetCaseFiles(int amount)
+    public List<Casefile> GetCasefiles(int amount)
     {
-        var caseFiles = new List<Casefile>();
+        var casefiles = new List<Casefile>();
         foreach (var defendant in Defendants)
         {
-            caseFiles.AddRange(defendant.CaseFiles);
-            if (caseFiles.Count == amount)
+            casefiles.AddRange(defendant.Casefiles);
+            if (casefiles.Count == amount)
             {
                 break;
             }
         }
 
-        return caseFiles;
+        return casefiles;
+    }
+
+    public void UpdateCasefiles(List<CasefileModel> updatedCasefiles)
+    {
+        var casefiles = GetCasefiles();
+        casefiles.Sort((a, b) => a.CasefileNumber.CompareTo(b.CasefileNumber));
+        updatedCasefiles.Sort((a, b) => a.CasefileNumber.CompareTo(b.CasefileNumber));
+        for (int i = 0; i < casefiles.Count; i++)
+        {
+            var casefile = casefiles[i];
+        }
     }
 }

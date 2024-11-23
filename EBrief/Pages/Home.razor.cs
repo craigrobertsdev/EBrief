@@ -21,7 +21,7 @@ public partial class Home
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
-    private string? CaseFileNumbers { get; set; }
+    private string? CasefileNumbers { get; set; }
     private List<Court> Courts = [];
     private string? SelectedFile { get; set; }
     private List<CourtListModel>? LandscapeList { get; set; }
@@ -278,18 +278,18 @@ public partial class Home
         {
             var client = new HttpClient();
 
-            IEnumerable<string> caseFileNumbers;
+            IEnumerable<string> casefileNumbers;
             if (EnterManually)
             {
-                caseFileNumbers = CaseFileNumbers!.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
+                casefileNumbers = CasefileNumbers!.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
             }
             else
             {
-                courtList.CaseFiles = LandscapeList!.First(cl => cl.CourtRoom == courtList.CourtRoom).CaseFiles;
-                caseFileNumbers = courtList.CaseFiles.Select(cf => cf.CaseFileNumber);
+                courtList.Casefiles = LandscapeList!.First(cl => cl.CourtRoom == courtList.CourtRoom).Casefiles;
+                casefileNumbers = courtList.Casefiles.Select(cf => cf.CasefileNumber);
             }
 
-            var body = new CourtListDto(caseFileNumbers, courtList.CourtDate);
+            var body = new CourtListDto(casefileNumbers, courtList.CourtDate);
             var response = await client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/generate-case-files", body);
             if (!response.IsSuccessStatusCode)
             {
@@ -297,21 +297,21 @@ public partial class Home
                 return;
             }
 
-            var caseFiles = await response.Content.ReadFromJsonAsync<List<CaseFileModel>>();
-            if (caseFiles is null)
+            var casefiles = await response.Content.ReadFromJsonAsync<List<CasefileModel>>();
+            if (casefiles is null)
             {
                 _loadNewCourtListError = "Failed to fetch court list.";
                 return;
             }
 
-            if (courtList.CaseFiles.Count > 0)
+            if (courtList.Casefiles.Count > 0)
             {
-                courtList.CombineCaseFiles(caseFiles);
-                courtList.CombineDefendantsWithServerResponse(caseFiles);
+                courtList.CombineCasefiles(casefiles);
+                courtList.CombineDefendantsWithServerResponse(casefiles);
             }
             else
             {
-                courtList.CaseFiles = caseFiles;
+                courtList.Casefiles = casefiles;
                 courtList.OrderAndAssignListingNumbers();
             }
 
@@ -354,7 +354,7 @@ public partial class Home
             return false;
         }
 
-        if (EnterManually && string.IsNullOrEmpty(CaseFileNumbers))
+        if (EnterManually && string.IsNullOrEmpty(CasefileNumbers))
         {
             return false;
         }
@@ -375,7 +375,7 @@ public partial class Home
         SelectedFile = null;
         LandscapeList = null;
         CourtListBuilder.Reset();
-        CaseFileNumbers = null;
+        CasefileNumbers = null;
     }
 
     private async Task ClosePreviousCourtListDialog() =>
@@ -446,9 +446,9 @@ public partial class Home
         IncludeDocuments = bool.Parse((string)e.Value);
     }
 
-    private void HandleEnterCaseFileNumbers(ChangeEventArgs e)
+    private void HandleEnterCasefileNumbers(ChangeEventArgs e)
     {
-        CaseFileNumbers = (string?)e.Value;
+        CasefileNumbers = (string?)e.Value;
     }
 
     private void HandleSelectCourtListEntry(CourtListEntry courtListEntry)
@@ -467,15 +467,15 @@ public partial class Home
         var client = new HttpClient();
         FileService.CreateDocumentDirectory();
 
-        foreach (var caseFile in courtList.CaseFiles)
+        foreach (var casefile in courtList.Casefiles)
         {
-            foreach (var document in caseFile.Documents)
+            foreach (var document in casefile.Documents)
             {
-                var endpoint = document.DocumentType == DocumentType.CaseFile ? "correspondence" : "evidence";
+                var endpoint = document.DocumentType == DocumentType.Casefile ? "correspondence" : "evidence";
                 await DownloadDocument(document, client, endpoint);
             }
 
-            caseFile.DocumentsLoaded = true;
+            casefile.DocumentsLoaded = true;
         }
     }
 

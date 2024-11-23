@@ -33,7 +33,7 @@ public class DefendantModel
             Address = Address,
             Phone = Phone,
             Email = Email,
-            CaseFiles = [],
+            Casefiles = [],
             ListStart = ListStart,
             ListEnd = ListEnd,
             BailAgreements = BailAgreements.Select(ba => ba.ToUIModel()).ToList(),

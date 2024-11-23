@@ -8,7 +8,7 @@ namespace EBrief.Data;
 public class ApplicationDbContext : DbContext
 {
     public DbSet<CourtListModel> CourtLists { get; set; }
-    public DbSet<CaseFileModel> CaseFiles { get; set; }
+    public DbSet<CasefileModel> Casefiles { get; set; }
     public DbSet<DefendantModel> Defendants { get; set; }
     public DbSet<DocumentModel> Documents { get; set; }
     public ApplicationDbContext(DbContextOptions options) : base(options)
@@ -29,45 +29,45 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CourtListModel>()
-            .HasMany(cl => cl.CaseFiles)
+            .HasMany(cl => cl.Casefiles)
             .WithOne(cf => cf.CourtList)
             .HasForeignKey(cf => cf.CourtListId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasOne(cf => cf.CourtList)
-            .WithMany(cl => cl.CaseFiles)
+            .WithMany(cl => cl.Casefiles)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasOne(cf => cf.Defendant)
             .WithMany()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasOne(cf => cf.Counsel)
             .WithMany()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasMany(cf => cf.Documents)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasMany(cf => cf.Schedule)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasMany(cf => cf.Charges)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .Ignore(cf => cf.Information);
 
-        modelBuilder.Entity<CaseFileModel>()
+        modelBuilder.Entity<CasefileModel>()
             .HasMany(cf => cf.CfelEntries)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
