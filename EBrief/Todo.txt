@@ -25,8 +25,6 @@ FUNCTIONALITY:
 		* Follow up tasks should be able to be created for the prosecutor they 
 			are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
 
-	- Fix issue where AddCourtList confirm button is disabled even when there is an error.
-
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 
 	- Allow user to load documents even when they chose not to on the first occasion

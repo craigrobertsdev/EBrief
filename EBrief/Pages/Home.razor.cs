@@ -18,6 +18,7 @@ public partial class Home
     [Inject] private AppState AppState { get; set; } = default!;
     [Inject] private IDataAccess DataAccess { get; set; } = default!;
     [Inject] private IFileService FileService { get; set; } = default!;
+    [Inject] private HttpService HttpService { get; set; } = default!;  
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
@@ -334,7 +335,7 @@ public partial class Home
             {
                 if (IncludeDocuments)
                 {
-                    await DownloadDocuments(courtList);
+                    await HttpService.DownloadDocuments(courtList);
                 }
 
                 await DataAccess.CreateCourtList(courtList);
@@ -475,38 +476,6 @@ public partial class Home
         }
 
         SelectedCourtListEntry = courtListEntry;
-    }
-
-    private async Task DownloadDocuments(CourtListModel courtList)
-    {
-        var client = new HttpClient();
-        FileService.CreateDocumentDirectory();
-
-        foreach (var casefile in courtList.Casefiles)
-        {
-            foreach (var document in casefile.Documents)
-            {
-                var endpoint = document.DocumentType == DocumentType.Casefile ? "correspondence" : "evidence";
-                await DownloadDocument(document, client, endpoint);
-            }
-
-            casefile.DocumentsLoaded = true;
-        }
-    }
-
-    private async Task DownloadDocument(DocumentModel document, HttpClient client, string endpoint)
-    {
-        var fileName = document.FileName;
-        var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/{endpoint}/?fileName={fileName}");
-
-        if (response.IsSuccessStatusCode)
-        {
-            var pdfStream = await response.Content.ReadAsStreamAsync();
-            var ext = Path.GetExtension(fileName);
-            var newFileName = Path.GetFileNameWithoutExtension(fileName) + $"-{Guid.NewGuid()}{ext}";
-            await FileService.SaveDocument(pdfStream, newFileName);
-            document.FileName = newFileName;
-        }
     }
 
     class Court

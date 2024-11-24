@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
     content: ["./**/*.{razor,html,cshtml}", "../EBrief.Shared/**/*"],
@@ -22,7 +21,7 @@ module.exports = {
                 text: "#DDD"
             },
             fontFamily: {
-                'sans': ['Monserrat', ...defaultTheme.fontFamily.sans]
+                'sans': ['Roboto']
             },
             boxShadow: {
                 'menu': "0px 8px 16px 0px rgba(0,0,0,0.2)"
