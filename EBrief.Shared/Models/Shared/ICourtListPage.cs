@@ -5,6 +5,7 @@ public interface ICourtListPage
 {
     Defendant? ActiveDefendant { get; set; }
     event Func<Task> OnDefendantChange;
+    event Action<CourtSitting>? OnCourtSessionAdded;
     bool IsSelected(Defendant defendant);
     void ActivateDefendant(Defendant defendant);
 }

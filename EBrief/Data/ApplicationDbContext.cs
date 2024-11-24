@@ -3,14 +3,17 @@ using EBrief.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;
+using EBrief.Shared.Models.UI;
 
 namespace EBrief.Data;
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<CourtListModel> CourtLists { get; set; }
-    public DbSet<CasefileModel> Casefiles { get; set; }
-    public DbSet<DefendantModel> Defendants { get; set; }
-    public DbSet<DocumentModel> Documents { get; set; }
+    public DbSet<CourtListModel> CourtLists { get; set; } = default!;
+    public DbSet<CasefileModel> Casefiles { get; set; } = default!;
+    public DbSet<DefendantModel> Defendants { get; set; } = default!;
+    public DbSet<DocumentModel> Documents { get; set; } = default!;
+    public DbSet<CourtSittingModel> CourtSittings { get; set; } = default!;
+
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {
         Database.EnsureCreated();
@@ -69,6 +72,11 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<CasefileModel>()
             .HasMany(cf => cf.CfelEntries)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CourtSittingModel>()
+            .HasMany(cs => cs.Defendants)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EBrief.Shared.Models.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace EBrief.Shared.Models.UI;
 public class CasefileEnquiryLogEntry
@@ -21,5 +22,16 @@ public class CasefileEnquiryLogEntry
         EntryText = entryText;
         EnteredBy = enteredBy;
         EntryDate = entryDate;
+    }
+
+    public CasefileEnquiryLogEntryModel ToDbModel()
+    {
+        return new CasefileEnquiryLogEntryModel()
+        {
+            Id = Id,
+            EntryText = EntryText,
+            EnteredBy = EnteredBy,
+            EntryDate = EntryDate
+        };
     }
 }

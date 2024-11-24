@@ -8,6 +8,11 @@
 <ul class="select-none pb-2">
     @for (int i = 0; i < CourtSittings.Count; i++)
     {
+        if (CourtSittings[i].Name == "Additions" && CourtSittings[i].Defendants.Count == 0)
+        {
+            continue;
+        }
+
         int idx = i;
         var courtSitting = CourtSittings[idx];
         <li class="tree">
@@ -19,15 +24,16 @@
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
                     {
-                        <li class="relative text-left text-md laptop:text-base font-medium p-1 first:mt-[1px] first:hover:mt-0 first:hover:border-t 
+                        <li class="relative text-left text-md laptop:text-base font-medium p-1 first:mt-[1px] first:hover:mt-0 first:hover:border-t
                             border-b border-gunmetal active:bg-slate-400
                             @(Parent.IsSelected(defendant) ? IsSelected : NotSelected)"
                             @onclick="() => Parent.ActivateDefendant(defendant)">
-                            @if (defendant.ListStart == defendant.ListEnd)
+                           
+                            @if (defendant.ListStart != 0 && defendant.ListStart == defendant.ListEnd)
                             {
                                 <span class="float-left pr-1">@(defendant.ListStart).</span>
                             }
-                            else
+                            else if (defendant.ListStart != 0)
                             {
                                 <span class="float-left pr-1">@(defendant.ListStart)-@(defendant.ListEnd).</span>
                             }
@@ -45,27 +51,33 @@
 
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
-    [Parameter] public List<CourtSession> CourtSittings { get; set; } = [];
-    private Dictionary<int, bool> _courtSittingVisibility { get; set; } = [];
+    [Parameter] public List<CourtSitting> CourtSittings { get; set; } = [];
+    private Dictionary<int, bool> _courtSessionVisibility { get; set; } = [];
     private string IsSelected = "bg-blue text-primary hover:bg-blue font-semibold";
     private string NotSelected = "hover:bg-slate-300";
 
     protected override void OnInitialized()
     {
-        CourtSittings.ForEach(cs => _courtSittingVisibility.Add(cs.Id, true));
+        CourtSittings.ForEach(cs => _courtSessionVisibility.Add(cs.Id, true));
+        Parent.OnCourtSessionAdded += CourtSessionAdded;
     }
 
-    private async Task ToggleCourtSitting(CourtSession courtSitting, int id)
+    private async Task ToggleCourtSitting(CourtSitting courtSitting, int id)
     {
-        _courtSittingVisibility[courtSitting.Id] = !_courtSittingVisibility[courtSitting.Id];
-        if (_courtSittingVisibility[courtSitting.Id])
+        _courtSessionVisibility[courtSitting.Id] = !_courtSessionVisibility[courtSitting.Id];
+        if (_courtSessionVisibility[courtSitting.Id])
         {
             await JSRuntime.InvokeVoidAsync("scrollToBottomOfCourtSitting", $"court-sitting-{courtSitting.Id}");
         }
     }
 
-    private bool IsVisible(CourtSession courtSitting)
+    private bool IsVisible(CourtSitting courtSitting)
     {
-        return _courtSittingVisibility[courtSitting.Id];
+        return _courtSessionVisibility[courtSitting.Id];
+    }
+
+    private void CourtSessionAdded(CourtSitting session)
+    {
+        _courtSessionVisibility.Add(session.Id, true);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using EBrief.Shared.Helpers;
 using EBrief.Shared.Models.Data;
+using EBrief.Shared.Models.UI;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -20,17 +21,16 @@ public class HttpService
         return await response.Content.ReadFromJsonAsync<List<CasefileModel>>() ?? [];
     }
 
-    public async Task<bool> UpdateCasefileLogs(IEnumerable<string> casefiles, string text)
+    public async Task<bool> UpdateCasefileLogs(IEnumerable<string> casefiles, CasefileEnquiryLogEntry entry)
     {
-        var result = await _client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/update-cfels", 
-            new CfelUpdate(casefiles, text));
+        var result = await _client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/update-cfels",
+            new CfelUpdate(casefiles, entry));
 
         return result.IsSuccessStatusCode;
     }
 
     public async Task<List<CasefileModel>> RefreshData(IEnumerable<string> casefileNumbers)
     {
-        var json = JsonSerializer.Serialize(casefileNumbers);
         var content = new CasefileUpdateContent(casefileNumbers);
         var result = await _client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/refresh", content);
         if (!result.IsSuccessStatusCode)
@@ -38,7 +38,7 @@ public class HttpService
             throw new Exception("Failed to refresh data.");
         }
 
-        var updatedCasefiles = await result.Content.ReadFromJsonAsync<List<CasefileModel>>(); 
+        var updatedCasefiles = await result.Content.ReadFromJsonAsync<List<CasefileModel>>();
         if (updatedCasefiles == null)
         {
             throw new Exception("Failed to refresh data.");
@@ -54,15 +54,14 @@ public class HttpService
 
     internal struct CfelUpdate
     {
-        public IEnumerable<string> CasefileNumbers { get; set; }
-        public string Text { get; set; }
+        public IEnumerable<string> CasefileNumbers { get; }
+        public CasefileEnquiryLogEntry Entry { get; }
 
-        public CfelUpdate(IEnumerable<string> casefileNumbers, string text)
+        public CfelUpdate(IEnumerable<string> casefileNumbers, CasefileEnquiryLogEntry entry)
         {
             CasefileNumbers = casefileNumbers;
-            Text = text;
+            Entry = entry;
         }
     }
+    internal record CasefileUpdateContent(IEnumerable<string> CasefileNumbers);
 }
-
-internal record CasefileUpdateContent(IEnumerable<string> CasefileNumbers);

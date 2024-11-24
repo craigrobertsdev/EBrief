@@ -99,8 +99,9 @@
             casefile.Cfel.Add(new(Parent.ActiveDefendant.AddCfelText, "Craig Roberts"));
         }
 
-        await DataAccess.UpdateCfels(SelectedCasefiles, Parent.ActiveDefendant.AddCfelText);
-        await _httpService.UpdateCasefileLogs(SelectedCasefiles, Parent.ActiveDefendant.AddCfelText);
+        var cfelEntry = new CasefileEnquiryLogEntry(Parent.ActiveDefendant.AddCfelText, "Craig Roberts", DateTime.Now);
+        await DataAccess.UpdateCfels(SelectedCasefiles, cfelEntry);
+        await _httpService.UpdateCasefileLogs(SelectedCasefiles, cfelEntry);
         Parent.ActiveDefendant.AddCfelText = string.Empty;
     }
 }

@@ -1,3 +1,16 @@
-﻿namespace EBrief.Shared.Models.UI;
+﻿
+using EBrief.Shared.Models.Data;
 
-public record OrderCondition(int Number, string Text);
+namespace EBrief.Shared.Models.UI;
+
+public record OrderCondition(int Number, string Text)
+{
+    internal OrderConditionModel ToDataModel()
+    {
+        return new OrderConditionModel
+        {
+            Number = Number,
+            Condition = Text
+        };
+    }
+}

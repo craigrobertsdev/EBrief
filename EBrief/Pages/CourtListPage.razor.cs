@@ -10,7 +10,7 @@ using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Services.Search;
 
 namespace EBrief.Pages;
-public partial class CourtListPage : ICourtListPage
+public partial class CourtListPage : ICourtListPage, IDisposable
 {
     [Inject] public IDataAccess DataAccess { get; set; } = default!;
     [Inject] public IFileService FileService { get; set; } = default!;
@@ -18,7 +18,6 @@ public partial class CourtListPage : ICourtListPage
     [Inject] public HttpService HttpService { get; set; } = default!;
     public SearchService SearchService { get; set; } = default!;
     private CourtList CourtList { get; set; } = default!;
-    public List<CourtSession> CourtSessions { get; set; } = [];
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
     private int CourtRoom { get; set; } = default!;
@@ -30,6 +29,7 @@ public partial class CourtListPage : ICourtListPage
     private string CasefilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChange;
+    public event Action<CourtSitting>? OnCourtSessionAdded;
     private string? _error;
     private string? _addCasefilesError;
     private bool _loading;
@@ -59,11 +59,19 @@ public partial class CourtListPage : ICourtListPage
 
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
-        CourtSessions = GenerateCourtSessions();
-        ActivateDefendant(CourtSessions[0].Defendants.First());
+
+        if (AppState.IsFirstLoad)
+        {
+            AppState.CourtSittings = await LoadCourtSittings();
+        }
+
+        ActivateDefendant(AppState.CourtSittings[0].Defendants.First());
         SearchService = new SearchService(CourtList);
 
         AppState.CurrentCourtList = CourtList;
+        AppState.ApplicationLoaded();
+
+        AppState.OnStateChanged += StateHasChanged;
         _loading = false;
     }
 
@@ -77,24 +85,35 @@ public partial class CourtListPage : ICourtListPage
         CourtList.CourtRoom = courtRoom;
     }
 
-    private List<CourtSession> GenerateCourtSessions()
+    private async Task<List<CourtSitting>> LoadCourtSittings()
     {
-        // iterate over the list of defendants and group them by the appearance time of their first case file in the list
-        var courtSessions = CourtList.Defendants.SelectMany(d => d.Casefiles)
-            .GroupBy(cf => cf.Schedule.Last().HearingDate)
-            .OrderBy(g => g.Key)
-            .Select((g, i) => new CourtSession(i, g.Key))
-            .ToList();
+        var courtSittings = await DataAccess.GetCourtSittings(new CourtListEntry(CourtCode, CourtDate, CourtRoom));
+        return GenerateCourtSittings(courtSittings);
+    }
 
+    private List<CourtSitting> GenerateCourtSittings(List<CourtSitting> courtSittings)
+    {
+        if (courtSittings.Count == 0)
+        {
+            courtSittings = CourtList.Defendants.SelectMany(d => d.Casefiles)
+                .GroupBy(cf => cf.Schedule.Last().HearingDate)
+                .OrderBy(g => g.Key)
+                .Select((g, i) => new CourtSitting(i, g.Key, CourtCode, CourtRoom))
+                .ToList();
+        }
+
+        // iterate over the list of defendants and group them by the appearance time of their first case file in the list
         foreach (var defendant in CourtList.Defendants)
         {
             var hearingTime = defendant.Casefiles.First().Schedule.Last().HearingDate;
-            courtSessions.First(cs => cs.SittingTime.TimeOfDay == hearingTime.TimeOfDay).Defendants.Add(defendant);
+            var courtSitting = courtSittings.FirstOrDefault(courtSittings => courtSittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
+            courtSitting.Defendants.Add(defendant);
         }
 
-        courtSessions.ForEach(cs => cs.Defendants.Sort((d1, d2) => d1.ListStart.CompareTo(d2.ListStart)));
+        courtSittings.ForEach(cs => cs.Defendants.Sort((d1, d2) => d1.ListStart.CompareTo(d2.ListStart)));
+        courtSittings.Sort((a, b) => a.Id.CompareTo(b.Id));
 
-        return courtSessions;
+        return courtSittings;
     }
 
     private async Task OpenAddCasefilesDialog()
@@ -120,7 +139,7 @@ public partial class CourtListPage : ICourtListPage
 
         if (newCasefileNumbers.Count == 0)
         {
-            _addCasefilesError = "All of those case files are in the list already";
+            _addCasefilesError = "You must include at least one unique, new casefile number";
             return;
         }
 
@@ -132,7 +151,7 @@ public partial class CourtListPage : ICourtListPage
             var newCasefiles = newCasefileModels.ToUIModels();
             newCasefiles.AddReferenceToDefendants();
             CourtList.AddCasefiles(newCasefiles);
-            UpdateCourtSessions(newCasefiles.Select(cf => cf.Defendant).ToList());
+            UpdateCourtSittings(newCasefiles.Select(cf => cf.Defendant));
 
             CasefilesToAdd = string.Empty;
             await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
@@ -147,20 +166,23 @@ public partial class CourtListPage : ICourtListPage
 
     }
 
-    private void UpdateCourtSessions(List<Defendant> defendants)
+    private async void UpdateCourtSittings(IEnumerable<Defendant> defendants)
     {
         foreach (var defendant in defendants)
         {
-            var courtSession = CourtSessions.FirstOrDefault(cs => cs.SittingTime == defendant.Casefiles.First().Schedule.Last().HearingDate);
+            var courtSession = AppState.CourtSittings.FirstOrDefault(cs => cs.SittingTime == defendant.Casefiles.First().Schedule.Last().HearingDate);
             if (courtSession is null)
             {
-                courtSession = new(CourtSessions.Count, defendant.Casefiles.First().Schedule.Last().HearingDate);
+                courtSession = new AdditionsListCourtSitting(AppState.CourtSittings.Count, defendant.Casefiles.First().Schedule.Last().HearingDate, CourtCode, CourtRoom);
             }
 
             courtSession.Defendants.Add(defendant);
-        }
+            AppState.CourtSittings.Add(courtSession);
 
-        OnDefendantChange?.Invoke();
+            await DataAccess.UpdateCourtSittings(AppState.CourtSittings, new CourtListEntry(CourtCode, CourtDate, CourtRoom));
+
+            OnCourtSessionAdded?.Invoke(courtSession);
+        }
     }
 
     private async Task HandleReturnHome()
@@ -288,5 +310,10 @@ public partial class CourtListPage : ICourtListPage
             _error = e.Message;
             return;
         }
+    }
+
+    public void Dispose()
+    {
+        AppState.OnStateChanged -= StateHasChanged;
     }
 }

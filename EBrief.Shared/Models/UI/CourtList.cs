@@ -1,7 +1,5 @@
 ﻿using EBrief.Shared.Models.Data;
 using EBrief.Shared.Models.Shared;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace EBrief.Shared.Models.UI;
 public class CourtList

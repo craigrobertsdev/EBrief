@@ -6,7 +6,6 @@ FUNCTIONALITY:
 		* Add logging to data access 
 		* Add logging to file service
 	- Search function for case files by either case file or courtfile number or defendant
-	- Add option to refresh local data from server
 	- Find a way to handle where files are double clicked when the user already has the app open
 		https://www.codeproject.com/Articles/5247406/Double-Clicking-a-File-in-Explorer-and-Adding-It-t
 	- Handle situation where there is no network connection, so the updates will need to be sent later when its back

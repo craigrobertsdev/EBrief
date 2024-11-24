@@ -11,13 +11,11 @@ public class DataAccess : IDataAccess
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DataAccess> _logger;
-    private readonly AppState _appState;
 
-    public DataAccess(ApplicationDbContext context, ILogger<DataAccess> logger, AppState appState)
+    public DataAccess(ApplicationDbContext context, ILogger<DataAccess> logger)
     {
         _context = context;
         _logger = logger;
-        _appState = appState;
     }
 
     public async Task CreateCourtList(CourtListModel courtList)
@@ -60,7 +58,7 @@ public class DataAccess : IDataAccess
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateCfels(IEnumerable<string> casefileNumbers, string updateText)
+    public async Task UpdateCfels(IEnumerable<string> casefileNumbers, CasefileEnquiryLogEntry entry)
     {
         var casefilesToUpdate = _context.Casefiles.Where(cf => casefileNumbers.Contains(cf.CasefileNumber))
             .ToDictionary(cf => cf.CasefileNumber);
@@ -68,12 +66,7 @@ public class DataAccess : IDataAccess
         foreach (var casefile in casefileNumbers)
         {
             casefilesToUpdate[casefile].CfelEntries
-                .Add(new()
-                {
-                    EntryText = updateText,
-                    EnteredBy = _appState.CurrentUser,
-                    EntryDate = DateTime.Now,
-                });
+                .Add(entry.ToDbModel());
         }
 
         await _context.SaveChangesAsync();
@@ -91,6 +84,10 @@ public class DataAccess : IDataAccess
             throw new Exception("Error adding new case files.");
         }
 
+        foreach (var cf in newCasefiles)
+        {
+            cf.CasefileNumber = cf.CasefileNumber.ToUpper();
+        }
         existingCourtList.Casefiles.AddRange(newCasefiles);
         await _context.SaveChangesAsync();
     }
@@ -172,6 +169,37 @@ public class DataAccess : IDataAccess
         for (int i = 0; i < existingCasefiles.Count; i++)
         {
             existingCasefiles[i].Update(newCasefiles[i]);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<CourtSitting>> GetCourtSittings(CourtListEntry entry)
+    {
+        var courtSittings = await _context.CourtSittings
+            .Where(cs => cs.CourtCode == entry.CourtCode && cs.CourtRoom == entry.CourtRoom && cs.SittingTime.Date == entry.CourtDate.Date)
+            .ToListAsync();
+
+        return courtSittings.ToUIModels();
+    }
+
+    public async Task UpdateCourtSittings(List<CourtSitting> courtSittings, CourtListEntry entry)
+    {
+        var existingCourtSittings = await _context.CourtSittings
+            .Where(cs => cs.CourtCode == entry.CourtCode && cs.CourtRoom == entry.CourtRoom && cs.SittingTime.Date == entry.CourtDate.Date)
+            .ToListAsync();
+
+        foreach (var courtSitting in courtSittings)
+        {
+            var existing = existingCourtSittings.FirstOrDefault(cs => cs.SittingTime == courtSitting.SittingTime);
+            if (existing is not null)
+            {
+                existing.Defendants = courtSitting.Defendants.ToDataModels();
+            }
+            else
+            {
+                _context.CourtSittings.Add(courtSitting.ToDataModel());
+            }
         }
 
         await _context.SaveChangesAsync();

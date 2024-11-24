@@ -36,8 +36,17 @@ public class DefendantModel
             Casefiles = [],
             ListStart = ListStart,
             ListEnd = ListEnd,
+            OffenderHistory = OffenderHistory,
             BailAgreements = BailAgreements.Select(ba => ba.ToUIModel()).ToList(),
             InterventionOrders = InterventionOrders.Select(io => io.ToUIModel()).ToList()
         };
+    }
+}
+
+public static class DefendantModelExtensions
+{
+    public static List<Defendant> ToUIModels(this IEnumerable<DefendantModel> models)
+    {
+        return models.Select(model => model.ToUIModel()).ToList();
     }
 }

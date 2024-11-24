@@ -1,4 +1,6 @@
-﻿namespace EBrief.Shared.Models.UI;
+﻿using EBrief.Shared.Models.Data;
+
+namespace EBrief.Shared.Models.UI;
 public class Defendant
 {
     public int Id { get; set; }
@@ -17,4 +19,27 @@ public class Defendant
     public string? OffenderHistory { get; set; }
     public List<BailAgreement> BailAgreements { get; set; } = [];
     public List<InterventionOrder> InterventionOrders { get; set; } = [];
+
+    public DefendantModel ToDataModel() => 
+        new DefendantModel
+        {
+            Id = Id,
+            ListStart = ListStart,
+            ListEnd = ListEnd,
+            FirstName = FirstName,
+            LastName = LastName,
+            DateOfBirth = DateOfBirth,
+            Address = Address,
+            Phone = Phone,
+            Email = Email,
+            OffenderHistory = OffenderHistory,
+            BailAgreements = BailAgreements.Select(ba => ba.ToDataModel()).ToList(),
+            InterventionOrders = InterventionOrders.Select(io => io.ToDataModel()).ToList()
+        };
+}
+
+public static class DefendantExtensions
+{
+    public static List<DefendantModel> ToDataModels(this IEnumerable<Defendant> models) =>
+        models.Select(d => d.ToDataModel()).ToList();
 }
