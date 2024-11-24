@@ -44,7 +44,7 @@
         }
 
         await HandleDefendantChange();
-        Parent.OnDefendantChange += HandleDefendantChange;
+        Parent.OnDefendantChanged += HandleDefendantChange;
     }
 
     private async Task HandleDefendantChange()
@@ -87,7 +87,7 @@
 
     public void Dispose()
     {
-        Parent.OnDefendantChange -= HandleDefendantChange;
+        Parent.OnDefendantChanged -= HandleDefendantChange;
         SelectedDocument = null;
         GC.Collect();
     }

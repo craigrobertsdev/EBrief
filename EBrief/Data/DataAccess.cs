@@ -11,11 +11,13 @@ public class DataAccess : IDataAccess
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DataAccess> _logger;
+    private readonly IFileServiceFactory _fileServiceFactory;
 
-    public DataAccess(ApplicationDbContext context, ILogger<DataAccess> logger)
+    public DataAccess(ApplicationDbContext context, ILogger<DataAccess> logger, IFileServiceFactory fileServiceFactory)
     {
         _context = context;
         _logger = logger;
+        _fileServiceFactory = fileServiceFactory;
     }
 
     public async Task CreateCourtList(CourtListModel courtList)
@@ -94,11 +96,19 @@ public class DataAccess : IDataAccess
 
     public async Task DeleteCourtList(CourtListEntry entry)
     {
+        // Need to delete the court list, all related casefiles, all defendants and all related documents
         var courtList = await _context.CourtLists.FirstOrDefaultAsync(e => e.CourtCode == entry.CourtCode && e.CourtDate == entry.CourtDate && e.CourtRoom == entry.CourtRoom);
         if (courtList is not null)
         {
             try
             {
+                var defendants = courtList.Casefiles.Select(cf => cf.Defendant).Distinct();
+                
+                var documents = courtList.Casefiles.SelectMany(cf => cf.Documents).Select(d => d.FileName);
+                var fileService = _fileServiceFactory.Create();
+                fileService.DeleteDocuments(documents);
+
+                _context.Defendants.RemoveRange(defendants);
                 _context.CourtLists.Remove(courtList);
                 _context.SaveChanges();
             }

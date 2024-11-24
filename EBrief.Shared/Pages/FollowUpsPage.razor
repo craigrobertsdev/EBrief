@@ -52,7 +52,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Parent.OnDefendantChange += HandleDefendantChange;
+        Parent.OnDefendantChanged += HandleDefendantChange;
         await HandleDefendantChange();
     }
 
@@ -69,7 +69,7 @@
     {
         Casefiles = null!;
         SelectedCasefiles = null!;
-        Parent.OnDefendantChange -= HandleDefendantChange;
+        Parent.OnDefendantChanged -= HandleDefendantChange;
     }
 
     private async Task HandleAddCfelEntry()

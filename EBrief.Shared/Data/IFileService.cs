@@ -11,4 +11,5 @@ public interface IFileService
     Task<string?> SelectLandscapeList();
     void CreateDocumentDirectory();
     Task SaveDocument(Stream stream, string fileName);
+    void DeleteDocuments(IEnumerable<string> documents);
 }

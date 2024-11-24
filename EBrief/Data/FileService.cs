@@ -12,10 +12,11 @@ using System.Windows;
 namespace EBrief.Data;
 public class FileService : IFileService
 {
-    private readonly IDataAccess _dataAccess;
-    public FileService(IDataAccess dataAccess)
+    private readonly IDataAccessFactory _dataAccessFactory;
+    public FileService(IDataAccessFactory dataAccessFactory)
     {
-        _dataAccess = dataAccess;
+        _dataAccessFactory = dataAccessFactory; 
+
     }
     public async Task SaveFile(CourtList courtList)
     {
@@ -29,7 +30,8 @@ public class FileService : IFileService
         bool? result = dialog.ShowDialog();
         if (result == true)
         {
-            var courtListModel = await _dataAccess.GetCourtList(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
+            var dataAccess = _dataAccessFactory.Create();
+            var courtListModel = await dataAccess.GetCourtList(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
             File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), dialog.FileName), courtListModel!.SerialiseToJson());
         }
     }
@@ -61,13 +63,14 @@ public class FileService : IFileService
             }
 
             var courtListEntry = new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
-            if (await _dataAccess.CheckCourtListExists(courtListEntry))
+            var dataAccess = _dataAccessFactory.Create();
+            if (await dataAccess.CheckCourtListExists(courtListEntry))
             {
                 var button = MessageBoxButton.YesNo;
                 var proceed = MessageBox.Show("Court list already exists. Do you want to overwrite?", "Confirmation", button, MessageBoxImage.Question);
                 if (proceed == MessageBoxResult.No)
                 {
-                    var entries = await _dataAccess.GetSavedCourtLists();
+                    var entries = await dataAccess.GetSavedCourtLists();
                     var entry = entries.Where(
                         cl => cl.CourtDate == courtListEntry.CourtDate
                         && cl.CourtCode == courtListEntry.CourtCode
@@ -78,7 +81,7 @@ public class FileService : IFileService
                 }
             }
 
-            await _dataAccess.CreateCourtList(courtList);
+            await dataAccess.CreateCourtList(courtList);
             return (courtListEntry, null);
         }
         catch (Exception e)
@@ -149,5 +152,20 @@ public class FileService : IFileService
 
         using var fileStream = new FileStream($"{FileHelpers.AppDataPath}/documents/{fileName}", FileMode.Create, FileAccess.Write);
         fileStream.Write(memoryStream.ToArray());
+    }
+
+    public void DeleteDocuments(IEnumerable<string> documents)
+    {
+        foreach (var fileName in documents)
+        {
+            try
+            {
+                File.Delete($"{FileHelpers.AppDataPath}/documents/{fileName}");
+            }
+            catch
+            {
+                continue;
+            }
+        }
     }
 }

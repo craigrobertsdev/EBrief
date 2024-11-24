@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.ComponentModel;
 using System.IO;
-using System.Net.Http;
 using System.Windows;
 
 namespace EBrief;
@@ -45,8 +44,11 @@ public partial class MainWindow : Window
                 options.UseSqlite($"Filename={dbPath}");
                 options.EnableSensitiveDataLogging();
             });
-            serviceCollection.AddScoped<IDataAccess, DataAccess>();
-            serviceCollection.AddScoped<IFileService, FileService>();
+            serviceCollection.AddTransient<IDataAccess, DataAccess>();
+            serviceCollection.AddTransient<IFileService, FileService>();
+
+            serviceCollection.AddSingleton<IDataAccessFactory, DataAccessFactory>();
+            serviceCollection.AddSingleton<IFileServiceFactory, FileServiceFactory>();
             serviceCollection.AddSingleton(new AppState());
 
             serviceCollection.AddHttpClient();

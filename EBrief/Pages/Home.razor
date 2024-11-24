@@ -155,7 +155,7 @@
     <div class="flex w-full justify-center gap-3">
         @if (PreviousCourtListEntries?.Count != 0)
         {
-            <Button Variant="ButtonTypes.Add" OnClick="LoadPreviousCourtList">
+            <Button Variant="ButtonTypes.Add" OnClick="LoadPreviousCourtList" Disabled="_deletingCourtList">
                 Confirm
             </Button>
         }
@@ -164,7 +164,7 @@
         </Button>
         @if (PreviousCourtListEntries?.Count != 0)
         {
-            <Button Variant="ButtonTypes.Delete" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtListEntry == null)>
+            <Button Variant="ButtonTypes.Delete" OnClick="OpenConfirmDialog" Disabled=@(SelectedCourtListEntry == null || _deletingCourtList)>
                 Delete
             </Button>
         }

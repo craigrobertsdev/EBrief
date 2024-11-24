@@ -6,6 +6,7 @@ public class AppState
     private List<CourtSitting> _courtSittings = [];
     public bool IsFirstLoad { get; private set; }
     public CourtList? CurrentCourtList { get; set; }
+
     public List<CourtSitting> CourtSittings
     {
         get => _courtSittings;
@@ -26,6 +27,13 @@ public class AppState
     public void ApplicationLoaded()
     {
         IsFirstLoad = false;
+    }
+
+    public void Clear()
+    {
+        _courtSittings.Clear();
+        CurrentCourtList = null;
+        IsFirstLoad = true;
     }
 
     public event Action? OnStateChanged;

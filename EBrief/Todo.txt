@@ -29,6 +29,11 @@ FUNCTIONALITY:
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 
+	- Fix data not being deleted from the database when the courtlist is deleted
+
+	- Allow user to load documents even when they chose not to on the first occasion
+	- Delete documents from the file system when they are deleted from the database
+
 UI:
 	- Case files and other scrolling documents should have the ability to be opened in a pop-out screen 
 		that takes up most of/all of the screen for easier reading.

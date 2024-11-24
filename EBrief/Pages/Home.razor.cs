@@ -32,6 +32,8 @@ public partial class Home
     private string? _error;
     private string? _loadNewCourtListError;
     private bool _previousCourtListDialogIsOpen;
+    private bool _deletingCourtList;
+
     private List<CourtListEntry>? PreviousCourtListEntries { get; set; }
     private CourtListEntry? SelectedCourtListEntry { get; set; }
 
@@ -190,12 +192,10 @@ public partial class Home
 
     private async Task DeletePreviousCourtList(bool confirmDeletion)
     {
+        _deletingCourtList = true;
         await CloseConfirmDialog();
-        if (!confirmDeletion)
-        {
-            return;
-        }
-        if (SelectedCourtListEntry is null || PreviousCourtListEntries is null)
+
+        if (!confirmDeletion || SelectedCourtListEntry is null || PreviousCourtListEntries is null)
         {
             return;
         }
@@ -203,15 +203,18 @@ public partial class Home
         try
         {
             await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtListEntry.CourtCode, SelectedCourtListEntry.CourtDate, SelectedCourtListEntry.CourtRoom));
+            PreviousCourtListEntries.Remove(SelectedCourtListEntry);
+            SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
         }
         catch (Exception e)
         {
             _error = e.InnerException?.Message ?? e.Message;
-            return;
+        }
+        finally
+        {
+            _deletingCourtList = false;
         }
 
-        PreviousCourtListEntries.Remove(SelectedCourtListEntry);
-        SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
     }
 
     private void ToggleManualCourtListEntry()

@@ -28,7 +28,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     private ElementReference? _searchDialog { get; set; }
     private string CasefilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
-    public event Func<Task>? OnDefendantChange;
+    public event Func<Task>? OnDefendantChanged;
     public event Action<CourtSitting>? OnCourtSessionAdded;
     private string? _error;
     private string? _addCasefilesError;
@@ -106,7 +106,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         foreach (var defendant in CourtList.Defendants)
         {
             var hearingTime = defendant.Casefiles.First().Schedule.Last().HearingDate;
-            var courtSitting = courtSittings.FirstOrDefault(courtSittings => courtSittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
+            var courtSitting = courtSittings.First(courtSittings => courtSittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
             courtSitting.Defendants.Add(defendant);
         }
 
@@ -193,19 +193,20 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         }
         else
         {
-            ReturnHome();
+            await ReturnHome();
         }
     }
 
     private async Task SaveChanges()
     {
         await DataAccess.UpdateCourtList(CourtList);
-        NavManager.NavigateTo("/");
+        await ReturnHome();
     }
 
-    private async void ReturnHome()
+    private async Task ReturnHome()
     {
         await JSRuntime.InvokeVoidAsync("removeSearchEventHandler");
+        AppState.Clear();
         NavManager.NavigateTo("/");
     }
 
@@ -222,7 +223,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
             ActiveDefendant.ActiveCasefile = ActiveDefendant.Casefiles.First();
         }
 
-        OnDefendantChange?.Invoke();
+        OnDefendantChanged?.Invoke();
         StateHasChanged();
     }
 
