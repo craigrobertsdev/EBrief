@@ -228,27 +228,39 @@ public partial class Home
     {
         _loadNewCourtListError = null;
         _loadingCourtList = true;
-        SelectedFile = await FileService.SelectLandscapeList();
-        if (SelectedFile is null)
+        try
         {
-            LandscapeList = null;
-            CourtListBuilder.Reset();
-            _loadingCourtList = false;
-            return;
-        }
 
-        var (landscapeList, error) = FileService.LoadLandscapeList(SelectedFile);
-        if (error is not null)
+            SelectedFile = await FileService.SelectLandscapeList();
+            if (SelectedFile is null)
+            {
+                LandscapeList = null;
+                CourtListBuilder.Reset();
+                _loadingCourtList = false;
+                return;
+            }
+
+            var (landscapeList, error) = FileService.LoadLandscapeList(SelectedFile);
+            if (error is not null)
+            {
+                _loadNewCourtListError = error;
+                _loadingCourtList = false;
+                return;
+            }
+
+            LandscapeList = landscapeList;
+            CourtListBuilder.SetCourtDate(landscapeList![0].CourtDate);
+            CourtListBuilder.SetCourtCode(landscapeList![0].CourtCode);
+        }
+        catch (Exception e)
         {
-            _loadNewCourtListError = error;
+            _loadNewCourtListError = e.Message;
             _loadingCourtList = false;
-            return;
         }
-
-        LandscapeList = landscapeList;
-        CourtListBuilder.SetCourtDate(landscapeList![0].CourtDate);
-        CourtListBuilder.SetCourtCode(landscapeList![0].CourtCode);
-        _loadingCourtList = false;
+        finally
+        {
+            _loadingCourtList = false;
+        }
     }
 
     private async Task SubmitNewCourtListForm()
