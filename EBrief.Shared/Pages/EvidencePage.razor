@@ -1,5 +1,5 @@
+@using EBrief.Shared.Components
 @using EBrief.Shared.Helpers
-@using EBrief.Shared.Models
 @using EBrief.Shared.Models.Shared
 @using EBrief.Shared.Models.UI
 @using System.IO
@@ -12,7 +12,12 @@
     }
     else if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
     {
+    <div>
         <p>No documents loaded for this court list</p>
+            <Button Variant="ButtonTypes.Add" OnClick="LoadDocuments">
+                Load Evidence
+            </Button>
+        </div>
     }
     else
     {
@@ -83,6 +88,11 @@
         }
 
         return "bg-slate-200 text-black";
+    }
+
+    private async Task LoadDocuments()
+    {
+        // var documentsList 
     }
 
     public void Dispose()

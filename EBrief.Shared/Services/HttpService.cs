@@ -3,11 +3,13 @@ using EBrief.Shared.Models.Data;
 using EBrief.Shared.Models.UI;
 using System.Net.Http.Json;
 using System.Text.Json;
+using EBrief.Shared.Data;
 
 namespace EBrief.Shared.Services;
 public class HttpService
 {
     private readonly HttpClient _client;
+    private readonly IFileServiceFactory _fileServiceFactory;
 
     public async Task<List<CasefileModel>> GetCasefiles(List<string> casefileNumbers, DateTime courtDate)
     {
@@ -47,9 +49,43 @@ public class HttpService
         return updatedCasefiles;
     }
 
-    public HttpService(HttpClient client)
+    public HttpService(HttpClient client, IFileServiceFactory fileServiceFactory)
     {
         _client = client;
+        _fileServiceFactory = fileServiceFactory;
+    }
+    
+    public async Task DownloadDocuments(CourtListModel courtList)
+    {
+        var client = new HttpClient();
+        var fileService = _fileServiceFactory.Create();
+        fileService.CreateDocumentDirectory();
+
+        foreach (var casefile in courtList.Casefiles)
+        {
+            foreach (var document in casefile.Documents)
+            {
+                var endpoint = document.DocumentType == DocumentType.Casefile ? "correspondence" : "evidence";
+                await DownloadDocument(document, client, fileService, endpoint);
+            }
+
+            casefile.DocumentsLoaded = true;
+        }
+    }
+
+    private async Task DownloadDocument(DocumentModel document, HttpClient client, IFileService fileService, string endpoint)
+    {
+        var fileName = document.FileName;
+        var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/{endpoint}/?fileName={fileName}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var pdfStream = await response.Content.ReadAsStreamAsync();
+            var ext = Path.GetExtension(fileName);
+            var newFileName = Path.GetFileNameWithoutExtension(fileName) + $"-{Guid.NewGuid()}{ext}";
+            await fileService.SaveDocument(pdfStream, newFileName);
+            document.FileName = newFileName;
+        }
     }
 
     internal struct CfelUpdate
