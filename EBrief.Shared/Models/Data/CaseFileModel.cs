@@ -29,7 +29,8 @@ public class CasefileModel
     public TimeSpan? TimeInCustody { get; set; }
     public List<ChargeModel> Charges { get; set; } = [];
     public List<DocumentModel> Documents { get; set; } = [];
-    public bool DocumentsLoaded { get; set; }
+    public bool EvidenceLoaded { get; set; }
+    public bool CasefileDocumentsLoaded { get; set; }
     public string Notes { get; set; } = string.Empty;
 
     public Casefile ToUIModel()
@@ -45,8 +46,9 @@ public class CasefileModel
             TimeInCustody = TimeInCustody,
             Charges = Charges.Select(charge => charge.ToUIModel()).ToList(),
             CasefileDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.Casefile).Select(doc => doc.ToUIModel()).ToList(),
-            OccurrenceDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.Occurrence).Select(doc => doc.ToUIModel()).ToList(),
-            DocumentsLoaded = DocumentsLoaded,
+            OccurrenceDocuments = Documents.Where(doc => doc.DocumentType == DocumentType.Evidence).Select(doc => doc.ToUIModel()).ToList(),
+            EvidenceLoaded = EvidenceLoaded,
+            CasefileDocumentsLoaded = CasefileDocumentsLoaded,
             Notes = new() { Text = Notes, HasChanged = false }
         };
     }
@@ -59,7 +61,8 @@ public class CasefileModel
         TimeInCustody = model.TimeInCustody;
         Charges = model.Charges;
         Documents = model.Documents;
-        DocumentsLoaded = model.DocumentsLoaded;
+        EvidenceLoaded = model.EvidenceLoaded;
+        CasefileDocumentsLoaded = model.CasefileDocumentsLoaded;
         Notes = model.Notes;
     }
 

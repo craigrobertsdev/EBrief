@@ -18,4 +18,5 @@ public interface IDataAccess
     Task UpdateDocumentName(string fileName, string newFileName);
     Task UpdateCourtSittings(List<CourtSitting> courtSittings, CourtListEntry entry);
     Task<List<CourtSitting>> GetCourtSittings(CourtListEntry entry);
+    Task UpdateCasefileDocumentLoadedStatus(Casefile cf, DocumentType documentType);
 }

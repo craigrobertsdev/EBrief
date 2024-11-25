@@ -42,7 +42,7 @@
 
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
-    [Inject] IDataAccess DataAccess { get; set; } = default!;
+    [Inject] IDataAccessFactory DataAccessFactory { get; set; } = default!;
     [Inject] HttpService _httpService { get; set; } = default!;
     private string? RemarksText { get; set; }
     private string? CfelText { get; set; }
@@ -100,7 +100,9 @@
         }
 
         var cfelEntry = new CasefileEnquiryLogEntry(Parent.ActiveDefendant.AddCfelText, "Craig Roberts", DateTime.Now);
-        await DataAccess.UpdateCfels(SelectedCasefiles, cfelEntry);
+        
+        var dataAccess = DataAccessFactory.Create();
+        await dataAccess.UpdateCfels(SelectedCasefiles, cfelEntry);
         await _httpService.UpdateCasefileLogs(SelectedCasefiles, cfelEntry);
         Parent.ActiveDefendant.AddCfelText = string.Empty;
     }

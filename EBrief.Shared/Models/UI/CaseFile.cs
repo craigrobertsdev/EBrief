@@ -13,7 +13,8 @@ public class Casefile
     public List<Document> CasefileDocuments { get; set; } = [];
     public Document? SelectedCasefileDocument { get; set; } = default!;
     public List<Document> OccurrenceDocuments { get; set; } = [];
-    public bool DocumentsLoaded { get; set; }
+    public bool EvidenceLoaded { get; set; }
+    public bool CasefileDocumentsLoaded { get; set; }
     public Document? SelectedOccurrenceDocument { get; set; } = default!;
     public CasefileNote Notes { get; set; } = default!;
     public string FollowUpText { get; set; } = string.Empty;

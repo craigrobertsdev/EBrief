@@ -10,7 +10,7 @@
     {
         <p>No correspondence to display</p>
     }
-    else if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
+    else if (Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocumentsLoaded == false)
     {
         <p>No documents loaded for this court list</p>
     }
@@ -46,7 +46,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
+        if (Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocumentsLoaded == false)
         {
             return;
         }

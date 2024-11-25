@@ -1,9 +1,10 @@
-﻿using EBrief.Shared.Models.UI;
+﻿using EBrief.Shared.Models.Shared;
+using EBrief.Shared.Models.UI;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace EBrief.Shared.Models.Data;
-public class DocumentModel
+public class DocumentModel : IDocument
 {
     [Key]
     [JsonIgnore]
@@ -26,5 +27,5 @@ public class DocumentModel
 public enum DocumentType
 {
     Casefile,
-    Occurrence
+    Evidence
 }

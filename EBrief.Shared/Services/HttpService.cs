@@ -2,14 +2,15 @@
 using EBrief.Shared.Models.Data;
 using EBrief.Shared.Models.UI;
 using System.Net.Http.Json;
-using System.Text.Json;
 using EBrief.Shared.Data;
+using EBrief.Shared.Models.Shared;
 
 namespace EBrief.Shared.Services;
 public class HttpService
 {
     private readonly HttpClient _client;
     private readonly IFileServiceFactory _fileServiceFactory;
+    private readonly IDataAccessFactory _dataAccessFactory;
 
     public async Task<List<CasefileModel>> GetCasefiles(List<string> casefileNumbers, DateTime courtDate)
     {
@@ -49,15 +50,15 @@ public class HttpService
         return updatedCasefiles;
     }
 
-    public HttpService(HttpClient client, IFileServiceFactory fileServiceFactory)
+    public HttpService(HttpClient client, IFileServiceFactory fileServiceFactory, IDataAccessFactory dataAccessFactory)
     {
         _client = client;
         _fileServiceFactory = fileServiceFactory;
+        _dataAccessFactory = dataAccessFactory;
     }
-    
+
     public async Task DownloadDocuments(CourtListModel courtList)
     {
-        var client = new HttpClient();
         var fileService = _fileServiceFactory.Create();
         fileService.CreateDocumentDirectory();
 
@@ -66,17 +67,33 @@ public class HttpService
             foreach (var document in casefile.Documents)
             {
                 var endpoint = document.DocumentType == DocumentType.Casefile ? "correspondence" : "evidence";
-                await DownloadDocument(document, client, fileService, endpoint);
+                await DownloadDocument(document, fileService, endpoint);
             }
 
-            casefile.DocumentsLoaded = true;
+            casefile.EvidenceLoaded = true;
+            casefile.CasefileDocumentsLoaded = true;
         }
     }
 
-    private async Task DownloadDocument(DocumentModel document, HttpClient client, IFileService fileService, string endpoint)
+    public async Task DownloadEvidence(Casefile casefile)
+    {
+        var fileService = _fileServiceFactory.Create();
+        fileService.CreateDocumentDirectory();
+
+        foreach (var document in casefile.OccurrenceDocuments)
+        {
+            var endpoint = "evidence";
+            await DownloadDocument(document, fileService, endpoint);
+        }
+
+        var dataAccess = _dataAccessFactory.Create();
+        await dataAccess.UpdateCasefileDocumentLoadedStatus(casefile, DocumentType.Evidence);
+    }
+
+    private async Task DownloadDocument(IDocument document, IFileService fileService, string endpoint)
     {
         var fileName = document.FileName;
-        var response = await client.GetAsync($"{AppConstants.ApiBaseUrl}/{endpoint}/?fileName={fileName}");
+        var response = await _client.GetAsync($"{AppConstants.ApiBaseUrl}/{endpoint}/?fileName={fileName}");
 
         if (response.IsSuccessStatusCode)
         {

@@ -3,6 +3,7 @@
 @using EBrief.Shared.Models.Shared
 @using EBrief.Shared.Models.UI
 @using System.IO
+@using EBrief.Shared.Services
 @implements IDisposable
 
 <div class="flex h-full">
@@ -10,10 +11,10 @@
     {
         <p>No evidence to display</p>
     }
-    else if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
+    else if (Parent.ActiveDefendant?.ActiveCasefile?.EvidenceLoaded == false)
     {
-    <div>
-        <p>No documents loaded for this court list</p>
+        <div>
+            <p>No documents loaded for this court list</p>
             <Button Variant="ButtonTypes.Add" OnClick="LoadDocuments">
                 Load Evidence
             </Button>
@@ -25,7 +26,7 @@
             @foreach (var document in Parent.ActiveDefendant?.ActiveCasefile?.OccurrenceDocuments!)
             {
                 <div class="text-md laptop:text-base p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" 
-                    @onclick=@(() => SelectDocument(document)) title="@document.Title">
+                @onclick=@(() => SelectDocument(document)) title="@document.Title">
                     @document.Title
                 </div>
             }
@@ -38,12 +39,13 @@
 
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
+    [Inject] HttpService HttpService { get; set; } = default!;
     private Document? SelectedDocument { get; set; }
     private string? PdfContent { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
-        if (Parent.ActiveDefendant?.ActiveCasefile?.DocumentsLoaded == false)
+        if (Parent.ActiveDefendant?.ActiveCasefile?.EvidenceLoaded == false)
         {
             return;
         }
@@ -92,7 +94,8 @@
 
     private async Task LoadDocuments()
     {
-        // var documentsList 
+        await HttpService.DownloadEvidence(Parent.ActiveDefendant!.ActiveCasefile!);
+        Parent.ActiveDefendant!.ActiveCasefile!.EvidenceLoaded = true;
     }
 
     public void Dispose()

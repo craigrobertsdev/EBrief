@@ -18,7 +18,7 @@ public partial class Home
     [Inject] private AppState AppState { get; set; } = default!;
     [Inject] private IDataAccess DataAccess { get; set; } = default!;
     [Inject] private IFileService FileService { get; set; } = default!;
-    [Inject] private HttpService HttpService { get; set; } = default!;  
+    [Inject] private HttpService HttpService { get; set; } = default!;
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
@@ -331,22 +331,22 @@ public partial class Home
                 courtList.OrderAndAssignListingNumbers();
             }
 
-            try
+            if (IncludeDocuments)
             {
-                if (IncludeDocuments)
+                try
                 {
                     await HttpService.DownloadDocuments(courtList);
                 }
 
-                await DataAccess.CreateCourtList(courtList);
-            }
-            catch (Exception e)
-            {
-                _loadNewCourtListError = e.InnerException?.Message ?? e.Message;
-                _loadingCourtList = false;
-                return;
+                catch (Exception e)
+                {
+                    _loadNewCourtListError = e.InnerException?.Message ?? e.Message;
+                    _loadingCourtList = false;
+                    return;
+                }
             }
 
+            await DataAccess.CreateCourtList(courtList);
             await NavigateToCourtList(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom, IncludeDocuments);
         }
         catch (HttpRequestException)

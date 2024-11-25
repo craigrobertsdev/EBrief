@@ -12,8 +12,8 @@ using EBrief.Shared.Services.Search;
 namespace EBrief.Pages;
 public partial class CourtListPage : ICourtListPage, IDisposable
 {
-    [Inject] public IDataAccess DataAccess { get; set; } = default!;
-    [Inject] public IFileService FileService { get; set; } = default!;
+    [Inject] public IDataAccessFactory DataAccessFactory { get; set; } = default!;
+    [Inject] public IFileServiceFactory FileServiceFactory { get; set; } = default!;
     [Inject] public AppState AppState { get; set; } = default!;
     [Inject] public HttpService HttpService { get; set; } = default!;
     public SearchService SearchService { get; set; } = default!;
@@ -60,7 +60,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         CourtList.GenerateInformations();
         CourtList.Defendants.Sort((a, b) => string.Compare(a.LastName, b.LastName, StringComparison.Ordinal));
 
-        if (AppState.IsFirstLoad)
+        if (AppState.IsFirstCourtListLoad)
         {
             AppState.CourtSittings = await LoadCourtSittings();
         }
@@ -69,7 +69,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         SearchService = new SearchService(CourtList);
 
         AppState.CurrentCourtList = CourtList;
-        AppState.ApplicationLoaded();
+        AppState.CourtListLoaded();
 
         AppState.OnStateChanged += StateHasChanged;
         _loading = false;
@@ -77,7 +77,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task LoadCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom)
     {
-        var courtList = (await DataAccess.GetCourtList(courtCode, courtDate, courtRoom))?.ToUIModel();
+        var dataAccess = DataAccessFactory.Create();
+        var courtList = (await dataAccess.GetCourtList(courtCode, courtDate, courtRoom))?.ToUIModel();
 
         CourtList = courtList ?? throw new Exception("Failed to load court list.");
         CourtList.CourtCode = courtCode;
@@ -87,7 +88,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task<List<CourtSitting>> LoadCourtSittings()
     {
-        var courtSittings = await DataAccess.GetCourtSittings(new CourtListEntry(CourtCode, CourtDate, CourtRoom));
+        var dataAccess = DataAccessFactory.Create();
+        var courtSittings = await dataAccess.GetCourtSittings(new CourtListEntry(CourtCode, CourtDate, CourtRoom));
         return GenerateCourtSittings(courtSittings);
     }
 
@@ -146,15 +148,22 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         try
         {
             _addCasefilesError = null;
+
             var newCasefileModels = await HttpService.GetCasefiles(newCasefileNumbers, CourtDate);
-            await DataAccess.AddCasefiles(newCasefileModels, CourtList);
+
+            var dataAccess = DataAccessFactory.Create();
+            await dataAccess.AddCasefiles(newCasefileModels, CourtList);
+
             var newCasefiles = newCasefileModels.ToUIModels();
             newCasefiles.AddReferenceToDefendants();
+
             CourtList.AddCasefiles(newCasefiles);
             UpdateCourtSittings(newCasefiles.Select(cf => cf.Defendant));
 
             CasefilesToAdd = string.Empty;
+
             await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
+            
             _loadingNewCasefiles = false;
         }
         catch
@@ -163,7 +172,6 @@ public partial class CourtListPage : ICourtListPage, IDisposable
             _loadingNewCasefiles = false;
             return;
         }
-
     }
 
     private async void UpdateCourtSittings(IEnumerable<Defendant> defendants)
@@ -179,7 +187,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
             courtSession.Defendants.Add(defendant);
             AppState.CourtSittings.Add(courtSession);
 
-            await DataAccess.UpdateCourtSittings(AppState.CourtSittings, new CourtListEntry(CourtCode, CourtDate, CourtRoom));
+            var dataAccess = DataAccessFactory.Create();
+            await dataAccess.UpdateCourtSittings(AppState.CourtSittings, new CourtListEntry(CourtCode, CourtDate, CourtRoom));
 
             OnCourtSessionAdded?.Invoke(courtSession);
         }
@@ -199,7 +208,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task SaveChanges()
     {
-        await DataAccess.UpdateCourtList(CourtList);
+        var dataAccess = DataAccessFactory.Create();    
+        await dataAccess.UpdateCourtList(CourtList);
         await ReturnHome();
     }
 
@@ -265,7 +275,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private void SaveCourtList()
     {
-        DataAccess.UpdateCourtList(CourtList);
+        var dataAccess = DataAccessFactory.Create();
+        dataAccess.UpdateCourtList(CourtList);
 
         foreach (var casefile in CourtList.GetCasefiles())
         {
@@ -275,7 +286,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task ExportCourtList()
     {
-        await FileService.SaveFile(CourtList);
+        var fileService = FileServiceFactory.Create();
+        await fileService.SaveFile(CourtList);
     }
 
     private bool UnsavedChanges()
@@ -302,7 +314,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         try
         {
             var updatedCasefiles = await HttpService.RefreshData(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber));
-            await DataAccess.UpdateCasefiles(updatedCasefiles);
+            var dataAccess = DataAccessFactory.Create();
+            await dataAccess.UpdateCasefiles(updatedCasefiles);
             CourtList.UpdateCasefiles(updatedCasefiles);
             NavManager.Refresh();
         }

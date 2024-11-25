@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EBrief.Data;
-public class DataAccess : IDataAccess
+public class DataAccess : IDataAccess, IDisposable
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DataAccess> _logger;
@@ -102,7 +102,7 @@ public class DataAccess : IDataAccess
             try
             {
                 var defendants = courtList.Casefiles.Select(cf => cf.Defendant).Distinct();
-                
+
                 var documents = courtList.Casefiles.SelectMany(cf => cf.Documents).Select(d => d.FileName);
                 var fileService = _fileServiceFactory.Create();
                 fileService.DeleteDocuments(documents);
@@ -212,5 +212,38 @@ public class DataAccess : IDataAccess
         }
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateCasefileDocumentLoadedStatus(Casefile cf, DocumentType documentType)
+    {
+        var casefile = await _context.Casefiles
+            .Where(casefile => casefile.CasefileNumber == cf.CasefileNumber)
+            .Include(cf => cf.Documents)
+            .FirstAsync();
+
+        if (documentType == DocumentType.Casefile)
+        {
+            casefile.CasefileDocumentsLoaded = true;
+            foreach (var document in cf.CasefileDocuments)
+            {
+                casefile.Documents.First(d => d.Id == document.Id).FileName = document.FileName;
+            }
+
+        }
+        else if (documentType == DocumentType.Evidence)
+        {
+            casefile.EvidenceLoaded = true;
+            foreach (var document in cf.OccurrenceDocuments)
+            {
+                casefile.Documents.First(d => d.Id == document.Id).FileName = document.FileName;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public void Dispose()
+    {
+        _context.Dispose();
     }
 }
