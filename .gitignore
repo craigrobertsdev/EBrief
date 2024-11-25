@@ -13,10 +13,11 @@
 */Uploads
 .idea/
 **/*.crt
-EBrief.Installer/
-EBrief.Installer/certs
+# EBrief.Installer/
+# EBrief.Installer/certs
 LandscapeLists/
 **/*.iss
+**/*.pfx
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

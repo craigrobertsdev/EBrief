@@ -27,14 +27,13 @@ FUNCTIONALITY:
 
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 
-	- Allow user to load documents even when they chose not to on the first occasion
-
 UI:
 	- Case files and other scrolling documents should have the ability to be opened in a pop-out screen 
 		that takes up most of/all of the screen for easier reading.
 	- Add the ability to zoom in and out.
 
 	- When deleting a court list, pressing escape when the confirm dialog is open then reopening the "LoadPreviousCourtList" dialog shows an incorrect state.
+		* Can't now replicate this.
 
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
