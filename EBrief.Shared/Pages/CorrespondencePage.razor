@@ -1,8 +1,10 @@
+@using EBrief.Shared.Components
 @using EBrief.Shared.Helpers
 @using EBrief.Shared.Models
 @using EBrief.Shared.Models.Shared
 @using EBrief.Shared.Models.UI
 @using System.IO
+@using EBrief.Shared.Services
 @implements IDisposable
 
 <div class="flex h-full">
@@ -12,15 +14,20 @@
     }
     else if (Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocumentsLoaded == false)
     {
-        <p>No documents loaded for this court list</p>
+        <div>
+            <p>No documents loaded for this court list</p>
+            <Button Variant="ButtonTypes.Add" OnClick="LoadDocuments">
+                Load Evidence
+            </Button>
+        </div>
     }
     else
     {
         <div class="row-span-2 flex flex-col pr-2 mr-2 border-r border-r-3 border-r-slate-500 overflow-y-auto w-40 laptop:w-56">
             @foreach (var document in Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocuments!)
             {
-                <div class="text-md laptop:text-base p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)" 
-                    @onclick=@(() => SelectDocument(document)) title="@document.Title">
+                <div class="text-md laptop:text-base p-1 max-h-[6rem] overflow-hidden border border-slate-500 cursor-pointer @IsSelected(document)"
+                @onclick=@(() => SelectDocument(document)) title="@document.Title">
                     @document.Title
                 </div>
             }
@@ -41,6 +48,8 @@
 
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
+    [Inject] HttpService HttpService { get; set; } = default!;
+
     private Document? _selectedDocument { get; set; }
     private string? PdfContent { get; set; } = null;
 
@@ -59,6 +68,7 @@
     {
         var file = Parent.ActiveDefendant?.ActiveCasefile?.SelectedCasefileDocument ??
             Parent.ActiveDefendant?.ActiveCasefile?.CasefileDocuments.FirstOrDefault();
+            
         if (file != null)
         {
             await SelectDocument(file);
@@ -91,6 +101,13 @@
         }
 
         return "bg-slate-200 text-black";
+    }
+
+    private async Task LoadDocuments()
+    {
+        await HttpService.DownloadCorrespondence(Parent.ActiveDefendant!.ActiveCasefile!);
+        Parent.ActiveDefendant!.ActiveCasefile!.CasefileDocumentsLoaded = true;
+        await HandleDefendantChange();
     }
 
     public void Dispose()

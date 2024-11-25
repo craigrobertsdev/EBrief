@@ -11,6 +11,8 @@ public class HttpService
     private readonly HttpClient _client;
     private readonly IFileServiceFactory _fileServiceFactory;
     private readonly IDataAccessFactory _dataAccessFactory;
+    private const string EVIDENCE_ENDPOINT = "evidence";
+    private const string CORRESPONDENCE_ENDPOINT = "correspondence";
 
     public async Task<List<CasefileModel>> GetCasefiles(List<string> casefileNumbers, DateTime courtDate)
     {
@@ -66,7 +68,7 @@ public class HttpService
         {
             foreach (var document in casefile.Documents)
             {
-                var endpoint = document.DocumentType == DocumentType.Casefile ? "correspondence" : "evidence";
+                var endpoint = document.DocumentType == DocumentType.Casefile ? CORRESPONDENCE_ENDPOINT : EVIDENCE_ENDPOINT;
                 await DownloadDocument(document, fileService, endpoint);
             }
 
@@ -82,12 +84,25 @@ public class HttpService
 
         foreach (var document in casefile.OccurrenceDocuments)
         {
-            var endpoint = "evidence";
-            await DownloadDocument(document, fileService, endpoint);
+            await DownloadDocument(document, fileService, EVIDENCE_ENDPOINT);
         }
 
         var dataAccess = _dataAccessFactory.Create();
         await dataAccess.UpdateCasefileDocumentLoadedStatus(casefile, DocumentType.Evidence);
+    }
+
+    public async Task DownloadCorrespondence(Casefile casefile)
+    {
+        var fileService = _fileServiceFactory.Create();
+        fileService.CreateDocumentDirectory();
+
+        foreach (var document in casefile.CasefileDocuments)
+        {
+            await DownloadDocument(document, fileService, CORRESPONDENCE_ENDPOINT);
+        }
+
+        var dataAccess = _dataAccessFactory.Create();
+        await dataAccess.UpdateCasefileDocumentLoadedStatus(casefile, DocumentType.Casefile);
     }
 
     private async Task DownloadDocument(IDocument document, IFileService fileService, string endpoint)

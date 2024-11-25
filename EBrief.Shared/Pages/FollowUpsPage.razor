@@ -58,7 +58,6 @@
 
     public async Task HandleDefendantChange()
     {
-        await Task.CompletedTask;
         if (Parent?.ActiveDefendant?.Casefiles is not null)
         {
             Casefiles = Parent.ActiveDefendant.Casefiles;

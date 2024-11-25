@@ -40,6 +40,7 @@
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
     [Inject] HttpService HttpService { get; set; } = default!;
+
     private Document? SelectedDocument { get; set; }
     private string? PdfContent { get; set; } = null;
 
@@ -96,6 +97,7 @@
     {
         await HttpService.DownloadEvidence(Parent.ActiveDefendant!.ActiveCasefile!);
         Parent.ActiveDefendant!.ActiveCasefile!.EvidenceLoaded = true;
+        await HandleDefendantChange();
     }
 
     public void Dispose()
