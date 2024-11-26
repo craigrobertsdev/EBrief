@@ -29,7 +29,7 @@ const onEscapePressed = (e, element) => {
         if (courtListPageReference !== null) {
             const searchField = document.getElementById("search-field");
             searchField.value = "";
-            courtListPageReference.invokeMethodAsync("CloseSearchDialog");
+            courtListPageReference.invokeMethodAsync("ClearSearchDialog");
         }
     }
 

@@ -2,19 +2,19 @@
 
 namespace EBrief.Shared.Services.Search;
 
-public class SearchResult : IComparable<SearchResult>
+public class SearchResult : IComparable<SearchResult> 
 {
     private readonly string _searchString;
     public Casefile Casefile { get; }
-    public string SearchQuery { get; } = string.Empty;
+    public string SearchQuery { get; }
 
     public SearchResult(Casefile casefile, string searchQuery)
     {
         Casefile = casefile;
         SearchQuery = searchQuery;
-        _searchString = casefile.CourtFileNumber != null ?
-            $"{casefile.CasefileNumber}{casefile.CourtFileNumber}" :
-            casefile.CasefileNumber;
+            _searchString = casefile.CourtFileNumber != null
+                ? $"{casefile.CasefileNumber}{casefile.CourtFileNumber}"
+                : casefile.CasefileNumber;
     }
 
     public int CompareTo(SearchResult? other)

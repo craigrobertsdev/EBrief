@@ -1,4 +1,6 @@
-﻿namespace EBrief.Shared.Models.UI;
+﻿using EBrief.Shared.Services.Search;
+
+namespace EBrief.Shared.Models.UI;
 public class Casefile
 {
     public string CasefileNumber { get; set; } = string.Empty;

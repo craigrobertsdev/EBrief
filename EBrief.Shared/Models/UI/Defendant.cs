@@ -1,4 +1,5 @@
 ﻿using EBrief.Shared.Models.Data;
+using EBrief.Shared.Services.Search;
 
 namespace EBrief.Shared.Models.UI;
 public class Defendant

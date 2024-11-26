@@ -45,12 +45,10 @@ public class SearchService
         return results;
     }
 
-    private static SearchTrie BuildTrie(CourtList courtList)
+    private static SearchTrie BuildTrie(CourtList courtList) 
     {
         SearchTrie trie = new();
         var casefiles = courtList.GetCasefiles();
-        var casefileNumbers = casefiles.Select(cf => cf.CasefileNumber);
-        var courtFileNumbers = casefiles.Select(cf => cf.CourtFileNumber);
         // go through each item, create trie node and add reference at leaf of the key.
         foreach (var cf in casefiles)
         {
@@ -60,7 +58,6 @@ public class SearchService
                 trie.Insert(cf.CourtFileNumber.ToUpper(), cf);
             }
         }
-
         return trie;
     }
 }

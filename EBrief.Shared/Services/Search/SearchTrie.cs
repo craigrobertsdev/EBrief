@@ -13,12 +13,12 @@ public class SearchTrie
         public bool HasValue => Value != null;
 
         public TrieNode() { }
-        public TrieNode(char key) => Key = Char.ToUpper(key);
+        public TrieNode(char key) => Key = char.ToUpper(key);
     }
 
     public void Insert(string key, Casefile value)
     {
-        TrieNode current = Root;
+        var current = Root;
         for (int i = 0; i < key.Length; i++)
         {
             if (current.Children.TryGetValue(key[i], out var node))
@@ -118,4 +118,9 @@ public class SearchTrie
         // this needs to be implemented when the ability to delete case files from the court list is implemented
         throw new NotImplementedException();
     }
+
+}
+
+public interface ITrieNodeValue
+{
 }

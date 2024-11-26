@@ -27,13 +27,17 @@ public class FileService : IFileService
             Filter = "Court files|*.court"
         };
 
-        bool? result = dialog.ShowDialog();
-        if (result == true)
+        try
         {
-            var dataAccess = _dataAccessFactory.Create();
-            var courtListModel = await dataAccess.GetCourtList(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
-            File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), dialog.FileName), courtListModel!.SerialiseToJson());
+            bool? result = dialog.ShowDialog();
+            if (result == true)
+            {
+                var dataAccess = _dataAccessFactory.Create();
+                var courtListModel = await dataAccess.GetCourtList(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
+                File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), dialog.FileName), courtListModel!.SerialiseToJson());
+            }
         }
+        catch { }
     }
 
     public async Task<(CourtListEntry?, string?)> LoadCourtFile()

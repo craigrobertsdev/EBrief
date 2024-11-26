@@ -264,9 +264,14 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     }
 
     [JSInvokable]
-    public void CloseSearchDialog()
+    public void ClearSearchDialog()
     {
         SearchResults.Clear();
+    }
+    
+    private async Task CloseSearchDialog()
+    {
+        await JSRuntime.InvokeVoidAsync("closeDialog", _searchDialog);
     }
 
     public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;
@@ -329,5 +334,14 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     public void Dispose()
     {
         AppState.OnStateChanged -= StateHasChanged;
+    }
+
+    private void SelectSearchResult(Casefile casefile)
+    {
+        ActiveDefendant = casefile.Defendant;
+        ActiveDefendant.ActiveCasefile = casefile;
+
+        CloseSearchDialog();
+
     }
 }
