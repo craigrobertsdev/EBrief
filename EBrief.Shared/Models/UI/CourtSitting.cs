@@ -25,7 +25,7 @@ public class CourtSitting
     protected CourtSitting(int id, DateTime sittingTime, CourtCode courtCode, int courtRoom, bool isAdditionsList)
     {
         IsAdditionsList = isAdditionsList;
-        SittingTime = SittingTime;
+        SittingTime = sittingTime;
         Id = id;
         CourtCode = courtCode;
         CourtRoom = courtRoom;
@@ -40,7 +40,7 @@ public class CourtSitting
             CourtRoom = CourtRoom,
             SittingTime = SittingTime,
             Name = Name,
-            Defendants = Defendants.ToDataModels(),
+            //Defendants = Defendants.ToDataModels(),
             IsAdditionsList = IsAdditionsList
         };
 }

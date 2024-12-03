@@ -5,49 +5,49 @@
 @using EBrief.Shared.Pages
 @inject IJSRuntime JSRuntime
 
-    <ul class="select-none pb-2">
-        @for (int i = 0; i < CourtSittings.Count; i++)
+<ul class="select-none pb-2">
+    @for (int i = 0; i < CourtSittings.Count; i++)
+    {
+        if (CourtSittings[i].Name == "Additions" && CourtSittings[i].Defendants.Count == 0)
         {
-            if (CourtSittings[i].Name == "Additions" && CourtSittings[i].Defendants.Count == 0)
-            {
-                continue;
-            }
+            continue;
+        }
 
-            int idx = i;
-            var courtSitting = CourtSittings[idx];
-            <li class="tree">
-                <div id="court-sitting-@idx" class="relative text-center">
-                    <p class="mt-2 py-1 text-center text-base laptop:text-lg font-bold border-gunmetal bg-slate-300 text-black hover:bg-slate-400 active:bg-slate-500"
-                       @onclick="() => ToggleCourtSitting(courtSitting, idx)">
-                        @courtSitting.Name
-                    </p>
-                    <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
-                        @foreach (var defendant in courtSitting.Defendants)
-                        {
-                            <li class="relative text-left text-md laptop:text-base font-medium p-1 first:mt-[1px] first:hover:mt-0 first:hover:border-t
+        int idx = i;
+        var courtSitting = CourtSittings[idx];
+        <li class="tree">
+            <div id="court-sitting-@idx" class="relative text-center">
+                <p class="mt-2 py-1 text-center text-base laptop:text-lg font-bold border-gunmetal bg-slate-300 text-black hover:bg-slate-400 active:bg-slate-500"
+                   @onclick="() => ToggleCourtSitting(courtSitting, idx)">
+                    @courtSitting.Name
+                </p>
+                <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
+                    @foreach (var defendant in courtSitting.Defendants)
+                    {
+                        <li class="relative text-left text-md laptop:text-base font-medium p-1 first:mt-[1px] first:hover:mt-0 first:hover:border-t
                             border-b border-gunmetal active:bg-slate-400
                             @(Parent.IsSelected(defendant) ? IsSelected : NotSelected)"
-                                @onclick="() => Parent.ActivateDefendant(defendant)">
+                            @onclick="() => Parent.ActivateDefendant(defendant)">
 
-                                @if (defendant.ListStart != 0 && defendant.ListStart == defendant.ListEnd)
-                                {
-                                    <span class="float-left pr-1">@(defendant.ListStart).</span>
-                                }
-                                else if (defendant.ListStart != 0)
-                                {
-                                    <span class="float-left pr-1">@(defendant.ListStart)-@(defendant.ListEnd).</span>
-                                }
-                                <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
-                                   title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
-                                    @defendant.LastName.ToUpper(), @defendant.FirstName
-                                </p>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </li>
-        }
-    </ul>
+                            @if (defendant.ListStart != 0 && defendant.ListStart == defendant.ListEnd)
+                            {
+                                <span class="float-left pr-1">@(defendant.ListStart).</span>
+                            }
+                            else if (defendant.ListStart != 0)
+                            {
+                                <span class="float-left pr-1">@(defendant.ListStart)-@(defendant.ListEnd).</span>
+                            }
+                            <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
+                               title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
+                                @defendant.LastName.ToUpper(), @defendant.FirstName
+                            </p>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </li>
+    }
+</ul>
 
 @code {
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
@@ -78,6 +78,9 @@
 
     private void CourtSessionAdded(CourtSitting session)
     {
-        _courtSessionVisibility.Add(session.Id, true);
+        if (!_courtSessionVisibility.ContainsKey(session.Id))
+        {
+            _courtSessionVisibility.Add(session.Id, true);
+        }
     }
 }

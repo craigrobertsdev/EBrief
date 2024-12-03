@@ -7,32 +7,18 @@ public class DefendantConfiguration : IEntityTypeConfiguration<DefendantModel>
 {
     public void Configure(EntityTypeBuilder<DefendantModel> builder)
     {
-        builder.HasMany(d => d.BailAgreements)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.OwnsMany(d => d.InterventionOrders, iob =>
+        {
+            iob.ToTable("InterventionOrders");
+            iob.WithOwner();
+            iob.OwnsMany(io => io.Conditions);
+        });
 
-        builder.HasMany(d => d.InterventionOrders)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
-public class BailAgreementConfiguration : IEntityTypeConfiguration<BailAgreementModel>
-{
-    public void Configure(EntityTypeBuilder<BailAgreementModel> builder)
-    {
-        builder.HasMany(ba => ba.Conditions)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
-public class InterventionOrderConfiguration : IEntityTypeConfiguration<InterventionOrderModel>
-{
-    public void Configure(EntityTypeBuilder<InterventionOrderModel> builder)
-    {
-        builder.HasMany(io => io.Conditions)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.OwnsMany(d => d.BailAgreements, bab =>
+        {
+            bab.ToTable("BailAgreements");
+            bab.WithOwner();
+            bab.OwnsMany(ba => ba.Conditions);
+        });
     }
 }

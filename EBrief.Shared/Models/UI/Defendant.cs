@@ -1,10 +1,9 @@
 ﻿using EBrief.Shared.Models.Data;
-using EBrief.Shared.Services.Search;
 
 namespace EBrief.Shared.Models.UI;
 public class Defendant
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int ListStart { get; set; }
     public int ListEnd { get; set; }
     public string FirstName { get; set; } = string.Empty;

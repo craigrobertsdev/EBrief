@@ -87,8 +87,17 @@ public class DataAccess : IDataAccess, IDisposable
 
         foreach (var cf in newCasefiles)
         {
+            if (_context.Defendants.FirstOrDefault(d => d.Id == cf.Defendant.Id) is null)
+            {
+                _context.Defendants.Add(cf.Defendant);
+            }
+
             cf.CasefileNumber = cf.CasefileNumber.ToUpper();
+            cf.CourtListId = existingCourtList.Id;
         }
+        
+        await _context.SaveChangesAsync();
+
         existingCourtList.Casefiles.AddRange(newCasefiles);
         await _context.SaveChangesAsync();
     }
@@ -100,8 +109,9 @@ public class DataAccess : IDataAccess, IDisposable
         if (courtList is not null)
         {
             try
-            {
+            { 
                 var defendants = courtList.Casefiles.Select(cf => cf.Defendant).Distinct();
+                var courtSittings = _context.CourtSittings.Where(cs => cs.CourtCode == entry.CourtCode && cs.CourtRoom == entry.CourtRoom && cs.CourtCode == entry.CourtCode);
 
                 var documents = courtList.Casefiles.SelectMany(cf => cf.Documents).Select(d => d.FileName);
                 var fileService = _fileServiceFactory.Create();
@@ -109,6 +119,7 @@ public class DataAccess : IDataAccess, IDisposable
 
                 _context.Defendants.RemoveRange(defendants);
                 _context.CourtLists.Remove(courtList);
+                _context.CourtSittings.RemoveRange(courtSittings);
                 _context.SaveChanges();
             }
             catch
@@ -201,11 +212,7 @@ public class DataAccess : IDataAccess, IDisposable
         foreach (var courtSitting in courtSittings)
         {
             var existing = existingCourtSittings.FirstOrDefault(cs => cs.SittingTime == courtSitting.SittingTime);
-            if (existing is not null)
-            {
-                existing.Defendants = courtSitting.Defendants.ToDataModels();
-            }
-            else
+            if (existing is null)
             {
                 _context.CourtSittings.Add(courtSitting.ToDataModel());
             }
@@ -245,5 +252,12 @@ public class DataAccess : IDataAccess, IDisposable
     public void Dispose()
     {
         _context.Dispose();
+    }
+
+    public async Task SaveCourtSittings(List<CourtSitting> courtSittings)
+    {
+        var models = courtSittings.Select(cs => cs.ToDataModel());
+        _context.CourtSittings.AddRange(models);
+        await _context.SaveChangesAsync();
     }
 }

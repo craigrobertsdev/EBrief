@@ -9,6 +9,7 @@ public class CasefileModelConfiguration : IEntityTypeConfiguration<CasefileModel
     {
         builder.HasOne(cf => cf.CourtList)
             .WithMany(cl => cl.Casefiles)
+            .HasForeignKey(cf => cf.CourtListId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(cf => cf.Defendant)

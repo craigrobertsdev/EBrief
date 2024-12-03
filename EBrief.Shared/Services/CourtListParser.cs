@@ -11,9 +11,9 @@ public class CourtListParser
     int pos = 0;
 
     /*********DELETE THIS IN PROD*********/
-    record ParsedDefendant(string First, string Last, int Id);
+    record ParsedDefendant(string First, string Last, Guid Id);
     List<ParsedDefendant> defendantNames = [];
-    int currentId = 0;
+    Guid currentId = Guid.NewGuid();
     /*************************************/
 
     public List<CourtListModel> ParseLandscapeList(string filePath)
@@ -131,7 +131,7 @@ public class CourtListParser
         {
             casefile.Defendant.Id = currentId;
             defendantNames.Add(new(casefile.Defendant.FirstName, casefile.Defendant.LastName, currentId));
-            currentId++;
+            currentId = Guid.NewGuid();
         }
         /*************************************/
 
@@ -210,7 +210,7 @@ public class CourtListParser
     private bool IsNewCourtRoom(OpenXmlElement row, int courtRoom)
     {
         var text = row.ChildElements[1].InnerText.Split(' ')[1];
-        var room = Int32.Parse(text);
+        var room = int.Parse(text);
         return room != courtRoom;
     }
 

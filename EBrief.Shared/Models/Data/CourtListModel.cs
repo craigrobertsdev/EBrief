@@ -9,7 +9,6 @@ namespace EBrief.Shared.Models.Data;
 public class CourtListModel
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     public List<CasefileModel> Casefiles { get; set; } = [];
     public DateTime CourtDate { get; set; }
@@ -84,7 +83,6 @@ public class CourtListModel
 
     // This handles the situation where a defendant has multiple case files
     // Every object from the server has a different reference, so we need to combine them
-
     public void CombineAndSortDefendantCasefiles()
     {
         var defendants = Casefiles.Select(cf => cf.Defendant).DistinctBy(d => d.Id).ToList();

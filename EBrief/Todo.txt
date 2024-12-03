@@ -25,9 +25,22 @@ FUNCTIONALITY:
 		* Follow up tasks should be able to be created for the prosecutor they 
 			are in court with so that work can be assigned directly to the prosecutor who will do the work at a later date.
 
+	- Add court jurisdiction information and highlight when a matter should be considered for adjournment to the correct jurisdiction
+
+	- If a user changes their credentials (ie password is updated), they are prompted to log in again
+	
+	- Save an email or document to multiple casefiles at once
+	- Create a link from the offender to their NCIS record
+
 	- Remove ID hack from parser. This is to allow defendants to have different ids by the time they reach the database so more than 1 defendant has case files against them
 
 	- Improve resiliency for adding documents to evidence and correspondence pages when there is an error.
+
+	- Clear error message on add casefiles dialog when closing it
+
+	- Refresh throws an error when there is an addition in the list. App cannot recover from this state even after restarting.
+	- Work out why there are so many entires for each defendant in the database
+		* Adding a casefile adds double the number of defendants when called
 
 UI:
 	- Case files and other scrolling documents should have the ability to be opened in a pop-out screen 

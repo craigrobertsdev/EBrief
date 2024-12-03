@@ -19,4 +19,5 @@ public interface IDataAccess
     Task UpdateCourtSittings(List<CourtSitting> courtSittings, CourtListEntry entry);
     Task<List<CourtSitting>> GetCourtSittings(CourtListEntry entry);
     Task UpdateCasefileDocumentLoadedStatus(Casefile cf, DocumentType documentType);
+    Task SaveCourtSittings(List<CourtSitting> courtSittings);
 }

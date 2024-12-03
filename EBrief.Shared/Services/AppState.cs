@@ -47,4 +47,14 @@ public class AppState
 
     public event Action? OnStateChanged;
     private void NotifyStateChanged() => OnStateChanged?.Invoke();
+
+    public void AddCourtSitting(CourtSitting courtSession)
+    {
+        if (CourtSittings.Any(c => c.Id == courtSession.Id))
+        {
+            return;
+        }
+
+        CourtSittings.Add(courtSession);
+    }
 }

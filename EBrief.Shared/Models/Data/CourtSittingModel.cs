@@ -15,14 +15,14 @@ public class CourtSittingModel
     public int CourtRoom { get; set; }
     public DateTime SittingTime { get; set; }
     public string Name { get; set; } = string.Empty;
-    public List<DefendantModel> Defendants { get; set; } = [];
+    //public List<DefendantModel> Defendants { get; set; } = [];
     public bool IsAdditionsList { get; set; }
 
     public CourtSitting ToUIModel() =>
         new CourtSitting(Id, SittingTime, CourtCode, CourtRoom)
         {
             Name = Name,
-            Defendants = Defendants.ToUIModels(),
+            //Defendants = Defendants.ToUIModels(),
             IsAdditionsList = IsAdditionsList
         };
 }

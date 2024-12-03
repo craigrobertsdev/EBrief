@@ -90,11 +90,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     {
         var dataAccess = DataAccessFactory.Create();
         var courtSittings = await dataAccess.GetCourtSittings(new CourtListEntry(CourtCode, CourtDate, CourtRoom));
-        return GenerateCourtSittings(courtSittings);
-    }
 
-    private List<CourtSitting> GenerateCourtSittings(List<CourtSitting> courtSittings)
-    {
         if (courtSittings.Count == 0)
         {
             courtSittings = CourtList.Defendants.SelectMany(d => d.Casefiles)
@@ -102,13 +98,20 @@ public partial class CourtListPage : ICourtListPage, IDisposable
                 .OrderBy(g => g.Key)
                 .Select((g, i) => new CourtSitting(i, g.Key, CourtCode, CourtRoom))
                 .ToList();
+
+            await dataAccess.SaveCourtSittings(courtSittings);
         }
 
+        return GenerateCourtSittings(courtSittings);
+    }
+
+    private List<CourtSitting> GenerateCourtSittings(List<CourtSitting> courtSittings)
+    {
         // iterate over the list of defendants and group them by the appearance time of their first case file in the list
         foreach (var defendant in CourtList.Defendants)
         {
             var hearingTime = defendant.Casefiles.First().Schedule.Last().HearingDate;
-            var courtSitting = courtSittings.First(courtSittings => courtSittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
+            var courtSitting = courtSittings.FirstOrDefault(courtSittings => courtSittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
             courtSitting.Defendants.Add(defendant);
         }
 
@@ -163,7 +166,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
             CasefilesToAdd = string.Empty;
 
             await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
-            
+
             _loadingNewCasefiles = false;
         }
         catch
@@ -185,7 +188,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
             }
 
             courtSession.Defendants.Add(defendant);
-            AppState.CourtSittings.Add(courtSession);
+            AppState.AddCourtSitting(courtSession);
 
             var dataAccess = DataAccessFactory.Create();
             await dataAccess.UpdateCourtSittings(AppState.CourtSittings, new CourtListEntry(CourtCode, CourtDate, CourtRoom));
@@ -208,7 +211,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task SaveChanges()
     {
-        var dataAccess = DataAccessFactory.Create();    
+        var dataAccess = DataAccessFactory.Create();
         await dataAccess.UpdateCourtList(CourtList);
         await ReturnHome();
     }
@@ -268,7 +271,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     {
         SearchResults.Clear();
     }
-    
+
     private async Task CloseSearchDialog()
     {
         await JSRuntime.InvokeVoidAsync("closeDialog", _searchDialog);
@@ -336,12 +339,11 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         AppState.OnStateChanged -= StateHasChanged;
     }
 
-    private void SelectSearchResult(Casefile casefile)
+    private async Task SelectSearchResult(Casefile casefile)
     {
         ActiveDefendant = casefile.Defendant;
         ActiveDefendant.ActiveCasefile = casefile;
 
-        CloseSearchDialog();
-
+        await CloseSearchDialog();
     }
 }

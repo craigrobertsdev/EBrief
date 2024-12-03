@@ -7,8 +7,8 @@ public class CourtSittingConfiguration : IEntityTypeConfiguration<CourtSittingMo
 {
     public void Configure(EntityTypeBuilder<CourtSittingModel> builder)
     {
-        builder.HasMany(cs => cs.Defendants)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
+        //builder.HasMany(cs => cs.Defendants)
+        //    .WithOne()
+        //    .OnDelete(DeleteBehavior.Cascade);
     }
 }
