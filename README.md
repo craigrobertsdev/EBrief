@@ -32,7 +32,7 @@ Clone the repo to your local machine:
 
 <br>
 
-You will need the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed.
+You will need the [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) installed.
 
 The application depends on dummy data being provided by a server which can be found [here](https://github.com/craigrobertsdev/DocumentServer).
 
