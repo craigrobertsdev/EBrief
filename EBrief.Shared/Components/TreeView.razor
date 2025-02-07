@@ -17,9 +17,17 @@
         var courtSitting = CourtSittings[idx];
         <li class="tree">
             <div id="court-sitting-@idx" class="relative text-center">
-                <p class="mt-2 py-1 text-center text-base laptop:text-lg font-bold border-gunmetal bg-slate-300 text-black hover:bg-slate-400 active:bg-slate-500"
-                   @onclick="() => ToggleCourtSitting(courtSitting, idx)">
+                <p class="mt-2 py-1 text-left pl-2 text-base laptop:text-lg font-bold border-gunmetal bg-slate-300 text-black hover:bg-slate-400 active:bg-slate-500"
+                @onclick="() => ToggleCourtSitting(courtSitting, idx)">
                     @courtSitting.Name
+
+                    @if (idx == 0) {
+
+                        @* <Button OnClick="ToggleMenuCollapse">@(MenuCollapsed ? "Expand" : "Collapse")</Button> *@
+                        <button @onclick="ToggleMenuCollapse" class="float-right text-sm my-auto">@(_menuCollapsed ? "Expand" : "Collapse")</button>
+
+                    }
+
                 </p>
                 <ul class="@(IsVisible(courtSitting) ? "block" : "hidden")">
                     @foreach (var defendant in courtSitting.Defendants)
@@ -27,7 +35,7 @@
                         <li class="relative text-left text-md laptop:text-base font-medium p-1 first:mt-[1px] first:hover:mt-0 first:hover:border-t
                             border-b border-gunmetal active:bg-slate-400
                             @(Parent.IsSelected(defendant) ? IsSelected : NotSelected)"
-                            @onclick="() => Parent.ActivateDefendant(defendant)">
+                        @onclick="() => Parent.ActivateDefendant(defendant)">
 
                             @if (defendant.ListStart != 0 && defendant.ListStart == defendant.ListEnd)
                             {
@@ -38,7 +46,7 @@
                                 <span class="float-left pr-1">@(defendant.ListStart)-@(defendant.ListEnd).</span>
                             }
                             <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
-                               title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
+                            title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
                                 @defendant.LastName.ToUpper(), @defendant.FirstName
                             </p>
                         </li>
@@ -55,6 +63,7 @@
     private Dictionary<int, bool> _courtSessionVisibility { get; set; } = [];
     private string IsSelected = "bg-blue text-primary hover:bg-blue font-semibold";
     private string NotSelected = "hover:bg-slate-300";
+    private bool _menuCollapsed = false;
 
     protected override void OnInitialized()
     {
@@ -69,6 +78,10 @@
         {
             await JSRuntime.InvokeVoidAsync("scrollToBottomOfCourtSitting", $"court-sitting-{courtSitting.Id}");
         }
+    }
+
+    private void ToggleMenuCollapse() {
+        _menuCollapsed = !_menuCollapsed;
     }
 
     private bool IsVisible(CourtSitting courtSitting)
