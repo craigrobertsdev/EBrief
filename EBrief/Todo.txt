@@ -1,4 +1,4 @@
-npx tailwindcss -i .\wwwroot\css\app.css -o .\wwwroot\css\output.css --watch
+tailwindcss -i .\wwwroot\css\app.css -o .\wwwroot\css\output.css --watch
 
 FUNCTIONALITY:
 	- Work out logging

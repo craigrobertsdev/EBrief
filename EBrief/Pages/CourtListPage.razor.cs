@@ -111,8 +111,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         foreach (var defendant in CourtList.Defendants)
         {
             var hearingTime = defendant.Casefiles.First().Schedule.Last().HearingDate;
-            var courtSitting = courtSittings.FirstOrDefault(courtSittings => courtSittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
-            courtSitting.Defendants.Add(defendant);
+            var courtSitting = courtSittings.FirstOrDefault(sittings => sittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
+            courtSitting?.Defendants.Add(defendant);
         }
 
         courtSittings.ForEach(cs => cs.Defendants.Sort((d1, d2) => d1.ListStart.CompareTo(d2.ListStart)));
