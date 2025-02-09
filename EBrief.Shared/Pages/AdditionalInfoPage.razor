@@ -3,14 +3,14 @@
 @using EBrief.Shared.Models.Shared
 
 <div class="h-full" @onclick="MinimiseImage">
-    <div class="grid grid-cols-[auto,_1fr] grid-rows-[auto,_1fr] gap-x-2 gap-y-8 w-full">
+    <div class="grid grid-cols-[auto__1fr] grid-rows-[auto__1fr] gap-x-2 gap-y-8 w-full">
         @* defendant's photo *@
         <div class="grid-col-1 grid-row-1 w-40 h-52 cursor-pointer">
             <img class="@(_imageExpanded ? "hidden" : "") w-40" src="images/mugshot.jpg" @onclick:stopPropagation @onclick="ExpandImage" />
             <img class="@(_imageExpanded ? "" : "hidden") absolute w-64" src="images/mugshot.jpg" />
         </div>
 
-        <div class="grid-col-2 grid-row-1 grid border-t border-l grid-cols-[auto,_1fr] w-content text-lg">
+        <div class="grid-col-2 grid-row-1 grid border-t border-l grid-cols-[auto__1fr] w-content text-lg">
             <p class="flex items-center border-b">Name:</p>
             <p class="flex items-center border-l border-b border-r border-slate-200 pl-4">@Parent.ActiveDefendant!.FirstName @Parent.ActiveDefendant!.LastName</p>
             <p class="flex items-center border-b">Date Of Birth:</p>
@@ -22,7 +22,7 @@
             <p class="flex items-center border-b">Email:</p>
             <p class="flex items-center border-l border-b border-r border-slate-200 pl-4">@Parent.ActiveDefendant!.Email</p>
         </div>
-        <div class="col-span-2 grid-row-2 grid border-t border-l grid-cols-[auto,_1fr] w-content text-lg">
+        <div class="col-span-2 grid-row-2 grid border-t border-l grid-cols-[auto__1fr] w-content text-lg">
             <p class="flex items-center border-b pr-4">Time in custody:</p>
             <p class="flex items-center border-l border-b border-r border-slate-200 pl-4">@Parent.ActiveDefendant!.ActiveCasefile?.TimeInCustody?.ToDisplayString()</p>
         </div>

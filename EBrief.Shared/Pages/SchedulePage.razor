@@ -1,7 +1,7 @@
 @using EBrief.Shared.Models
 @using EBrief.Shared.Models.Shared
 
-<div class="flex-grow">
+<div class="grow">
     @if (Parent.ActiveDefendant?.ActiveCasefile is not null) {
         @foreach (var hearing in Parent.ActiveDefendant.ActiveCasefile.Schedule) {
             <div class="border-b border-b-black pb-4 mb-4">
