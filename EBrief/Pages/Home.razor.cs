@@ -198,6 +198,7 @@ public partial class Home
 
         if (!confirmDeletion || SelectedCourtListEntry is null || PreviousCourtListEntries is null)
         {
+            _deletingCourtList = false;
             return;
         }
 
