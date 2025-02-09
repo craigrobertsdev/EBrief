@@ -1,6 +1,49 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@source '../../../EBrief.Shared/**/*';
+
+@theme {
+  --color-primary: #f0f0f0;
+  --color-blue: #2360da;
+  --color-blue-hover: #184cb5;
+  --color-jade: #04b33b;
+  --color-jade-hover: #02a134;
+  --color-turquoise: #028299;
+  --color-turquoise-hover: #017185;
+  --color-ceramic: #3d0101;
+  --color-ceramic-hover: #a84f42;
+  --color-peach: #dd8e75;
+  --color-peach-hover: #c97c5d;
+  --color-gunmetal: #272d2d;
+  --color-disabled: #f2ede9;
+  --color-text: #ddd;
+
+  --font-sans: Roboto;
+
+  --shadow-menu: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+
+  --breakpoint-laptop: 1360px;
+
+  --text-md: 15px, 22px;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
 
 @font-face {
     font-family: "Roboto";

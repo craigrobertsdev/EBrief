@@ -26,15 +26,30 @@ else if (_loading)
 else
 {
     <CascadingValue Value="this">
-        <div class="h-full grid @(ColWidth) laptop:grid-cols-[300px_1fr] grid-rows-[auto_1fr] pt-2">
+        <div class="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] pt-2">
             @* Defendant column *@
-            <div id="defendant-container"
-                 class="row-span-2 overflow-auto max-h-full pl-2 @(MenuCollapsed ? "w-20" : "")">
-                @* <Button OnClick="ToggleMenuCollapse">@(MenuCollapsed ? "Expand" : "Collapse")</Button> *@
-                <div class="flex flex-col mr-2 h-full">
-                    <TreeView CourtSittings="AppState.CourtSittings"/>
+            <div id="defendant-container" class="row-span-2 overflow-auto max-h-full flex flex-col mr-2 h-full border-r px-2 border-black">
+                <div>
+                    <button @onclick="ToggleMenuCollapse" class="float-right text-sm my-auto hover:bg-slate-200 p-1">
+                        @if (_menuCollapsed)
+                        {
+                            <img src="images/open-icon.png" class="max-h-[20px] m-auto" />
+                        }
+                        else
+                        {
+                            <img src="images/close-icon.png" class="max-h-[20px] m-auto" />
+                        }
+                    </button>
                 </div>
+
+                @if (!_menuCollapsed)
+                {
+                    @* <div class="mt-2"> *@
+                        <DefendantList CourtSittings="AppState.CourtSittings" />
+                    @* </div> *@
+                }
             </div>
+
             @if (ActiveDefendant is null)
             {
                 <div class="pb-2">
@@ -67,11 +82,11 @@ else
                     @* Court List Menu *@
                     <div class="max-w-2xl flex items-center">
                         <DropdownMenu Text="Menu">
-                            <DropdownMenuItem Text="Save" OnClick="SaveCourtList"/>
-                            <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCasefilesDialog"/>
-                            <DropdownMenuItem Text="Refresh Data" OnClick="RefreshData"/>
-                            <DropdownMenuItem Text="Export Court List" OnClick="ExportCourtList"/>
-                            <DropdownMenuItem Text="Return Home" OnClick="HandleReturnHome"/>
+                            <DropdownMenuItem Text="Save" OnClick="SaveCourtList" />
+                            <DropdownMenuItem Text="Add Case Files" OnClick="OpenAddCasefilesDialog" />
+                            <DropdownMenuItem Text="Refresh Data" OnClick="RefreshData" />
+                            <DropdownMenuItem Text="Export Court List" OnClick="ExportCourtList" />
+                            <DropdownMenuItem Text="Return Home" OnClick="HandleReturnHome" />
                         </DropdownMenu>
                     </div>
                 </div>
@@ -79,37 +94,37 @@ else
             <div class="h-full ml-2">
                 <TabControl>
                     <TabPage Title="CFEL">
-                        <CfelPage/>
+                        <CfelPage />
                     </TabPage>
                     <TabPage Title="Information">
-                        <InformationPage/>
+                        <InformationPage />
                     </TabPage>
                     <TabPage Title="Facts of Charge">
-                        <FactsOfChargePage/>
+                        <FactsOfChargePage />
                     </TabPage>
                     <TabPage Title="Offender History">
-                        <OffenderHistoryPage/>
+                        <OffenderHistoryPage />
                     </TabPage>
                     <TabPage Title="Correspondence">
-                        <CorrespondencePage/>
+                        <CorrespondencePage />
                     </TabPage>
                     <TabPage Title="Evidence">
-                        <EvidencePage/>
+                        <EvidencePage />
                     </TabPage>
                     <TabPage Title="Orders">
-                        <OrdersPage/>
+                        <OrdersPage />
                     </TabPage>
                     <TabPage Title="Additional Info">
-                        <AdditionalInfoPage/>
+                        <AdditionalInfoPage />
                     </TabPage>
                     <TabPage Title="Schedule">
-                        <SchedulePage/>
+                        <SchedulePage />
                     </TabPage>
                     <TabPage Title="Follow-Ups">
-                        <FollowUpsPage/>
+                        <FollowUpsPage />
                     </TabPage>
                     <TabPage Title="Notes">
-                        <NotesPage/>
+                        <NotesPage />
                     </TabPage>
                 </TabControl>
             </div>
@@ -120,16 +135,16 @@ else
 <dialog @ref="_unsavedChangesDialog" class="p-5">
     <h3 class="text-lg pb-2">You have unsaved changes. Do you want to save them before returning home?</h3>
     <div class="flex w-full justify-center gap-3">
-        <RadzenButton Text="Yes" Click="SaveChanges"/>
-        <RadzenButton Text="No" Click="ReturnHome"/>
-        <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog"/>
+        <RadzenButton Text="Yes" Click="SaveChanges" />
+        <RadzenButton Text="No" Click="ReturnHome" />
+        <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog" />
     </div>
 </dialog>
 
 <dialog @ref="_addCasefilesDialog" class="p-5">
     @if (_loadingNewCasefiles)
     {
-        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false/>
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
     }
     else
     {
@@ -138,11 +153,11 @@ else
         </h3>
         <div class="w-full pb-4">
             <textarea @bind="@CasefilesToAdd" rows="10"
-                      class="w-full p-2 border border-slate-500 rounded-md resize-none"/>
+                      class="w-full p-2 border border-slate-500 rounded-md resize-none" />
         </div>
         <div class="flex w-full justify-end gap-3 pb-2">
-            <RadzenButton Text="Add" Click="AddCasefiles"/>
-            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCasefilesDialog"/>
+            <RadzenButton Text="Add" Click="AddCasefiles" />
+            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCasefilesDialog" />
         </div>
 
         @if (_addCasefilesError is not null)
@@ -154,7 +169,7 @@ else
 
 <dialog @ref="_searchDialog" id="search-dialog" class="p-2 border border-gunmetal w-[400px]">
     <h1 class="text-lg font-semibold">Search by Case file or Court file number</h1>
-    <input id="search-field" class="border border-gunmetal w-full p-1" @oninput="SearchCasefiles"/>
+    <input id="search-field" class="border border-gunmetal w-full p-1" @oninput="SearchCasefiles" />
     <ul>
         @foreach (var result in SearchResults)
         {
@@ -181,22 +196,21 @@ else
 </dialog>
 
 @code {
-    private bool MenuCollapsed { get; set; }
-    private string ColWidth => MenuCollapsed ? "grid-cols-[auto_1fr]" : "grid-cols-[225px_1fr]";
+    private bool _menuCollapsed = false;
 
     private MarkupString GenerateCasefileTooltipText(Casefile casefile)
     {
         var markup = new StringBuilder();
-        int maxCharges = 4;
+        int maxDisplayCharges = 4;
 
-        if (casefile.Charges.Count > maxCharges)
+        if (casefile.Charges.Count > maxDisplayCharges)
         {
             markup.Append($"<p class=\"pb-2 text-sm\">{casefile.Charges.Count} total charges</p>");
         }
 
-        foreach (var (charge, i) in casefile.Charges.Take(maxCharges).Select((c, i) => (c, i)))
+        foreach (var (charge, i) in casefile.Charges.Take(maxDisplayCharges).Select((c, i) => (c, i)))
         {
-            if (i == maxCharges)
+            if (i == maxDisplayCharges)
             {
                 markup.Append($"<p>{i + 1}. {charge.Date:d}: {charge.Name}</p>");
             }
@@ -211,7 +225,6 @@ else
 
     private void ToggleMenuCollapse()
     {
-        MenuCollapsed = !MenuCollapsed;
+        _menuCollapsed = !_menuCollapsed;
     }
-
 }

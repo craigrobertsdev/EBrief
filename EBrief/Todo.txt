@@ -47,9 +47,6 @@ UI:
 		that takes up most of/all of the screen for easier reading.
 	- Add the ability to zoom in and out.
 
-	- When deleting a court list, pressing escape when the confirm dialog is open then reopening the "LoadPreviousCourtList" dialog shows an incorrect state.
-		* Can't now replicate this.
-
 STYLING:
 	- Add colour coding for whether notes have been added to the case file
 	- Go through every date and time and format them consistently
