@@ -26,7 +26,7 @@ public class HttpService
         return await response.Content.ReadFromJsonAsync<List<CasefileModel>>() ?? [];
     }
 
-    public async Task<bool> UpdateCasefileLogs(IEnumerable<string> casefiles, CasefileEnquiryLogEntry entry)
+    public async Task<bool> UpdateCasefileEnquiryLogs(IEnumerable<string> casefiles, CasefileEnquiryLogEntry entry)
     {
         var result = await _client.PostAsJsonAsync($"{AppConstants.ApiBaseUrl}/update-cfels",
             new CfelUpdate(casefiles, entry));
@@ -131,5 +131,6 @@ public class HttpService
             Entry = entry;
         }
     }
+
     internal record CasefileUpdateContent(IEnumerable<string> CasefileNumbers);
 }
