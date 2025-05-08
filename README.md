@@ -48,7 +48,7 @@ dotnet run -lp https
   <br>
 
 2. Start the application:
-   Run the application from your text editor of choice, or from the terminal using the following command:
+   Run the application from your text editor of choice, or from the terminal, navigate to the EBrief folder containing the EBrief.csproj file then run the following command:
 
 ```bash
 dotnet run
