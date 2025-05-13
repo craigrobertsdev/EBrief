@@ -15,18 +15,18 @@ namespace EBrief.Pages;
 
 public partial class Home
 {
-    [Inject] private AppState AppState { get; set; } = default!;
-    [Inject] private IDataAccess DataAccess { get; set; } = default!;
-    [Inject] private IFileService FileService { get; set; } = default!;
-    [Inject] private HttpService HttpService { get; set; } = default!;
+    [Inject] private AppState AppState { get; set; } = null!;
+    [Inject] private IDataAccess DataAccess { get; set; } = null!;
+    [Inject] private IFileService FileService { get; set; } = null!;
+    [Inject] private HttpService HttpService { get; set; } = null!;
     private ElementReference? NewCourtListDialog { get; set; }
     private ElementReference? PreviousCourtListDialog { get; set; }
     private ElementReference? ConfirmDialog { get; set; }
     private string? CasefileNumbers { get; set; }
-    private List<Court> Courts = [];
+    private List<Court> _courts = [];
     private string? SelectedFile { get; set; }
     private List<CourtListModel>? LandscapeList { get; set; }
-    private CourtListBuilder CourtListBuilder { get; set; } = default!;
+    private CourtListBuilder CourtListBuilder { get; set; } = null!;
     private bool IncludeDocuments { get; set; }
     private bool _loadingCourtList;
     private bool EnterManually { get; set; }
@@ -43,25 +43,25 @@ public partial class Home
         CourtListBuilder = new CourtListBuilder();
         // This will be replaced when the application is in prod. Need to work out the actual court rooms
         // or create a generic list of court rooms up to 25 to cover everything. Need to add all the courts too
-        Courts.Add(new Court
+        _courts.Add(new Court
         {
             CourtCode = CourtCode.AMC,
             CourtRooms = [2, 3, 12, 15, 17, 18, 19, 20, 22, 23, 24]
         });
 
-        Courts.Add(new Court
+        _courts.Add(new Court
         {
             CourtCode = CourtCode.EMC,
             CourtRooms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         });
 
-        Courts.Add(new Court
+        _courts.Add(new Court
         {
             CourtCode = CourtCode.CBMC,
             CourtRooms = [1, 2, 3, 4, 5]
         });
 
-        Courts.Add(new Court
+        _courts.Add(new Court
         {
             CourtCode = CourtCode.PAMC,
             CourtRooms = [1, 2, 3, 4, 5]
@@ -160,11 +160,13 @@ public partial class Home
         }
     }
 
-    private async Task NavigateToCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom, bool? includeDocuments = null)
+    private async Task NavigateToCourtList(CourtCode courtCode, DateTime courtDate, int courtRoom,
+        bool? includeDocuments = null)
     {
         await JSRuntime.InvokeVoidAsync("removeDeleteEventHandler");
         var incDocs = includeDocuments is not null ? $"&includeDocuments={includeDocuments!}" : string.Empty;
-        NavManager.NavigateTo($"/court-list?courtCode={courtCode}&courtDate={courtDate}&courtRoom={courtRoom}{incDocs}");
+        NavManager.NavigateTo(
+            $"/court-list?courtCode={courtCode}&courtDate={courtDate}&courtRoom={courtRoom}{incDocs}");
     }
 
     private async Task OpenPreviousCourtListDialog()
@@ -188,7 +190,8 @@ public partial class Home
             return;
         }
 
-        NavManager.NavigateTo($"/court-list?courtCode={SelectedCourtListEntry.CourtCode}&courtDate={SelectedCourtListEntry.CourtDate}&courtRoom={SelectedCourtListEntry.CourtRoom}");
+        NavManager.NavigateTo(
+            $"/court-list?courtCode={SelectedCourtListEntry.CourtCode}&courtDate={SelectedCourtListEntry.CourtDate}&courtRoom={SelectedCourtListEntry.CourtRoom}");
     }
 
     private async Task DeletePreviousCourtList(bool confirmDeletion)
@@ -204,7 +207,8 @@ public partial class Home
 
         try
         {
-            await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtListEntry.CourtCode, SelectedCourtListEntry.CourtDate, SelectedCourtListEntry.CourtRoom));
+            await DataAccess.DeleteCourtList(new CourtListEntry(SelectedCourtListEntry.CourtCode,
+                SelectedCourtListEntry.CourtDate, SelectedCourtListEntry.CourtRoom));
             PreviousCourtListEntries.Remove(SelectedCourtListEntry);
             SelectedCourtListEntry = PreviousCourtListEntries.FirstOrDefault();
         }
@@ -216,7 +220,6 @@ public partial class Home
         {
             _deletingCourtList = false;
         }
-
     }
 
     private void ToggleManualCourtListEntry()
@@ -232,7 +235,6 @@ public partial class Home
         _loadingCourtList = true;
         try
         {
-
             SelectedFile = await FileService.SelectLandscapeList();
             if (SelectedFile is null)
             {
@@ -280,7 +282,6 @@ public partial class Home
 
     private async Task FetchCourtList(CourtListModel courtList)
     {
-
         _loadingCourtList = true;
         var entry = new CourtListEntry(courtList.CourtCode, courtList.CourtDate, courtList.CourtRoom);
         var listAlreadyExists = await DataAccess.CheckCourtListExists(entry);
@@ -360,12 +361,10 @@ public partial class Home
             _loadNewCourtListError = e.InnerException?.Message ?? e.Message;
             _loadingCourtList = false;
         }
-
     }
 
     private bool NewCourtListParametersAreValid()
     {
-
         if (!CourtListBuilder.IsValid)
         {
             return false;
@@ -406,6 +405,7 @@ public partial class Home
         {
             return;
         }
+
         _loadNewCourtListError = null;
         var courtRoom = int.Parse((string)e.Value);
         CourtListBuilder.SetCourtRoom(courtRoom);
@@ -418,6 +418,7 @@ public partial class Home
             CourtListBuilder.SetCourtCode(null);
             return;
         }
+
         _loadNewCourtListError = null;
 
         try
@@ -425,7 +426,9 @@ public partial class Home
             var courtCode = Enum.Parse<CourtCode>((string)e.Value);
             CourtListBuilder.SetCourtCode(courtCode);
         }
-        catch (Exception) { }
+        catch (Exception)
+        {
+        }
     }
 
     private void HandleEnterCourtRoom(ChangeEventArgs e)
@@ -436,6 +439,7 @@ public partial class Home
             CourtListBuilder.SetCourtRoom(null);
             return;
         }
+
         _loadNewCourtListError = null;
         try
         {
@@ -444,6 +448,7 @@ public partial class Home
             {
                 courtRoom = 1;
             }
+
             CourtListBuilder.SetCourtRoom(courtRoom);
         }
         catch (Exception)

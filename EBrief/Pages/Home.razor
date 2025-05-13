@@ -31,7 +31,7 @@
             </div>
         }
     </div>
-    <p class="text-right pr-2">&copy; Craig Roberts 2024</p>
+    <p class="text-right pr-2">&copy; Craig Roberts @(DateTime.Now.Year)</p>
 </div>
 
 <dialog id="new-court-list-dialog" @ref="NewCourtListDialog" class="p-5 w-[750px] h-[430px] m-auto">
@@ -79,7 +79,7 @@
                 <label class="ml-auto text-lg">Court code </label>
                 <select value="@CourtListBuilder.CourtCode" @oninput="HandleSelectCourt" class="border border-black p-2 rounded-md disabled:bg-gray-200">
                     <option selected hidden disabled></option>
-                    @foreach (var courtCode in Courts.Select(c => c.CourtCode))
+                    @foreach (var courtCode in _courts.Select(c => c.CourtCode))
                     {
                         <option value="@courtCode">@courtCode</option>
                     }
