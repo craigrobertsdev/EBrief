@@ -24,12 +24,12 @@ const onEscapePressed = (e, element) => {
         if (dialogReference !== null) {
             dialogReference.invokeMethodAsync("CloseLoadNewCourtListDialog");
         }
-    }
-    else if (currentDialog.id === "search-dialog") {
+    } else if (currentDialog.id === "search-dialog") {
         if (courtListPageReference !== null) {
+            removeKeyBoardSearchNavigation(e);
             const searchField = document.getElementById("search-field");
             searchField.value = "";
-            courtListPageReference.invokeMethodAsync("ClearSearchDialog");
+            courtListPageReference.invokeMethodAsync("ClearSearchResults");
         }
     }
 
@@ -94,9 +94,28 @@ const handleSearch = (event) => {
     }
 
     event.preventDefault();
-    const searchDialog = document.getElementById("search-dialog");
 
+    window.addEventListener("keydown", handleKeyBoardSearchNavigation);
     courtListPageReference.invokeMethodAsync("OpenSearchDialog");
+}
+
+function handleKeyBoardSearchNavigation(event) {
+    if (event.key === "ArrowDown") {
+        courtListPageReference.invokeMethodAsync("SelectNextSearchResult");
+    } else if (event.key === "ArrowUp") {
+        courtListPageReference.invokeMethodAsync("SelectPreviousSearchResult");
+    } else if (event.key === "Enter") {
+        courtListPageReference.invokeMethodAsync("SelectSearchResult");
+    }
+}
+
+function removeKeyBoardSearchNavigation(e) {
+    window.removeEventListener("keydown", handleKeyBoardSearchNavigation);
+}
+
+function clearSearchText() {
+    const searchField = document.getElementById("search-field");
+    searchField.value = "";
 }
 
 function addSearchEventHandler(courtListPageRef) {
@@ -106,4 +125,5 @@ function addSearchEventHandler(courtListPageRef) {
 
 function removeSearchEventHandler() {
     window.removeEventListener("keydown", handleSearch);
+    window.removeEventListener("keydown", handleKeyBoardSearchNavigation);
 }

@@ -65,7 +65,7 @@ public class CourtList
             }
         }
 
-        return casefiles;
+        return casefiles.Take(amount).ToList();
     }
 
     public void UpdateCasefiles(List<CasefileModel> updatedCasefiles)

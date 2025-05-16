@@ -28,7 +28,8 @@ else
     <CascadingValue Value="this">
         <div class="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] pt-2">
             @* Defendant column *@
-            <div id="defendant-container" class="row-span-2 overflow-auto max-h-full flex flex-col mr-2 h-full border-r px-2 border-black">
+            <div id="defendant-container"
+                 class="row-span-2 overflow-auto max-h-full flex flex-col mr-2 h-full border-r px-2 border-black">
                 <div>
                     <button @onclick="ToggleMenuCollapse" class="float-right text-sm my-auto hover:bg-slate-200 p-1">
                         @if (_menuCollapsed)
@@ -44,9 +45,7 @@ else
 
                 @if (!_menuCollapsed)
                 {
-                    @* <div class="mt-2"> *@
-                        <DefendantList CourtSittings="AppState.CourtSittings" />
-                    @* </div> *@
+                    <DefendantList CourtSittings="AppState.CourtSittings" />
                 }
             </div>
 
@@ -132,7 +131,7 @@ else
     </CascadingValue>
 }
 
-<dialog @ref="_unsavedChangesDialog" class="p-5">
+<dialog @ref="UnsavedChangesDialog" class="p-5">
     <h3 class="text-lg pb-2">You have unsaved changes. Do you want to save them before returning home?</h3>
     <div class="flex w-full justify-center gap-3">
         <RadzenButton Text="Yes" Click="SaveChanges" />
@@ -141,67 +140,60 @@ else
     </div>
 </dialog>
 
-<dialog @ref="_addCasefilesDialog" class="p-5">
+<dialog @ref="AddCasefilesDialog" class="p-5">
     @if (_loadingNewCasefiles)
     {
-        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
-    }
-    else
-    {
-        <h3 class="text-lg text-center pb-2">
-            Enter the case file numbers you want to add, separated by a space or new line
-        </h3>
-        <div class="w-full pb-4">
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false/>
+        }
+        else
+        {
+            <h3 class="text-lg text-center pb-2">
+                Enter the case file numbers you want to add, separated by a space or new line
+            </h3>
+            <div class="w-full pb-4">
             <textarea @bind="@CasefilesToAdd" rows="10"
                       class="w-full p-2 border border-slate-500 rounded-md resize-none" />
-        </div>
-        <div class="flex w-full justify-end gap-3 pb-2">
-            <RadzenButton Text="Add" Click="AddCasefiles" />
-            <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCasefilesDialog" />
-        </div>
+            </div>
+            <div class="flex w-full justify-end gap-3 pb-2">
+                <RadzenButton Text="Add" Click="AddCasefiles" />
+                <RadzenButton Text="Close" ButtonType="ButtonType.Reset" Click="CloseAddCasefilesDialog" />
+            </div>
 
-        @if (_addCasefilesError is not null)
-        {
-            <p class="text-red-500 text-center text-lg">@_addCasefilesError</p>
+            @if (_addCasefilesError is not null)
+            {
+                <p class="text-red-500 text-center text-lg">@_addCasefilesError</p>
+            }
         }
-    }
 </dialog>
 
-<dialog @ref="_searchDialog" id="search-dialog" class="p-2 border border-gunmetal w-[400px]">
+<dialog @ref="SearchDialog" id="search-dialog" class="p-2 border border-gunmetal w-[400px] absolute top-[15%] max-h-[70%] mx-auto">
     <h1 class="text-lg font-semibold">Search by Case file or Court file number</h1>
     <input id="search-field" class="border border-gunmetal w-full p-1" @oninput="SearchCasefiles" />
     <ul>
         @foreach (var result in SearchResults)
         {
-            <li class="border-b border-gunmetal" @onclick="@(() => SelectSearchResult(result.Casefile))">
-                <p class="font-semibold text-center">@result.Casefile.Defendant.FullName</p>
-                @if (result.Casefile.CasefileNumber.ToLower().Contains(result.SearchQuery))
-                {
-                    <div class="flex justify-around">
-                        <span class="font-bold">@result.Casefile.CasefileNumber</span>
-                        @if (result.Casefile.CourtFileNumber is not null)
-                        {
-                            <span>@result.Casefile.CourtFileNumber</span>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <p class="font-bold">@result.Casefile.CourtFileNumber</p>
-                    <p>@result.Casefile.CasefileNumber</p>
-                }
+            <li class="border-b border-gunmetal @(IsSelected(result) ? "bg-blue-400 text-white" : "")"
+                @onclick="@(() => SelectSearchResult(result.Casefile))">
+                <p class="text-center">@result.Casefile.Defendant.FullName</p>
+                <div class="flex justify-around">
+                    <span>@result.Casefile.CasefileNumber</span>
+                    @if (result.Casefile.CourtFileNumber is not null)
+                    {
+                        <span>@result.Casefile.CourtFileNumber</span>
+                    }
+                </div>
             </li>
         }
     </ul>
 </dialog>
 
 @code {
-    private bool _menuCollapsed = false;
+    private bool _menuCollapsed;
 
-    private MarkupString GenerateCasefileTooltipText(Casefile casefile)
+    private static MarkupString GenerateCasefileTooltipText(Casefile casefile)
     {
         var markup = new StringBuilder();
-        int maxDisplayCharges = 4;
+        const int maxDisplayCharges = 4;
 
         if (casefile.Charges.Count > maxDisplayCharges)
         {
@@ -227,4 +219,5 @@ else
     {
         _menuCollapsed = !_menuCollapsed;
     }
+
 }

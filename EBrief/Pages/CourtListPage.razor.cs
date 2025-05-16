@@ -5,27 +5,29 @@ using EBrief.Shared.Models.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
-using Radzen;
 using EBrief.Shared.Models.Shared;
 using EBrief.Shared.Services.Search;
 
 namespace EBrief.Pages;
+
 public partial class CourtListPage : ICourtListPage, IDisposable
 {
-    [Inject] public IDataAccessFactory DataAccessFactory { get; set; } = default!;
-    [Inject] public IFileServiceFactory FileServiceFactory { get; set; } = default!;
-    [Inject] public AppState AppState { get; set; } = default!;
-    [Inject] public HttpService HttpService { get; set; } = default!;
-    public SearchService SearchService { get; set; } = default!;
-    private CourtList CourtList { get; set; } = default!;
+    [Inject] public IDataAccessFactory DataAccessFactory { get; set; } = null!;
+    [Inject] public IFileServiceFactory FileServiceFactory { get; set; } = null!;
+    [Inject] public AppState AppState { get; set; } = null!;
+    [Inject] public HttpService HttpService { get; set; } = null!;
+    public SearchService SearchService { get; set; } = null!;
+    private CourtList CourtList { get; set; } = null!;
     private CourtCode CourtCode { get; set; } = default!;
     private DateTime CourtDate { get; set; } = default!;
-    private int CourtRoom { get; set; } = default!;
+    private int CourtRoom { get; set; } = 0!;
     private bool IncludeDocuments { get; set; }
     private List<SearchResult> SearchResults { get; set; } = [];
-    private ElementReference? _unsavedChangesDialog { get; set; }
-    private ElementReference? _addCasefilesDialog { get; set; }
-    private ElementReference? _searchDialog { get; set; }
+    private SearchResult? SelectedSearchResult { get; set; }
+    private int SearchResultIndex { get; set; } = -1;
+    private ElementReference? UnsavedChangesDialog { get; set; }
+    private ElementReference? AddCasefilesDialog { get; set; }
+    private ElementReference? SearchDialog { get; set; }
     private string CasefilesToAdd { get; set; } = string.Empty;
     public Defendant? ActiveDefendant { get; set; }
     public event Func<Task>? OnDefendantChanged;
@@ -111,7 +113,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         foreach (var defendant in CourtList.Defendants)
         {
             var hearingTime = defendant.Casefiles.First().Schedule.Last().HearingDate;
-            var courtSitting = courtSittings.FirstOrDefault(sittings => sittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
+            var courtSitting =
+                courtSittings.FirstOrDefault(sittings => sittings.SittingTime.TimeOfDay == hearingTime.TimeOfDay);
             courtSitting?.Defendants.Add(defendant);
         }
 
@@ -123,24 +126,25 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task OpenAddCasefilesDialog()
     {
-        if (_addCasefilesDialog is not null)
+        if (AddCasefilesDialog is not null)
         {
             _error = null;
-            await JSRuntime.InvokeAsync<string>("openDialog", _addCasefilesDialog);
+            await JSRuntime.InvokeAsync<string>("openDialog", AddCasefilesDialog);
         }
     }
 
     private async Task CloseAddCasefilesDialog()
     {
         CasefilesToAdd = string.Empty;
-        await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
+        await JSRuntime.InvokeVoidAsync("closeDialog", AddCasefilesDialog);
     }
 
     private async Task AddCasefiles()
     {
         _loadingNewCasefiles = true;
         var casefileNumbers = CasefilesToAdd.Split(' ', '\n').Where(e => !string.IsNullOrWhiteSpace(e));
-        var newCasefileNumbers = casefileNumbers.Except(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber)).ToList();
+        var newCasefileNumbers =
+            casefileNumbers.Except(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber)).ToList();
 
         if (newCasefileNumbers.Count == 0)
         {
@@ -165,7 +169,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
             CasefilesToAdd = string.Empty;
 
-            await JSRuntime.InvokeVoidAsync("closeDialog", _addCasefilesDialog);
+            await JSRuntime.InvokeVoidAsync("closeDialog", AddCasefilesDialog);
 
             _loadingNewCasefiles = false;
         }
@@ -179,21 +183,31 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async void UpdateCourtSittings(IEnumerable<Defendant> defendants)
     {
-        foreach (var defendant in defendants)
+        try
         {
-            var courtSession = AppState.CourtSittings.FirstOrDefault(cs => cs.SittingTime == defendant.Casefiles.First().Schedule.Last().HearingDate);
-            if (courtSession is null)
+            foreach (var defendant in defendants)
             {
-                courtSession = new AdditionsListCourtSitting(AppState.CourtSittings.Count, defendant.Casefiles.First().Schedule.Last().HearingDate, CourtCode, CourtRoom);
+                var courtSession = AppState.CourtSittings.FirstOrDefault(cs =>
+                    cs.SittingTime == defendant.Casefiles.First().Schedule.Last().HearingDate);
+                if (courtSession is null)
+                {
+                    courtSession = new AdditionsListCourtSitting(AppState.CourtSittings.Count,
+                        defendant.Casefiles.First().Schedule.Last().HearingDate, CourtCode, CourtRoom);
+                }
+
+                courtSession.Defendants.Add(defendant);
+                AppState.AddCourtSitting(courtSession);
+
+                var dataAccess = DataAccessFactory.Create();
+                await dataAccess.UpdateCourtSittings(AppState.CourtSittings,
+                    new CourtListEntry(CourtCode, CourtDate, CourtRoom));
+
+                OnCourtSessionAdded?.Invoke(courtSession);
             }
-
-            courtSession.Defendants.Add(defendant);
-            AppState.AddCourtSitting(courtSession);
-
-            var dataAccess = DataAccessFactory.Create();
-            await dataAccess.UpdateCourtSittings(AppState.CourtSittings, new CourtListEntry(CourtCode, CourtDate, CourtRoom));
-
-            OnCourtSessionAdded?.Invoke(courtSession);
+        }
+        catch (Exception e)
+        {
+            _error = e.Message;
         }
     }
 
@@ -201,7 +215,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     {
         if (UnsavedChanges())
         {
-            await JSRuntime.InvokeVoidAsync("openDialog", _unsavedChangesDialog);
+            await JSRuntime.InvokeVoidAsync("openDialog", UnsavedChangesDialog);
         }
         else
         {
@@ -225,7 +239,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
 
     private async Task CloseUnsavedChangesDialog()
     {
-        await JSRuntime.InvokeVoidAsync("closeDialog", _unsavedChangesDialog);
+        await JSRuntime.InvokeVoidAsync("closeDialog", UnsavedChangesDialog);
     }
 
     public void ActivateDefendant(Defendant defendant)
@@ -246,6 +260,7 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         {
             ActiveDefendant.ActiveCasefile = casefile;
         }
+
         ActivateDefendant(ActiveDefendant!);
     }
 
@@ -254,32 +269,98 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         if (e.Value is not null)
         {
             SearchResults = SearchService.Find((string)e.Value);
+            SelectedSearchResult = SearchResults.FirstOrDefault();
         }
     }
 
     [JSInvokable]
     public async void OpenSearchDialog()
     {
-        var casefiles = CourtList.GetCasefiles(10);
-        SearchResults = casefiles.Select(cf => new SearchResult(cf, "")).ToList();
-        await JSRuntime.InvokeVoidAsync("openDialog", _searchDialog);
+        try
+        {
+            var casefiles = CourtList.GetCasefiles(10);
+            SearchResults = casefiles.Select(cf => new SearchResult(cf, "")).ToList();
+            SelectedSearchResult = SearchResults.FirstOrDefault();
+            SearchResultIndex = 0;
+            
+            await JSRuntime.InvokeVoidAsync("openDialog", SearchDialog);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _error = "Failed to load search window";
+        }
+    }
+
+    [JSInvokable]
+    public void SelectNextSearchResult()
+    {
+        if (SelectedSearchResult is null && SearchResults.Count > 0)
+        {
+            SelectedSearchResult = SearchResults.First();
+            return;
+        }
+
+        if (SearchResultIndex >= SearchResults.Count - 1)
+        {
+            SelectedSearchResult = SearchResults[0];
+            SearchResultIndex = 0;
+        }
+        else
+        {
+            SearchResultIndex++;
+            SelectedSearchResult = SearchResults[SearchResultIndex];
+        }
+
         StateHasChanged();
     }
 
     [JSInvokable]
-    public void ClearSearchDialog()
+    public void SelectPreviousSearchResult()
     {
+        if (SelectedSearchResult is null && SearchResults.Count > 0)
+        {
+            SelectedSearchResult = SearchResults.Last();
+            return;
+        }
+
+        if (SearchResultIndex <= 0)
+        {
+            SelectedSearchResult = SearchResults[^1];
+            SearchResultIndex = SearchResults.Count - 1;
+        }
+        else
+        {
+            SearchResultIndex--;
+            SelectedSearchResult = SearchResults[SearchResultIndex];
+        }
+
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void ClearSearchResults()
+    {
+        
         SearchResults.Clear();
     }
 
     private async Task CloseSearchDialog()
     {
-        await JSRuntime.InvokeVoidAsync("closeDialog", _searchDialog);
+        SelectedSearchResult = null;
+        SearchResultIndex = 0;
+        ClearSearchResults();
+        await JSRuntime.InvokeVoidAsync("clearSearchText");
+        await JSRuntime.InvokeVoidAsync("closeDialog", SearchDialog);
     }
 
     public bool IsSelected(Defendant defendant) => ActiveDefendant?.Id == defendant.Id;
 
-    private bool IsSelected(Casefile casefile) => ActiveDefendant?.ActiveCasefile?.CasefileNumber == casefile.CasefileNumber;
+    private bool IsSelected(Casefile casefile) =>
+        ActiveDefendant?.ActiveCasefile?.CasefileNumber == casefile.CasefileNumber;
+
+    private bool IsSelected(SearchResult result) =>
+        result.Casefile.CasefileNumber == SelectedSearchResult?.Casefile.CasefileNumber;
 
     private void SaveCourtList()
     {
@@ -321,7 +402,8 @@ public partial class CourtListPage : ICourtListPage, IDisposable
     {
         try
         {
-            var updatedCasefiles = await HttpService.RefreshData(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber));
+            var updatedCasefiles =
+                await HttpService.RefreshData(CourtList.GetCasefiles().Select(cf => cf.CasefileNumber));
             var dataAccess = DataAccessFactory.Create();
             await dataAccess.UpdateCasefiles(updatedCasefiles);
             CourtList.UpdateCasefiles(updatedCasefiles);
@@ -330,7 +412,6 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         catch (Exception e)
         {
             _error = e.Message;
-            return;
         }
     }
 
@@ -345,5 +426,20 @@ public partial class CourtListPage : ICourtListPage, IDisposable
         ActiveDefendant.ActiveCasefile = casefile;
 
         await CloseSearchDialog();
+    }
+
+    [JSInvokable]
+    public async Task SelectSearchResult()
+    {
+        if (SelectedSearchResult is null)
+        {
+            return;
+        }
+
+        ActiveDefendant = SelectedSearchResult.Casefile.Defendant;
+        ActiveDefendant.ActiveCasefile = SelectedSearchResult.Casefile;
+
+        await CloseSearchDialog();
+        StateHasChanged();
     }
 }
