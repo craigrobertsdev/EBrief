@@ -56,20 +56,20 @@
     [CascadingParameter] public ICourtListPage Parent { get; set; } = default!;
     [Parameter] public List<CourtSitting> CourtSittings { get; set; } = [];
 
-    private Dictionary<int, bool> _courtSessionVisibility { get; set; } = [];
-    private string IsSelected = "bg-blue text-primary hover:bg-blue font-semibold";
-    private string NotSelected = "hover:bg-slate-300";
+    private Dictionary<int, bool> CourtSessionVisibility { get; set; } = [];
+    private const string IsSelected = "bg-blue text-primary hover:bg-blue font-semibold";
+    private const string NotSelected = "hover:bg-slate-300";
 
     protected override void OnInitialized()
     {
-        CourtSittings.ForEach(cs => _courtSessionVisibility.Add(cs.Id, true));
+        CourtSittings.ForEach(cs => CourtSessionVisibility.Add(cs.Id, true));
         Parent.OnCourtSessionAdded += CourtSessionAdded;
     }
 
     private async Task ToggleCourtSitting(CourtSitting courtSitting, int id)
     {
-        _courtSessionVisibility[courtSitting.Id] = !_courtSessionVisibility[courtSitting.Id];
-        if (_courtSessionVisibility[courtSitting.Id])
+        CourtSessionVisibility[courtSitting.Id] = !CourtSessionVisibility[courtSitting.Id];
+        if (CourtSessionVisibility[courtSitting.Id])
         {
             await JSRuntime.InvokeVoidAsync("scrollToBottomOfCourtSitting", $"court-sitting-{courtSitting.Id}");
         }
@@ -77,14 +77,14 @@
 
     private bool IsVisible(CourtSitting courtSitting)
     {
-        return _courtSessionVisibility[courtSitting.Id];
+        return CourtSessionVisibility[courtSitting.Id];
     }
 
     private void CourtSessionAdded(CourtSitting session)
     {
-        if (!_courtSessionVisibility.ContainsKey(session.Id))
+        if (!CourtSessionVisibility.ContainsKey(session.Id))
         {
-            _courtSessionVisibility.Add(session.Id, true);
+            CourtSessionVisibility.Add(session.Id, true);
         }
     }
 }

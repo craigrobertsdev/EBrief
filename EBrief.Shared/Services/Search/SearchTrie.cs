@@ -3,7 +3,7 @@
 namespace EBrief.Shared.Services.Search;
 public class SearchTrie
 {
-    public TrieNode Root { get; private set; } = new();
+    private TrieNode Root { get; } = new();
 
     public class TrieNode
     {
@@ -50,7 +50,7 @@ public class SearchTrie
     {
         List<Casefile> results = [];
 
-        TrieNode? current = Search(key);
+        var current = Search(key);
         if (current is null) // key not found, return empty set
         {
             return results;
@@ -61,7 +61,7 @@ public class SearchTrie
         }
         else // build list of child nodes that branch off the endpoint of key and return them
         {
-            int maxResults = 10;
+            const int maxResults = 10;
             results = FindWords(current, key, results, maxResults);
         }
 
@@ -70,10 +70,10 @@ public class SearchTrie
 
     private TrieNode? Search(string key)
     {
-        TrieNode current = Root;
-        for (int i = 0; i < key.Length; i++)
+        var current = Root;
+        foreach (var k in key)
         {
-            if (current.Children.TryGetValue(key[i], out var node))
+            if (current.Children.TryGetValue(k, out var node))
             {
                 current = node;
             }

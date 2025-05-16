@@ -4,7 +4,7 @@ namespace EBrief.Shared.Services.Search;
 
 public class SearchService
 {
-    public SearchTrie SearchTrie { get; private set; }
+    private SearchTrie SearchTrie { get; }
     private readonly Casefile[] _casefiles;
 
     public SearchService(CourtList courtList)
