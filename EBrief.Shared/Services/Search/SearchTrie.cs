@@ -24,6 +24,11 @@ public class SearchTrie
             if (current.Children.TryGetValue(key[i], out var node))
             {
                 current = node;
+
+                if (i == key.Length - 1 && current.HasValue)
+                {
+                    throw new InvalidOperationException();
+                }
             }
             else
             {
@@ -118,9 +123,4 @@ public class SearchTrie
         // this needs to be implemented when the ability to delete case files from the court list is implemented
         throw new NotImplementedException();
     }
-
-}
-
-public interface ITrieNodeValue
-{
 }

@@ -123,7 +123,8 @@ public class CourtListParser
             FirstName = defendantName[1].Split(" ")[0].Trim(),
             MiddleName = defendantName[1].Split(" ")[1..]
                 .Select(n => n.Trim())
-                .Aggregate((a, b) => $"{a} {b}"),
+                .Aggregate((a, b) => $"{a} {b}")
+                .Trim(),
             LastName = defendantName[0].Trim()
         };
 

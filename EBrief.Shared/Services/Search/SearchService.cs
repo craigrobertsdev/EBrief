@@ -34,7 +34,8 @@ public class SearchService
 
             key = key.ToUpper();
             if (casefile.CasefileNumber.Contains(key) ||
-                (casefile.CourtFileNumber is not null && casefile.CourtFileNumber!.Contains(key)))
+                (casefile.CourtFileNumber is not null && casefile.CourtFileNumber!.Contains(key))
+                 || casefile.Defendant.FullName.Contains(key, StringComparison.OrdinalIgnoreCase))
             {
                 results.Add(new(SearchTrie.Find(casefile.CasefileNumber), key));
             }
@@ -45,7 +46,7 @@ public class SearchService
         return results;
     }
 
-    private static SearchTrie BuildTrie(CourtList courtList) 
+    private static SearchTrie BuildTrie(CourtList courtList)
     {
         SearchTrie trie = new();
         var casefiles = courtList.GetCasefiles();
@@ -58,6 +59,21 @@ public class SearchService
                 trie.Insert(cf.CourtFileNumber.ToUpper(), cf);
             }
         }
+
+        var defendants = courtList.Defendants;
+        foreach (var defendant in defendants)
+        {
+            var fullName = $"{defendant.FirstName} {defendant.MiddleName ?? ""} {defendant.LastName}".ToUpper();
+            try
+            {
+                trie.Insert(fullName, defendant.Casefiles.First());
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
         return trie;
     }
 }
