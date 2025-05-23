@@ -38,7 +38,7 @@ public class CasefileModel
         return new Casefile
         {
             CasefileNumber = CasefileNumber,
-            Defendant = Defendant.ToUIModel(),
+            Defendant = Defendant.ToUiModel(),
             CourtFileNumber = CourtFileNumber,
             Schedule = Schedule.Select(hearing => hearing.ToUIModel()).ToList(),
             Cfel = CfelEntries.Select(cfel => cfel.ToUIModel()).ToList(),

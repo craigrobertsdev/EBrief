@@ -4,6 +4,7 @@ using EBrief.Shared.Models.Data;
 using EBrief.Shared.Models.Shared;
 
 namespace EBrief.Shared.Services;
+
 public class CourtListParser
 {
     bool _endOfCourtRoom = false;
@@ -11,7 +12,8 @@ public class CourtListParser
     int pos = 0;
 
     /*********DELETE THIS IN PROD*********/
-    record ParsedDefendant(string First, string Last, Guid Id);
+    record ParsedDefendant(string First, string Middle, string Last, Guid Id);
+
     List<ParsedDefendant> defendantNames = [];
     Guid currentId = Guid.NewGuid();
     /*************************************/
@@ -66,13 +68,13 @@ public class CourtListParser
 
         while (!_endOfCourtRoom && pos < hearingEntries.ChildElements.Count)
         {
-            ParseNext(courtList, hearingEntries.ChildElements);
+            ParseNextEntry(courtList, hearingEntries.ChildElements);
         }
 
         return courtList;
     }
 
-    private void ParseNext(CourtListModel courtList, OpenXmlElementList childElements)
+    private void ParseNextEntry(CourtListModel courtList, OpenXmlElementList childElements)
     {
         var row = childElements[pos];
 
@@ -81,7 +83,7 @@ public class CourtListParser
             pos++;
             return;
         }
-        
+
         if (row.InnerText.StartsWith("COURT"))
         {
             _endOfCourtRoom = IsNewCourtRoom(row, courtList.CourtRoom);
@@ -89,6 +91,7 @@ public class CourtListParser
             {
                 pos += 2; // skips the column header line immediately following the court session header
             }
+
             return;
         }
 
@@ -113,24 +116,30 @@ public class CourtListParser
             casefile.ListingType = ids.ListingType;
         }
 
-        //elements[4] = "SURNAME, FirstName"
+        //elements[4] = "SURNAME, FirstName MiddleNames"
         var defendantName = elements[4].InnerText.Split(", ");
         casefile.Defendant = new DefendantModel
         {
-            FirstName = defendantName[1].Trim(),
+            FirstName = defendantName[1].Split(" ")[0].Trim(),
+            MiddleName = defendantName[1].Split(" ")[1..]
+                .Select(n => n.Trim())
+                .Aggregate((a, b) => $"{a} {b}"),
             LastName = defendantName[0].Trim()
         };
 
         /*********DELETE THIS IN PROD*********/
         var defendant = defendantNames.LastOrDefault();
-        if (defendant is not null && defendant.First == casefile.Defendant.FirstName && defendant.Last == casefile.Defendant.LastName)
+        if (defendant is not null 
+            && defendant.First == casefile.Defendant.FirstName 
+            && defendant.Middle == casefile.Defendant.MiddleName
+            && defendant.Last == casefile.Defendant.LastName)
         {
             casefile.Defendant.Id = defendant.Id;
         }
         else
         {
             casefile.Defendant.Id = currentId;
-            defendantNames.Add(new(casefile.Defendant.FirstName, casefile.Defendant.LastName, currentId));
+            defendantNames.Add(new(casefile.Defendant.FirstName, casefile.Defendant.MiddleName, casefile.Defendant.LastName, currentId));
             currentId = Guid.NewGuid();
         }
         /*************************************/

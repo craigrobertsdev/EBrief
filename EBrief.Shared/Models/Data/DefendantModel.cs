@@ -8,6 +8,7 @@ public class DefendantModel
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
+    public string? MiddleName { get; set; }
     public string LastName { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }
     public string? Address { get; set; }
@@ -18,12 +19,13 @@ public class DefendantModel
     public List<BailAgreementModel> BailAgreements { get; set; } = [];
     public List<InterventionOrderModel> InterventionOrders { get; set; } = [];
     public string? OffenderHistory { get; set; }
-    public Defendant ToUIModel()
+    public Defendant ToUiModel()
     {
         return new Defendant
         {
             Id = Id,
             FirstName = FirstName,
+            MiddleName = MiddleName,
             LastName = LastName,
             DateOfBirth = DateOfBirth,
             Address = Address,
@@ -41,8 +43,8 @@ public class DefendantModel
 
 public static class DefendantModelExtensions
 {
-    public static List<Defendant> ToUIModels(this IEnumerable<DefendantModel> models)
+    public static List<Defendant> ToUiModels(this IEnumerable<DefendantModel> models)
     {
-        return models.Select(model => model.ToUIModel()).ToList();
+        return models.Select(model => model.ToUiModel()).ToList();
     }
 }

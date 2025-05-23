@@ -7,8 +7,9 @@ public class Defendant
     public int ListStart { get; set; }
     public int ListEnd { get; set; }
     public string FirstName { get; set; } = string.Empty;
+    public string? MiddleName { get; set; }
     public string LastName { get; set; } = string.Empty;
-    public string FullName => $"{FirstName} {LastName}";
+    public string FullName => $"{FirstName} {MiddleName + " " ?? ""}{LastName}";
     public DateTime DateOfBirth { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }

@@ -41,8 +41,8 @@
                                 <span class="float-left pr-1">@(defendant.ListStart)-@(defendant.ListEnd).</span>
                             }
                             <p class="cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
-                               title="@(defendant.LastName.ToUpper()), @(defendant.FirstName)">
-                                @defendant.LastName.ToUpper(), @defendant.FirstName
+                               title="@(defendant.LastName.ToUpper()), @(defendant.FirstName) @(defendant.MiddleName)">
+                                @defendant.LastName.ToUpper(), @defendant.FirstName @defendant.MiddleName
                             </p>
                         </li>
                     }
